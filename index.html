@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Klíma Profik - Klíma Telepítés és Karbantartás</title>
+    <title>Klíma - Klíma Telepítés és Karbantartás</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,6 +36,12 @@
             font-weight: 900;
             font-size: 2.5rem; /* 40px */
         }
+        .text-shadow {
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+        }
+        .text-shadow-md {
+             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
         @media (min-width: 768px) {
             .section-title {
                 font-size: 3rem; /* 48px */
@@ -43,20 +49,20 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-100 text-gray-800">
 
     <!-- Navigáció -->
-    <header class="bg-gray-100/60 backdrop-blur-xl sticky top-0 z-50 shadow-md">
-        <div class="container mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
-                <a href="#" class="text-2xl font-bold text-cyan-700">Klíma siófok</a>
+    <header class="fixed top-0 left-0 right-0 z-50 p-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="bg-white/80 backdrop-blur-xl shadow-lg rounded-full px-4 sm:px-6 py-2 flex items-center justify-between">
+                <a href="#" class="text-2xl font-bold text-black-500 text-shadow-md">𖣘Klíma Siófok𖣘</a>
                 
                 <!-- Asztali nézet menü -->
-                <nav class="hidden md:flex items-center space-x-6">
-                    <a href="#szolgaltatasok" class="text-gray-600 hover:text-cyan-700 transition duration-300">Szolgáltatások</a>
-                    <a href="#rolunk" class="text-gray-600 hover:text-cyan-700 transition duration-300">Rólunk</a>
-                    <a href="#munkaink" class="text-gray-600 hover:text-cyan-700 transition duration-300">Munkáink</a>
-                    <a href="#kapcsolat" class="bg-cyan-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-cyan-700 transition duration-300 shadow-md">Időpontfoglalás</a>
+                <nav class="hidden md:flex items-center space-x-2">
+                    <a href="#szolgaltatasok" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Szolgáltatások</a>
+                    <a href="#rolunk" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Rólunk</a>
+                    <a href="#munkaink" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Munkáink</a>
+                    <a href="#kapcsolat" class="bg-cyan-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-cyan-700 transition duration-300 shadow-md text-shadow-md">Időpontfoglalás</a>
                 </nav>
 
                 <!-- Mobil nézet menü gomb -->
@@ -64,20 +70,20 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
             </div>
-        </div>
-        <!-- Mobil menü (alapból rejtett) -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white/90 backdrop-blur-lg">
-            <a href="#szolgaltatasok" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50">Szolgáltatások</a>
-            <a href="#rolunk" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50">Rólunk</a>
-            <a href="#munkaink" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50">Munkáink</a>
-            <a href="#kapcsolat" class="block text-center py-4 px-4 text-sm bg-cyan-600 text-white font-semibold hover:bg-cyan-700">Időpontfoglalás</a>
+            <!-- Mobil menü (alapból rejtett) -->
+            <div id="mobile-menu" class="hidden md:hidden bg-white/90 backdrop-blur-lg mt-2 rounded-2xl shadow-lg overflow-hidden">
+                <a href="#szolgaltatasok" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Szolgáltatások</a>
+                <a href="#rolunk" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Rólunk</a>
+                <a href="#munkaink" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Munkáink</a>
+                <a href="#kapcsolat" class="block text-center py-4 px-4 text-sm bg-cyan-600 text-white font-semibold hover:bg-cyan-700">Időpontfoglalás</a>
+            </div>
         </div>
     </header>
 
     <main>
         <!-- Hero Szekció -->
         <section class="hero-bg text-white">
-            <div class="hero-content container mx-auto px-6 py-24 md:py-32 text-center">
+            <div class="hero-content container mx-auto px-6 pt-32 pb-16 md:pt-40 md:pb-24 text-center">
                 <h1 class="text-4xl md:text-6xl font-black leading-tight mb-4">Professzionális Klíma Megoldások</h1>
                 <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-gray-200">Telepítés, karbantartás és javítás Siófok és környékén. Gondoskodjon otthona vagy irodája tökéletes hőmérsékletéről velünk!</p>
                 <a href="#kapcsolat" class="bg-yellow-400 text-gray-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition duration-300 shadow-xl inline-block">Ajánlatot Kérek</a>
@@ -85,7 +91,7 @@
         </section>
 
         <!-- Szolgáltatások Szekció -->
-        <section id="szolgaltatasok" class="py-20 bg-gray-100">
+        <section id="szolgaltatasok" class="py-20">
             <div class="container mx-auto px-6">
                 <h2 class="section-title text-center mb-12 text-cyan-800">Szolgáltatásaink</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -147,7 +153,7 @@
         </section>
 
         <!-- Aktuális Munkáink Szekció -->
-        <section id="munkaink" class="py-20 bg-gray-100">
+        <section id="munkaink" class="py-20">
             <div class="container mx-auto px-6">
                 <h2 class="section-title text-center mb-4 text-cyan-800">Aktuális Munkáink</h2>
                 <p class="text-center text-lg text-gray-600 mb-12 max-w-2xl mx-auto">Tekintse meg néhány nemrégiben befejezett projektünket. Büszkék vagyunk minden elvégzett munkánkra!</p>
@@ -184,7 +190,7 @@
     <!-- Lábléc -->
     <footer class="bg-gray-800 text-white py-10">
         <div class="container mx-auto px-6 text-center">
-            <p class="text-xl font-bold text-white mb-2">Klíma Profik</p>
+            <p class="text-xl font-bold text-white mb-2">Klíma Siófok</p>
             <p class="text-gray-400">&copy; 2025 Minden jog fenntartva.</p>
             <div class="mt-4">
                 <a href="#szolgaltatasok" class="text-gray-400 hover:text-white px-2">Szolgáltatások</a>
@@ -253,4 +259,3 @@
     </script>
 </body>
 </html>
-
