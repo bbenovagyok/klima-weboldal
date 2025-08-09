@@ -42,6 +42,20 @@
         .text-shadow-md {
              text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
+        
+        /* Görgetésre megjelenő animációk */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            transition-delay: var(--delay, 0ms);
+        }
+
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         @media (min-width: 768px) {
             .section-title {
                 font-size: 3rem; /* 48px */
@@ -55,7 +69,7 @@
     <header class="fixed top-0 left-0 right-0 z-50 p-4">
         <div class="max-w-6xl mx-auto">
             <div class="bg-white/80 backdrop-blur-xl shadow-lg rounded-full px-4 sm:px-6 py-2 flex items-center justify-between">
-                <a href="#" class="text-2xl font-bold text-black-500 text-shadow-md">𖣘Klíma Siófok𖣘</a>
+                <a href="#" class="text-2xl font-bold text-yellow-600 text-shadow-md">Klíma Siófok</a>
                 
                 <!-- Asztali nézet menü -->
                 <nav class="hidden md:flex items-center space-x-2">
@@ -84,19 +98,19 @@
         <!-- Hero Szekció -->
         <section class="hero-bg text-white">
             <div class="hero-content container mx-auto px-6 pt-32 pb-16 md:pt-40 md:pb-24 text-center">
-                <h1 class="text-4xl md:text-6xl font-black leading-tight mb-4">Professzionális Klíma Megoldások</h1>
-                <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-gray-200">Telepítés, karbantartás és javítás Siófok és környékén. Gondoskodjon otthona vagy irodája tökéletes hőmérsékletéről velünk!</p>
-                <a href="#kapcsolat" class="bg-yellow-400 text-gray-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition duration-300 shadow-xl inline-block">Ajánlatot Kérek</a>
+                <h1 class="text-4xl md:text-6xl font-black leading-tight mb-4 reveal-on-scroll">Professzionális Klíma Megoldások</h1>
+                <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-gray-200 reveal-on-scroll" style="--delay: 200ms;">Telepítés, karbantartás és javítás Siófok és környékén. Gondoskodjon otthona vagy irodája tökéletes hőmérsékletéről velünk!</p>
+                <a href="#kapcsolat" class="bg-yellow-400 text-gray-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition duration-300 shadow-xl inline-block reveal-on-scroll" style="--delay: 400ms;">Ajánlatot Kérek</a>
             </div>
         </section>
 
         <!-- Szolgáltatások Szekció -->
         <section id="szolgaltatasok" class="py-20">
             <div class="container mx-auto px-6">
-                <h2 class="section-title text-center mb-12 text-cyan-800">Szolgáltatásaink</h2>
+                <h2 class="section-title text-center mb-12 text-cyan-800 reveal-on-scroll">Szolgáltatásaink</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <!-- Szolgáltatás kártya 1: Telepítés -->
-                    <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200">
+                    <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200 reveal-on-scroll">
                         <div class="bg-cyan-100 text-cyan-700 rounded-full w-16 h-16 flex items-center justify-center mb-6">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
                         </div>
@@ -104,7 +118,7 @@
                         <p class="text-gray-600">Modern, energiahatékony klímaberendezések szakszerű telepítése, az Ön igényeire szabva.</p>
                     </div>
                     <!-- Szolgáltatás kártya 2: Karbantartás -->
-                    <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200">
+                    <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200 reveal-on-scroll" style="--delay: 150ms;">
                         <div class="bg-cyan-100 text-cyan-700 rounded-full w-16 h-16 flex items-center justify-center mb-6">
                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
                         </div>
@@ -112,7 +126,7 @@
                         <p class="text-gray-600">Előzze meg a gombásodást és a meghibásodást! A rendszeres tisztítás elengedhetetlen az egészséges levegőért.</p>
                     </div>
                     <!-- Szolgáltatás kártya 3: Javítás -->
-                    <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200">
+                    <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200 reveal-on-scroll" style="--delay: 300ms;">
                          <div class="bg-cyan-100 text-cyan-700 rounded-full w-16 h-16 flex items-center justify-center mb-6">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
                         </div>
@@ -124,13 +138,13 @@
         </section>
 
         <!-- Rólunk Szekció -->
-        <section id="rolunk" class="py-20 bg-cyan-700 text-white">
+        <section id="rolunk" class="py-20 bg-cyan-700 text-white overflow-hidden">
             <div class="container mx-auto px-6">
                 <div class="flex flex-col md:flex-row items-center gap-12">
-                    <div class="md:w-1/2">
+                    <div class="md:w-1/2 reveal-on-scroll">
                         <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop" alt="Barátságos klímaszerelő csapat" class="rounded-2xl shadow-2xl w-full">
                     </div>
-                    <div class="md:w-1/2">
+                    <div class="md:w-1/2 reveal-on-scroll" style="--delay: 200ms;">
                         <h2 class="section-title mb-6 text-white">Miért válasszon minket?</h2>
                         <p class="text-lg mb-4 text-cyan-100">Több éves szakmai tapasztalattal a hátunk mögött elkötelezettek vagyunk a minőségi és megbízható munkavégzés mellett. Célunk, hogy ügyfeleink 100%-ig elégedettek legyenek.</p>
                         <ul class="space-y-3">
@@ -155,8 +169,8 @@
         <!-- Aktuális Munkáink Szekció -->
         <section id="munkaink" class="py-20">
             <div class="container mx-auto px-6">
-                <h2 class="section-title text-center mb-4 text-cyan-800">Aktuális Munkáink</h2>
-                <p class="text-center text-lg text-gray-600 mb-12 max-w-2xl mx-auto">Tekintse meg néhány nemrégiben befejezett projektünket. Büszkék vagyunk minden elvégzett munkánkra!</p>
+                <h2 class="section-title text-center mb-4 text-cyan-800 reveal-on-scroll">Aktuális Munkáink</h2>
+                <p class="text-center text-lg text-gray-600 mb-12 max-w-2xl mx-auto reveal-on-scroll" style="--delay: 150ms;">Tekintse meg néhány nemrégiben befejezett projektünket. Büszkék vagyunk minden elvégzett munkánkra!</p>
                 
                 <!-- A galéria képei dinamikusan fognak betöltődni ide -->
                 <div id="gallery-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -169,9 +183,9 @@
         <!-- Kapcsolat / Időpontfoglalás Szekció -->
         <section id="kapcsolat" class="py-20 bg-cyan-700 text-white">
             <div class="container mx-auto px-6 text-center">
-                <h2 class="text-4xl font-black mb-4">Készen áll a tökéletes klímára?</h2>
-                <p class="text-xl mb-8 text-cyan-100">Hívjon minket bizalommal időpontért vagy egyedi ajánlatért!</p>
-                <div class="inline-block bg-white/90 text-cyan-800 rounded-xl p-8 shadow-2xl">
+                <h2 class="text-4xl font-black mb-4 reveal-on-scroll">Készen áll a tökéletes klímára?</h2>
+                <p class="text-xl mb-8 text-cyan-100 reveal-on-scroll" style="--delay: 150ms;">Hívjon minket bizalommal időpontért vagy egyedi ajánlatért!</p>
+                <div class="inline-block bg-white/90 text-cyan-800 rounded-xl p-8 shadow-2xl reveal-on-scroll" style="--delay: 300ms;">
                     <p class="text-lg mb-2">Időpontegyeztetés telefonon:</p>
                     <a href="tel:+36709304841" class="text-4xl font-bold hover:text-cyan-600 transition-colors duration-300 flex items-center justify-center gap-3">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.518.759a1.156 1.156 0 00-.43 1.659l4.592 4.592a1.156 1.156 0 001.659-.43l.759-1.518a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" /></svg>
@@ -179,7 +193,7 @@
                     </a>
                     <p class="mt-4 text-sm text-gray-600">Hívható hétköznap 8:00 és 18:00 között.</p>
                 </div>
-                 <div class="mt-6">
+                 <div class="mt-6 reveal-on-scroll" style="--delay: 400ms;">
                     <p class="text-cyan-200">Vagy írjon nekünk e-mailt:</p>
                     <a href="mailto:sandor.szanto@gmail.com" class="text-cyan-100 hover:text-white font-semibold transition-colors duration-300">sandor.szanto@gmail.com</a>
                 </div>
@@ -234,9 +248,9 @@
                 .then(data => {
                     galleryContainer.innerHTML = ''; // Töröljük a "betöltés" üzenetet
                     if (data.images && data.images.length > 0) {
-                        data.images.forEach(item => {
+                        data.images.forEach((item, index) => {
                             const card = `
-                                <div class="group relative overflow-hidden rounded-xl shadow-lg">
+                                <div class="group relative overflow-hidden rounded-xl shadow-lg reveal-on-scroll" style="--delay: ${index * 150}ms">
                                     <img src="${item.image}" alt="${item.title}" class="w-full h-72 object-cover group-hover:scale-110 transition-transform duration-500">
                                     <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300"></div>
                                     <div class="absolute bottom-0 left-0 p-4 text-white">
@@ -247,6 +261,8 @@
                             `;
                             galleryContainer.innerHTML += card;
                         });
+                        // Miután hozzáadtuk a kártyákat, újra inicializáljuk az animáció figyelőt
+                        initializeScrollAnimation();
                     } else {
                         galleryContainer.innerHTML = '<p class="text-center col-span-full">Jelenleg nincsenek képek a galériában.</p>';
                     }
@@ -256,6 +272,26 @@
                     galleryContainer.innerHTML = '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben. Kérjük, próbálja meg később.</p>';
                 });
         });
+        
+        // Görgetés figyelő animációhoz
+        function initializeScrollAnimation() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+
+            const elementsToAnimate = document.querySelectorAll('.reveal-on-scroll');
+            elementsToAnimate.forEach(el => observer.observe(el));
+        }
+
+        initializeScrollAnimation();
+
     </script>
 </body>
 </html>
