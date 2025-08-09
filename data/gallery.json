@@ -1,14 +1,19 @@
 {
   "images": [
     {
-      "image": "/img/uploads/pulse_duál_klíma.jpg",
-      "title": "legujabb munkám",
-      "description": "egy csúnya klíma volt"
+      "image": "/img/uploads/20230705_075721-1-.jpg",
+      "title": "Endoszkópos ellenőrzés",
+      "description": "Az endoszkópos kamera kijelzőjén látható a klíma belsejének nagyított felvétele."
     },
     {
-      "image": "/img/uploads/comfort-x-1-1-500x500.jpg",
-      "title": "dsfsa",
-      "description": "fsadf"
+      "image": "/img/uploads/20230718_093440.jpg",
+      "title": "Koszos klímaszűrő",
+      "description": "A klíma levegőszűrője vastagon fedve porral és szennyeződéssel."
+    },
+    {
+      "image": "/img/uploads/20230705_075801.jpg",
+      "title": "Szennyezett klímalamellák",
+      "description": "A klíma belső lamellái és ventilátor része poros, tisztításra szorul."
     }
   ]
 }
