@@ -33,10 +33,6 @@
             position: relative;
             z-index: 2;
         }
-        .section-title {
-            font-weight: 900;
-            font-size: 2.5rem; /* 40px */
-        }
         .text-shadow {
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
         }
@@ -93,13 +89,6 @@
 
         .header-scrolled #header-company-name {
             font-size: 1.125rem; /* text-lg */
-        }
-
-
-        @media (min-width: 768px) {
-            .section-title {
-                font-size: 3rem; /* 48px */
-            }
         }
     </style>
 </head>
@@ -198,8 +187,7 @@
                 <h2 class="text-4xl md:text-5xl font-black text-center mb-4 text-white reveal-on-scroll">Aktuális Munkáink</h2>
                 <p class="text-center text-lg text-cyan-100 mb-12 max-w-2xl mx-auto reveal-on-scroll" style="--delay: 150ms;">Minden klímánk mögött egy elégedett ügyfél áll!</p>
                 
-                <!-- A galéria képei dinamikusan fognak betöltődni ide -->
-                <div id="gallery-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div id="gallery-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     <!-- Betöltési jelzés -->
                     <p class="text-center col-span-full">Galéria betöltése...</p>
                 </div>
@@ -281,6 +269,18 @@
         </div>
     </div>
 
+    <!-- Lightbox (Képnézegető) -->
+    <div id="lightbox" class="fixed inset-0 z-[110] flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm hidden transition-opacity duration-300">
+        <div id="lightbox-content" class="relative max-w-4xl max-h-[90vh] w-full p-4">
+            <button id="close-lightbox" class="absolute -top-2 -right-2 md:top-0 md:-right-10 text-white text-5xl font-bold">&times;</button>
+            <img id="lightbox-image" src="" alt="" class="max-w-full max-h-[75vh] mx-auto rounded-lg shadow-2xl">
+            <div id="lightbox-caption" class="text-center text-white mt-4">
+                <h4 id="lightbox-title" class="text-xl font-bold"></h4>
+                <p id="lightbox-description" class="text-gray-300"></p>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Mobil menü kezelése
         const mobileMenuButton = document.getElementById('mobile-menu-button');
@@ -297,34 +297,62 @@
             });
         });
 
-        // Galéria dinamikus betöltése
+        // Galéria dinamikus betöltése és Lightbox
+        const galleryContainer = document.getElementById('gallery-container');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImage = document.getElementById('lightbox-image');
+        const lightboxTitle = document.getElementById('lightbox-title');
+        const lightboxDescription = document.getElementById('lightbox-description');
+        const closeLightboxButton = document.getElementById('close-lightbox');
+
+        function openLightbox(src, title, description) {
+            lightboxImage.src = src;
+            lightboxTitle.textContent = title;
+            lightboxDescription.textContent = description;
+            lightbox.classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            lightbox.classList.add('hidden');
+        }
+
+        galleryContainer.addEventListener('click', (e) => {
+            const galleryItem = e.target.closest('.gallery-item');
+            if (galleryItem) {
+                openLightbox(
+                    galleryItem.dataset.src,
+                    galleryItem.dataset.title,
+                    galleryItem.dataset.description
+                );
+            }
+        });
+
+        closeLightboxButton.addEventListener('click', closeLightbox);
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) {
+                closeLightbox();
+            }
+        });
+
         window.addEventListener('DOMContentLoaded', () => {
-            const galleryContainer = document.getElementById('gallery-container');
-            
             fetch('/data/gallery.json')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Hálózati hiba: ' + response.statusText);
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
                     galleryContainer.innerHTML = ''; // Töröljük a "betöltés" üzenetet
                     if (data.images && data.images.length > 0) {
                         data.images.forEach((item, index) => {
                             const card = `
-                                <div class="group relative overflow-hidden rounded-xl shadow-lg reveal-on-scroll" style="--delay: ${index * 150}ms">
-                                    <img src="${item.image}" alt="${item.title}" class="w-full h-72 object-cover group-hover:scale-110 transition-transform duration-500">
+                                <div class="gallery-item group relative aspect-square overflow-hidden rounded-lg shadow-lg cursor-pointer reveal-on-scroll" 
+                                     data-src="${item.image}" 
+                                     data-title="${item.title}" 
+                                     data-description="${item.description}"
+                                     style="--delay: ${index * 100}ms">
+                                    <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                                     <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300"></div>
-                                    <div class="absolute bottom-0 left-0 p-4 text-white">
-                                        <h4 class="font-bold text-lg">${item.title}</h4>
-                                        <p class="text-sm">${item.description}</p>
-                                    </div>
                                 </div>
                             `;
                             galleryContainer.innerHTML += card;
                         });
-                        // Miután hozzáadtuk a kártyákat, újra inicializáljuk az animáció figyelőt
                         initializeScrollAnimation();
                     } else {
                         galleryContainer.innerHTML = '<p class="text-center col-span-full">Jelenleg nincsenek képek a galériában.</p>';
@@ -332,7 +360,7 @@
                 })
                 .catch(error => {
                     console.error('Hiba a galéria betöltése közben:', error);
-                    galleryContainer.innerHTML = '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben. Kérjük, próbálja meg később.</p>';
+                    galleryContainer.innerHTML = '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben.</p>';
                 });
         });
         
