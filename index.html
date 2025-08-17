@@ -56,6 +56,45 @@
             transform: translateY(0);
         }
 
+        /* Fejléc animáció stílusai */
+        #header-container, #header-logo, #header-company-name, #main-nav, #mobile-menu-button {
+            transition: all 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+        
+        #header-container {
+            justify-content: space-between;
+        }
+
+        #main-header .max-w-6xl {
+            text-align: center;
+        }
+
+        .header-scrolled #main-nav,
+        .header-scrolled #mobile-menu-button {
+            opacity: 0;
+            max-width: 0;
+            padding: 0;
+            margin: 0;
+            flex-basis: 0;
+            overflow: hidden;
+        }
+        
+        .header-scrolled #header-container {
+            display: inline-flex;
+            justify-content: center;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        .header-scrolled #header-logo {
+            height: 1.75rem; /* 28px */
+        }
+
+        .header-scrolled #header-company-name {
+            font-size: 1.125rem; /* text-lg */
+        }
+
+
         @media (min-width: 768px) {
             .section-title {
                 font-size: 3rem; /* 48px */
@@ -66,16 +105,16 @@
 <body class="bg-gray-100 text-gray-800">
 
     <!-- Navigáció -->
-    <header class="fixed top-0 left-0 right-0 z-50 p-4">
+    <header id="main-header" class="fixed top-0 left-0 right-0 z-50 p-4">
         <div class="max-w-6xl mx-auto">
-            <div class="bg-white/80 backdrop-blur-xl shadow-lg rounded-full px-4 sm:px-6 py-2 flex items-center justify-between">
+            <div id="header-container" class="bg-white/80 backdrop-blur-xl shadow-lg rounded-full px-4 sm:px-6 py-2 flex items-center">
                 <a href="#" class="flex items-center">
-                    <img src="https://i.postimg.cc/xTYhg4gG/image.png" alt="Cég logó" class="h-8 mr-2 sm:mr-3">
-                    <span class="text-base sm:text-xl font-bold text-yellow-600 text-shadow-md">Eszes Tiszta Klíma Kft.</span>
+                    <img id="header-logo" src="https://i.postimg.cc/xTYhg4gG/image.png" alt="Cég logó" class="h-8 mr-2 sm:mr-3">
+                    <span id="header-company-name" class="text-base sm:text-xl font-bold text-yellow-600 text-shadow-md">Eszes Tiszta Klíma Kft.</span>
                 </a>
                 
                 <!-- Asztali nézet menü -->
-                <nav class="hidden md:flex items-center space-x-2">
+                <nav id="main-nav" class="hidden md:flex items-center space-x-2">
                     <a href="#szolgaltatasok" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Szolgáltatások</a>
                     <a href="#munkaink" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Munkáink</a>
                     <a href="#rolunk" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Rólunk</a>
@@ -147,7 +186,7 @@
         <section id="munkaink" class="py-20 bg-cyan-700 text-white overflow-hidden">
             <div class="container mx-auto px-6">
                 <h2 class="section-title text-center mb-4 text-white reveal-on-scroll">Aktuális Munkáink</h2>
-                <p class="text-center text-lg text-cyan-100 mb-12 max-w-2xl mx-auto reveal-on-scroll" style="--delay: 150ms;">Tekintse meg néhány nemrégiben befejezett projektünket. Büszkék vagyunk minden elvégzett munkánkra!</p>
+                <p class="text-center text-lg text-cyan-100 mb-12 max-w-2xl mx-auto reveal-on-scroll" style="--delay: 150ms;">Minden klímánk mögött egy elégedett ügyfél áll!</p>
                 
                 <!-- A galéria képei dinamikusan fognak betöltődni ide -->
                 <div id="gallery-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -167,14 +206,10 @@
                     <div class="md:w-1/2 reveal-on-scroll" style="--delay: 200ms;">
                         <h2 class="section-title mb-6 text-cyan-800">Rólunk</h2>
                         <div class="bg-white p-6 rounded-xl shadow-lg">
-                            <div class="space-y-3 text-gray-700 text-base md:text-lg leading-relaxed">
-                                <p>Az Eszes Tiszta Klíma Kft alapjában családi vállalkozás.</p>
-                                <p>A Tiszta klímákért elsősorban!</p>
-                                <p>Nagyon sok klíma tulajdonos nem gondol arra, hogy a klíma tisztítás, karbantartás milyen fontos!</p>
-                                <p>Nem csak, hogy a berendezés megbízhatóan és energiatakarékosan működjön, de a felhasználó pénztárcája és nem utolsó sorban egészsége ne károsodjon.</p>
-                                <p>Egyéni Vállalkozóként a fenti célokért kezdtem el a vállalkozást, de gyorsan az igény miatt bővíteni kellett a szolgáltatást és a létszámot.</p>
-                                <p>A fiaimmal közösen dolgozunk, igyekszünk pontosan megbízhatóan és tisztán dolgozni.</p>
-                                <p>Az elmúlt időben több ezer klíma karbantartáson és mosáson és több száz telepítésen vagyunk túl.</p>
+                            <div class="space-y-4 text-gray-700 text-base md:text-lg leading-relaxed">
+                                <p>Az Eszes Tiszta Klíma Kft. egy családi vállalkozás, ahol a tiszta és megbízható klímákért dolgozunk.</p>
+                                <p>Sokan nem gondolnak arra, mennyire fontos a rendszeres tisztítás és karbantartás: ez nemcsak a berendezés élettartamát és energiafogyasztását javítja, hanem az egészség megőrzésében is kulcsszerepe van.</p>
+                                <p>Egyéni vállalkozásként indultam, de a növekvő igények miatt mára fiaimmal közösen dolgozunk. Több ezer karbantartást és mosást, valamint több száz telepítést végeztünk el, mindig pontosan, tisztán és megbízhatóan.</p>
                             </div>
                             <blockquote class="border-l-4 border-yellow-400 pl-4 italic mt-6 text-xl text-gray-800 font-semibold">
                                 Mottónk: Legyen a te klímád is tiszta!
@@ -211,17 +246,14 @@
         <div class="container mx-auto px-6 text-center">
             <p class="text-xl font-bold text-white mb-2">Eszes Tiszta Klíma Kft.</p>
             <p class="text-gray-400">&copy; 2025 Minden jog fenntartva.</p>
-            <div class="mt-4">
-                <a href="#szolgaltatasok" class="text-gray-400 hover:text-white px-2">Szolgáltatások</a>
-                <span class="text-gray-500">|</span>
-                <a href="#munkaink" class="text-gray-400 hover:text-white px-2">Munkáink</a>
-                <span class="text-gray-500">|</span>
-                <a href="#rolunk" class="text-gray-400 hover:text-white px-2">Rólunk</a>
-                <span class="text-gray-500">|</span>
-                <a href="#kapcsolat" class="text-gray-400 hover:text-white px-2">Kapcsolat</a>
-            </div>
+            <p class="text-sm text-gray-500 mt-4">Powered by: Berceli Bence</p>
         </div>
     </footer>
+
+    <!-- Vissza a tetejére gomb -->
+    <a href="#" id="to-top-button" class="fixed bottom-5 right-5 z-50 w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg hover:bg-yellow-500 transition-all duration-300 opacity-0 transform translate-y-5">
+        <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+    </a>
 
     <script>
         // Mobil menü kezelése
@@ -296,6 +328,26 @@
         }
 
         initializeScrollAnimation();
+
+        // Fejléc és Vissza a tetejére gomb animáció
+        const toTopButton = document.getElementById('to-top-button');
+        const header = document.getElementById('main-header');
+
+        window.addEventListener('scroll', () => {
+            // Fejléc
+            if (window.scrollY > 50) {
+                header.classList.add('header-scrolled');
+            } else {
+                header.classList.remove('header-scrolled');
+            }
+
+            // Vissza a tetejére gomb
+            if (window.scrollY > window.innerHeight / 2) {
+                toTopButton.classList.remove('opacity-0', 'translate-y-5');
+            } else {
+                toTopButton.classList.add('opacity-0', 'translate-y-5');
+            }
+        });
 
     </script>
 </body>
