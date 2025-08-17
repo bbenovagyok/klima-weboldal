@@ -143,7 +143,16 @@
             <div class="hero-content container mx-auto px-6 pt-32 pb-16 md:pt-40 md:pb-24 text-center">
                 <h1 class="text-4xl md:text-6xl font-black leading-tight mb-4 reveal-on-scroll">Tökéletes klíma otthonodba 48 órán belül</h1>
                 <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-gray-200 reveal-on-scroll" style="--delay: 200ms;">Forró nyarak és hideg telek ellen – mi gondoskodunk az otthonod kényelméről Siófokon és környékén.</p>
-                <a href="#kapcsolat" class="bg-yellow-400 text-gray-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition duration-300 shadow-xl inline-block reveal-on-scroll" style="--delay: 400ms;">Ingyenes ajánlat</a>
+                <div class="mt-10 reveal-on-scroll" style="--delay: 400ms;">
+                    <a href="#kapcsolat" class="bg-yellow-400 text-gray-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition duration-300 shadow-xl inline-block">Ingyenes ajánlat</a>
+                    <div class="text-white text-center mt-6">
+                         <div class="text-2xl text-yellow-400">
+                            <span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span>
+                        </div>
+                        <p class="mt-1 font-semibold">Kiemelkedő értékelés</p>
+                        <p class="text-gray-200 text-sm">Több mint 120 elégedett ügyfél</p>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -205,7 +214,7 @@
                         <img src="https://i.postimg.cc/4yCkJ4zj/20250705-112625.jpg" alt="Barátságos klímaszerelő csapat" class="rounded-2xl shadow-2xl w-full">
                     </div>
                     <div class="md:w-1/2 reveal-on-scroll" style="--delay: 200ms;">
-                        <h2 class="section-title mb-6 text-cyan-800">Rólunk</h2>
+                        <h2 class="section-title mb-6 text-cyan-800 text-center">Rólunk</h2>
                         <div class="bg-white p-6 rounded-xl shadow-lg">
                             <div class="space-y-4 text-gray-700 text-base md:text-lg leading-relaxed">
                                 <p>Az Eszes Tiszta Klíma Kft. egy családi vállalkozás, ahol a tiszta és megbízható klímákért dolgozunk.</p>
@@ -255,6 +264,22 @@
     <a href="#" id="to-top-button" class="fixed bottom-5 right-5 z-50 w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg hover:bg-yellow-500 transition-all duration-300 opacity-0 transform translate-y-5">
         <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
     </a>
+
+    <!-- Pályázat Popup -->
+    <div id="palyazat-popup" class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm hidden transition-opacity duration-300">
+        <div id="popup-content" class="bg-yellow-50 rounded-xl shadow-2xl p-8 max-w-lg w-full m-4 relative transform transition-all duration-300 opacity-0 translate-y-5">
+            <button id="close-popup-button" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-yellow-800">PÁLYÁZATI LEHETŐSÉG!</h2>
+                <p class="text-5xl font-black text-cyan-800 my-4">100.000 Ft kedvezmény</p>
+                <p class="text-lg text-gray-700">A P-HEM Klíma pályázat keretében most minden magánszemély, aki meglévő fűtési rendszerét klímás fűtéssel egészítené ki, bruttó 100.000 Ft kedvezményre jogosult!</p>
+                <p class="text-gray-600 mt-2">(A pályázatban csak Polar klímák használhatók fel.)</p>
+                <a href="#kapcsolat" id="popup-contact-button" class="mt-6 bg-cyan-600 text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-cyan-700 transition duration-300 shadow-lg inline-block">Segítünk a pályázatban!</a>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Mobil menü kezelése
@@ -347,6 +372,41 @@
                 toTopButton.classList.remove('opacity-0', 'translate-y-5');
             } else {
                 toTopButton.classList.add('opacity-0', 'translate-y-5');
+            }
+        });
+
+        // Popup kezelése
+        const popup = document.getElementById('palyazat-popup');
+        const popupContent = document.getElementById('popup-content');
+        const closePopupButton = document.getElementById('close-popup-button');
+        const popupContactButton = document.getElementById('popup-contact-button');
+
+        function showPopup() {
+            if (!sessionStorage.getItem('palyazatPopupShown')) {
+                popup.classList.remove('hidden');
+                setTimeout(() => {
+                    popup.classList.remove('opacity-0');
+                    popupContent.classList.remove('opacity-0', 'translate-y-5');
+                }, 50);
+                sessionStorage.setItem('palyazatPopupShown', 'true');
+            }
+        }
+
+        function hidePopup() {
+            popup.classList.add('opacity-0');
+            popupContent.classList.add('opacity-0', 'translate-y-5');
+            setTimeout(() => {
+                popup.classList.add('hidden');
+            }, 300);
+        }
+
+        setTimeout(showPopup, 3000);
+
+        closePopupButton.addEventListener('click', hidePopup);
+        popupContactButton.addEventListener('click', hidePopup);
+        popup.addEventListener('click', (e) => {
+            if (e.target === popup) {
+                hidePopup();
             }
         });
 
