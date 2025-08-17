@@ -9,8 +9,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <!-- Leaflet CSS for map -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -92,11 +90,26 @@
         .header-scrolled #header-company-name {
             font-size: 1.125rem; /* text-lg */
         }
-        #map {
-            height: 450px;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            background-color: #f9fafb;
+
+        /* Térkép stílusok */
+        .county {
+            stroke: #fff;
+            stroke-width: 1.5px;
+            transition: fill 0.3s ease;
+        }
+        .county-label {
+            font-size: 10px;
+            fill: #374151; /* gray-700 */
+            font-weight: 600;
+            pointer-events: none;
+            text-anchor: middle;
+            font-family: 'Inter', sans-serif;
+        }
+        .highlighted {
+            fill: #16a34a; /* green-600 */
+        }
+        .default-county {
+            fill: #e5e7eb; /* gray-200 */
         }
     </style>
 </head>
@@ -202,7 +215,9 @@
 
                 <div class="mt-16 reveal-on-scroll" style="--delay: 300ms;">
                     <h3 class="text-2xl font-bold text-center text-white mb-6">Ahol már dolgoztunk:</h3>
-                    <div id="map"></div>
+                    <div id="map-container" class="bg-white p-4 rounded-xl shadow-lg max-w-3xl mx-auto">
+                        <!-- A térkép dinamikusan töltődik be ide -->
+                    </div>
                 </div>
             </div>
         </section>
@@ -294,8 +309,6 @@
         </div>
     </div>
     
-    <!-- Leaflet JS for map -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script>
         // Mobil menü kezelése
         const mobileMenuButton = document.getElementById('mobile-menu-button');
@@ -456,61 +469,28 @@
         });
         
         // Térkép inicializálása
-        const map = L.map('map', {
-            scrollWheelZoom: false,
-            dragging: false,
-            zoomControl: false,
-            attributionControl: false
-        }).setView([47.1, 18.5], 7);
-
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png').addTo(map);
-
+        const mapContainer = document.getElementById('map-container');
+        
         Promise.all([
-            fetch('/data/hungary-counties.json').then(res => res.json()),
+            fetch('/map.svg').then(res => res.text()),
             fetch('/data/locations.json').then(res => res.json())
-        ]).then(([geojson, locationData]) => {
+        ]).then(([svgData, locationData]) => {
+            mapContainer.innerHTML = svgData;
             const highlightedCounties = locationData.counties || [];
+            const svg = mapContainer.querySelector('svg');
+            const counties = svg.querySelectorAll('path');
 
-            L.geoJSON(geojson, {
-                style: function(feature) {
-                    if (highlightedCounties.includes(feature.properties.name)) {
-                        return {
-                            fillColor: '#16a34a', // green-600
-                            weight: 1,
-                            opacity: 1,
-                            color: 'white',
-                            fillOpacity: 0.7
-                        };
-                    } else {
-                        return {
-                            fillColor: '#e5e7eb', // gray-200
-                            weight: 1,
-                            opacity: 1,
-                            color: 'white',
-                            fillOpacity: 0.5
-                        };
-                    }
-                },
-                onEachFeature: function(feature, layer) {
-                    layer.bindPopup(feature.properties.name);
-                    layer.on({
-                        mouseover: function(e) {
-                            if (highlightedCounties.includes(feature.properties.name)) {
-                                e.target.setStyle({
-                                    fillColor: '#15803d' // green-700
-                                });
-                            }
-                        },
-                        mouseout: function(e) {
-                            if (highlightedCounties.includes(feature.properties.name)) {
-                                e.target.setStyle({
-                                    fillColor: '#16a34a' // green-600
-                                });
-                            }
-                        }
-                    });
+            counties.forEach(county => {
+                const countyName = county.getAttribute('data-name');
+                if (highlightedCounties.includes(countyName)) {
+                    county.classList.add('highlighted');
+                } else {
+                    county.classList.add('default-county');
                 }
-            }).addTo(map);
+            });
+        }).catch(error => {
+            console.error('Hiba a térkép betöltése közben:', error);
+            mapContainer.innerHTML = '<p class="text-center text-red-500">A térképet nem sikerült betölteni.</p>';
         });
 
     </script>
