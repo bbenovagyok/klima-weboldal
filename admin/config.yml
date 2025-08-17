@@ -20,3 +20,14 @@ collections:
               - { label: "Kép", name: "image", widget: "image" }
               - { label: "Cím", name: "title", widget: "string" }
               - { label: "Leírás", name: "description", widget: "string" }
+  - name: "locations"
+    label: "Munkaterületek"
+    files:
+      - label: "Megye Lista"
+        name: "counties"
+        file: "data/locations.json"
+        fields:
+          - label: "Megyék"
+            name: "counties"
+            widget: "list"
+            field: { label: "Megye neve", name: "county", widget: "string" }
