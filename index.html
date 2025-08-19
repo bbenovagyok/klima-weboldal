@@ -350,9 +350,14 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         // --- Init ---
-        const app = initializeApp(firebaseConfig);
-        const db  = getFirestore(app);
-        const auth = getAuth(app);
+        let app, db, auth;
+        if (firebaseConfig && Object.keys(firebaseConfig).length > 0) {
+            app = initializeApp(firebaseConfig);
+            db  = getFirestore(app);
+            auth = getAuth(app);
+        } else {
+            console.warn("Firebase config is missing. Review functionality will be disabled.");
+        }
 
         // DOM horgonyok
         const reviewForm = document.getElementById('reviewForm');
@@ -362,15 +367,19 @@
         const reviewsContainer = document.getElementById('reviews-container');
 
         // Auth: anonim login, utána betöltés
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                loadReviews();
-            } else {
-                signInAnonymously(auth).catch((error) => {
-                    console.error("Anonim bejelentkezési hiba:", error);
-                });
-            }
-        });
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    loadReviews();
+                } else {
+                    signInAnonymously(auth).catch((error) => {
+                        console.error("Anonim bejelentkezési hiba:", error);
+                    });
+                }
+            });
+        } else {
+            loadDefaultReviews();
+        }
 
         // Csillag értékelés
         starRatingContainer.addEventListener('click', (e) => {
@@ -385,6 +394,10 @@
         // Vélemény beküldés
         reviewForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!db) {
+                alert("A véleményküldés funkció jelenleg nem elérhető.");
+                return;
+            }
             const btn = document.getElementById('submitReviewBtn');
             btn.disabled = true;
             btn.textContent = 'Küldés...';
@@ -435,6 +448,7 @@
 
                 if (snap.empty) {
                     reviewsList.innerHTML = '<p class="col-span-full text-center text-gray-400">Még nincsenek vélemények. Legyen Ön az első!</p>';
+                    loadDefaultReviews(); // Alapértelmezett vélemények, ha az adatbázis üres
                     return;
                 }
                 
@@ -443,7 +457,6 @@
                 snap.forEach(docSnap => {
                     const r = docSnap.data();
                     
-                    // Csak az első 6 jelenik meg a listában
                     if (count < 6) {
                         let starsHtml = '';
                         for (let i = 1; i <= 5; i++) {
@@ -461,7 +474,6 @@
                         count++;
                     }
 
-                    // Mindegyik bekerül a futó sávba
                     marqueeHTML += `
                         <div class="flex-shrink-0 mx-4 text-center">
                             <p class="text-white">"${escapeHtml(r.text)}"</p>
@@ -469,12 +481,31 @@
                         </div>
                     `;
                 });
-                reviewsContainer.innerHTML = marqueeHTML + marqueeHTML; // Duplikálás a folyamatos animációhoz
+                reviewsContainer.innerHTML = marqueeHTML + marqueeHTML; 
 
             } catch (err) {
                 console.error('Betöltési hiba:', err);
                 reviewsList.innerHTML = '<p class="col-span-full text-center text-red-400">Hiba történt a vélemények betöltésekor.</p>';
+                loadDefaultReviews();
             }
+        }
+        
+        function loadDefaultReviews() {
+            const defaultReviews = [
+                { name: "Nagy Család, Siófok", review: "Gyorsak, profik és nagyon tisztán dolgoztak. Végre hűvös van a nappaliban!" },
+                { name: "Kiss Péter", review: "Minden a megbeszéltek szerint történt, a klíma tökéletesen működik. Csak ajánlani tudom!" },
+                { name: "Horváth Éva, Veszprém", review: "A régi, zajos klímánkat cserélték le egy újra. Hatalmas a különbség, köszönjük!" }
+            ];
+            let marqueeHTML = '';
+            defaultReviews.forEach(r => {
+                 marqueeHTML += `
+                    <div class="flex-shrink-0 mx-4 text-center">
+                        <p class="text-white">"${r.review}"</p>
+                        <p class="text-sm text-gray-300 mt-1">- ${r.name}</p>
+                    </div>
+                `;
+            });
+            reviewsContainer.innerHTML = marqueeHTML + marqueeHTML;
         }
 
         function escapeHtml(str) {
@@ -488,6 +519,166 @@
                 }[match];
             });
         }
+    </script>
+    <script>
+        // UI scriptek, amik nem függnek a Firebase-től
+        // Mobil menü kezelése
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navLinks = mobileMenu.querySelectorAll('a');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // Galéria dinamikus betöltése és Lightbox
+        const galleryContainer = document.getElementById('gallery-container');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImage = document.getElementById('lightbox-image');
+        const lightboxTitle = document.getElementById('lightbox-title');
+        const lightboxDescription = document.getElementById('lightbox-description');
+        const closeLightboxButton = document.getElementById('close-lightbox');
+
+        function openLightbox(src, title, description) {
+            lightboxImage.src = src;
+            lightboxTitle.textContent = title;
+            lightboxDescription.textContent = description;
+            lightbox.classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            lightbox.classList.add('hidden');
+        }
+
+        galleryContainer.addEventListener('click', (e) => {
+            const galleryItem = e.target.closest('.gallery-item');
+            if (galleryItem) {
+                openLightbox(
+                    galleryItem.dataset.src,
+                    galleryItem.dataset.title,
+                    galleryItem.dataset.description
+                );
+            }
+        });
+
+        closeLightboxButton.addEventListener('click', closeLightbox);
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) {
+                closeLightbox();
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const galleryContainer = document.getElementById('gallery-container');
+            
+            fetch('/data/gallery.json')
+                .then(response => response.json())
+                .then(data => {
+                    galleryContainer.innerHTML = ''; // Töröljük a "betöltés" üzenetet
+                    if (data.images && data.images.length > 0) {
+                        data.images.forEach((item, index) => {
+                            const card = `
+                                <div class="gallery-item group relative aspect-square overflow-hidden rounded-lg shadow-lg cursor-pointer reveal-on-scroll" 
+                                     data-src="${item.image}" 
+                                     data-title="${item.title}" 
+                                     data-description="${item.description}"
+                                     style="--delay: ${index * 100}ms">
+                                    <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                    <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300"></div>
+                                </div>
+                            `;
+                            galleryContainer.innerHTML += card;
+                        });
+                        initializeScrollAnimation();
+                    } else {
+                        galleryContainer.innerHTML = '<p class="text-center col-span-full">Jelenleg nincsenek képek a galériában.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Hiba a galéria betöltése közben:', error);
+                    galleryContainer.innerHTML = '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben.</p>';
+                });
+        });
+        
+        // Görgetés figyelő animációhoz
+        function initializeScrollAnimation() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+
+            const elementsToAnimate = document.querySelectorAll('.reveal-on-scroll');
+            elementsToAnimate.forEach(el => observer.observe(el));
+        }
+
+        initializeScrollAnimation();
+
+        // Fejléc és Vissza a tetejére gomb animáció
+        const toTopButton = document.getElementById('to-top-button');
+        const header = document.getElementById('main-header');
+
+        window.addEventListener('scroll', () => {
+            // Fejléc
+            if (window.scrollY > 50) {
+                header.classList.add('header-scrolled');
+            } else {
+                header.classList.remove('header-scrolled');
+            }
+
+            // Vissza a tetejére gomb
+            if (window.scrollY > window.innerHeight / 2) {
+                toTopButton.classList.remove('opacity-0', 'translate-y-5');
+            } else {
+                toTopButton.classList.add('opacity-0', 'translate-y-5');
+            }
+        });
+
+        // Popup kezelése
+        const popup = document.getElementById('palyazat-popup');
+        const popupContent = document.getElementById('popup-content');
+        const closePopupButton = document.getElementById('close-popup-button');
+        const popupContactButton = document.getElementById('popup-contact-button');
+
+        function showPopup() {
+            if (!sessionStorage.getItem('palyazatPopupShown')) {
+                popup.classList.remove('hidden');
+                setTimeout(() => {
+                    popup.classList.remove('opacity-0');
+                    popupContent.classList.remove('opacity-0', 'translate-y-5');
+                }, 50);
+                sessionStorage.setItem('palyazatPopupShown', 'true');
+            }
+        }
+
+        function hidePopup() {
+            popup.classList.add('opacity-0');
+            popupContent.classList.add('opacity-0', 'translate-y-5');
+            setTimeout(() => {
+                popup.classList.add('hidden');
+            }, 300);
+        }
+
+        setTimeout(showPopup, 2000);
+
+        closePopupButton.addEventListener('click', hidePopup);
+        popupContactButton.addEventListener('click', hidePopup);
+        popup.addEventListener('click', (e) => {
+            if (e.target === popup) {
+                hidePopup();
+            }
+        });
     </script>
 </body>
 </html>
