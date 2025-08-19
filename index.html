@@ -9,8 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <!-- Leaflet CSS for map -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <!-- Font Awesome for stars -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -92,27 +92,24 @@
         .header-scrolled #header-company-name {
             font-size: 1.125rem; /* text-lg */
         }
-        #map {
-            height: 450px;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-        }
-        .county-label {
-            background: transparent;
-            border: none;
-            box-shadow: none;
-            font-weight: bold;
-            color: #374151; /* gray-700 */
-            font-size: 10px;
-            text-shadow: 0 0 2px white, 0 0 2px white, 0 0 2px white;
-        }
+       
         /* Vélemény sáv animáció */
         .marquee {
-            animation: marquee 30s linear infinite;
+            animation: marquee 40s linear infinite;
         }
         @keyframes marquee {
             from { transform: translateX(0); }
             to { transform: translateX(-50%); }
+        }
+
+        /* Csillag értékelés */
+        .star-rating .fa-star { 
+            color: #d1d5db; /* gray-300 */
+            cursor: pointer; 
+            transition: color .15s; 
+        }
+        .star-rating .fa-star.selected { 
+            color:#f59e0b; /* amber-500 */
         }
     </style>
 </head>
@@ -164,31 +161,7 @@
             <div class="absolute bottom-0 left-0 right-0 bg-black/20 backdrop-blur-sm py-4">
                 <div class="w-full flex">
                     <div id="reviews-container" class="flex whitespace-nowrap marquee">
-                        <div class="flex-shrink-0 mx-4 text-center">
-                            <p class="text-white">"Gyorsak, profik és nagyon tisztán dolgoztak. Végre hűvös van a nappaliban!"</p>
-                            <p class="text-sm text-gray-300 mt-1">- Nagy Család, Siófok</p>
-                        </div>
-                        <div class="flex-shrink-0 mx-4 text-center">
-                            <p class="text-white">"Minden a megbeszéltek szerint történt, a klíma tökéletesen működik. Csak ajánlani tudom!"</p>
-                            <p class="text-sm text-gray-300 mt-1">- Kiss Péter</p>
-                        </div>
-                        <div class="flex-shrink-0 mx-4 text-center">
-                            <p class="text-white">"A régi, zajos klímánkat cserélték le egy újra. Hatalmas a különbség, köszönjük!"</p>
-                            <p class="text-sm text-gray-300 mt-1">- Horváth Éva, Veszprém</p>
-                        </div>
-                        <!-- Duplikált vélemények az animációhoz -->
-                        <div class="flex-shrink-0 mx-4 text-center">
-                            <p class="text-white">"Gyorsak, profik és nagyon tisztán dolgoztak. Végre hűvös van a nappaliban!"</p>
-                            <p class="text-sm text-gray-300 mt-1">- Nagy Család, Siófok</p>
-                        </div>
-                        <div class="flex-shrink-0 mx-4 text-center">
-                            <p class="text-white">"Minden a megbeszéltek szerint történt, a klíma tökéletesen működik. Csak ajánlani tudom!"</p>
-                            <p class="text-sm text-gray-300 mt-1">- Kiss Péter</p>
-                        </div>
-                        <div class="flex-shrink-0 mx-4 text-center">
-                            <p class="text-white">"A régi, zajos klímánkat cserélték le egy újra. Hatalmas a különbség, köszönjük!"</p>
-                            <p class="text-sm text-gray-300 mt-1">- Horváth Éva, Veszprém</p>
-                        </div>
+                        <!-- Vélemények dinamikusan töltődnek be ide -->
                     </div>
                 </div>
             </div>
@@ -291,20 +264,24 @@
                 </div>
             </div>
         </section>
-        
+
         <!-- Vélemény írása Szekció -->
         <section id="velemeny" class="py-20">
-            <div class="container mx-auto px-6 text-center">
-                <h2 class="text-4xl md:text-5xl font-black mb-4 text-cyan-800 reveal-on-scroll">Írjon véleményt!</h2>
-                <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto reveal-on-scroll" style="--delay: 150ms;">Ossza meg velünk tapasztalatait, hogy még jobbak lehessünk!</p>
-                <form name="reviews" method="POST" action="/" data-netlify="true" class="max-w-xl mx-auto reveal-on-scroll" style="--delay: 300ms;">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl md:text-5xl font-black text-center mb-12 text-cyan-800 reveal-on-scroll">Mondja el a véleményét!</h2>
+                
+                <!-- Vélemény űrlap -->
+                <form name="reviews" method="POST" action="/" data-netlify="true" class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg mb-12 reveal-on-scroll" style="--delay: 150ms;">
+                    <h3 class="text-2xl font-bold text-gray-800 text-center mb-6">Ossza meg velünk tapasztalatait!</h3>
                     <div class="mb-4">
-                        <input type="text" name="name" placeholder="Az Ön neve" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-500" required>
+                        <label for="reviewerName" class="block mb-2 text-sm font-medium text-gray-600">Neve</label>
+                        <input id="reviewerName" name="name" type="text" class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-3 focus:ring-cyan-500 focus:border-cyan-500" required />
                     </div>
-                    <div class="mb-4">
-                        <textarea name="review" placeholder="Az Ön véleménye..." rows="4" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-500" required></textarea>
+                    <div class="mb-6">
+                        <label for="reviewText" class="block mb-2 text-sm font-medium text-gray-600">Véleménye</label>
+                        <textarea id="reviewText" name="review" rows="4" class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-3 focus:ring-cyan-500 focus:border-cyan-500" required></textarea>
                     </div>
-                    <button type="submit" class="bg-cyan-600 text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-cyan-700 transition duration-300 shadow-lg">Vélemény elküldése</button>
+                    <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-6 rounded-full text-lg transition shadow-md">Vélemény elküldése</button>
                 </form>
             </div>
         </section>
