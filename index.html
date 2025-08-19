@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome for stars -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -38,6 +40,9 @@
         }
         .text-shadow-md {
              text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .text-shadow-strong {
+            text-shadow: 0px 1px 4px rgba(0, 0, 0, 0.8);
         }
         
         /* Görgetésre megjelenő animációk */
@@ -146,7 +151,7 @@
                 </div>
             </div>
             <!-- Futó vélemények sáv -->
-            <div class="absolute bottom-0 left-0 right-0 bg-black/30 backdrop-blur-sm py-4">
+            <div class="absolute bottom-0 left-0 right-0 bg-black/50 backdrop-blur-sm py-4">
                 <div class="w-full flex">
                     <div id="reviews-container" class="flex whitespace-nowrap marquee items-center">
                         <!-- Vélemények dinamikusan töltődnek be ide -->
@@ -430,8 +435,8 @@
                     const r = docSnap.data();
                     marqueeHTML += `
                         <div class="flex-shrink-0 mx-6 text-center">
-                            <p class="text-white text-lg">"${escapeHtml(r.text)}"</p>
-                            <p class="text-sm text-gray-300 mt-1">- ${escapeHtml(r.name)}, ${escapeHtml(r.city)}</p>
+                            <p class="text-white text-lg font-semibold text-shadow-strong">"${escapeHtml(r.text)}"</p>
+                            <p class="text-base text-gray-200 mt-1 text-shadow-strong">- ${escapeHtml(r.name)}, ${escapeHtml(r.city)}</p>
                         </div>
                     `;
                 });
@@ -453,8 +458,8 @@
             defaultReviews.forEach(r => {
                  marqueeHTML += `
                     <div class="flex-shrink-0 mx-6 text-center">
-                        <p class="text-white text-lg">"${r.review}"</p>
-                        <p class="text-sm text-gray-300 mt-1">- ${r.name}, ${r.city}</p>
+                        <p class="text-white text-lg font-semibold text-shadow-strong">"${r.review}"</p>
+                        <p class="text-base text-gray-200 mt-1 text-shadow-strong">- ${r.name}, ${r.city}</p>
                     </div>
                 `;
             });
