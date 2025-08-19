@@ -213,13 +213,6 @@
                     <!-- Betöltési jelzés -->
                     <p class="text-center col-span-full">Galéria betöltése...</p>
                 </div>
-
-                <div class="mt-16 reveal-on-scroll" style="--delay: 300ms;">
-                    <h3 class="text-2xl font-bold text-center text-white mb-6">Ahol már dolgoztunk:</h3>
-                    <div class="bg-white p-4 rounded-xl shadow-lg max-w-3xl mx-auto">
-                        <img src="https://i.postimg.cc/W47BAyM1/hungary-map-eszesklima.png" alt="Munkaterületeink térképen" class="w-full h-auto">
-                    </div>
-                </div>
             </div>
         </section>
 
@@ -347,23 +340,26 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, Timestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Biztonságos Firebase config betöltés ---
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // --- Firebase config ---
+        // FONTOS: Cseréld le a placeholder blokkot a saját Firebase projekt-beállításaidra!
+        const firebaseConfig = {
+            apiKey: "AIzaSyB0yin_VnilXLpth-qzNsJqpIwyalirI6M",
+            authDomain: "klima-weboldal.firebaseapp.com",
+            projectId: "klima-weboldal",
+            storageBucket: "klima-weboldal.appspot.com",
+            messagingSenderId: "31440003199",
+            appId: "1:31440003199:web:13ec2fcd1601861eec5f4a"
+        };
+        const appId = firebaseConfig.projectId || 'default-app-id';
 
         // --- Init ---
         let app, db, auth;
-        // Csak akkor inicializáljuk, ha a config létezik
-        if (firebaseConfig && Object.keys(firebaseConfig).length > 0) {
-            try {
-                app = initializeApp(firebaseConfig);
-                db  = getFirestore(app);
-                auth = getAuth(app);
-            } catch (e) {
-                console.error("Firebase initialization failed:", e);
-            }
-        } else {
-            console.warn("Firebase config is missing. Review functionality will be disabled.");
+        try {
+            app = initializeApp(firebaseConfig);
+            db  = getFirestore(app);
+            auth = getAuth(app);
+        } catch (e) {
+            console.error("Firebase initialization failed. Using default content.", e);
         }
 
         // DOM horgonyok
