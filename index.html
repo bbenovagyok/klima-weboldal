@@ -9,8 +9,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <!-- Font Awesome for stars -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -101,16 +99,6 @@
             from { transform: translateX(0); }
             to { transform: translateX(-50%); }
         }
-
-        /* Csillag értékelés */
-        .star-rating .fa-star { 
-            color: #d1d5db; /* gray-300 */
-            cursor: pointer; 
-            transition: color .15s; 
-        }
-        .star-rating .fa-star.selected { 
-            color:#f59e0b; /* amber-500 */
-        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -158,9 +146,9 @@
                 </div>
             </div>
             <!-- Futó vélemények sáv -->
-            <div class="absolute bottom-0 left-0 right-0 bg-black/20 backdrop-blur-sm py-4">
+            <div class="absolute bottom-0 left-0 right-0 bg-black/30 backdrop-blur-sm py-4">
                 <div class="w-full flex">
-                    <div id="reviews-container" class="flex whitespace-nowrap marquee">
+                    <div id="reviews-container" class="flex whitespace-nowrap marquee items-center">
                         <!-- Vélemények dinamikusan töltődnek be ide -->
                     </div>
                 </div>
@@ -269,16 +257,15 @@
                 <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg reveal-on-scroll" style="--delay: 150ms;">
                     <h3 class="text-2xl font-bold text-gray-800 text-center mb-6">Ossza meg velünk tapasztalatait!</h3>
                     <form id="reviewForm">
-                        <div class="mb-4">
-                            <label for="reviewerName" class="block mb-2 text-sm font-medium text-gray-600">Neve</label>
-                            <input id="reviewerName" type="text" class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-3 focus:ring-cyan-500 focus:border-cyan-500" required />
-                        </div>
-                        <div class="mb-4">
-                            <label class="block mb-2 text-sm font-medium text-gray-600">Értékelés</label>
-                            <div id="star-rating" class="star-rating text-3xl text-left">
-                                <i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label for="reviewerName" class="block mb-2 text-sm font-medium text-gray-600">Neve</label>
+                                <input id="reviewerName" type="text" class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-3 focus:ring-cyan-500 focus:border-cyan-500" required />
                             </div>
-                            <input id="ratingValue" type="hidden" value="0" />
+                             <div>
+                                <label for="reviewerCity" class="block mb-2 text-sm font-medium text-gray-600">Település</label>
+                                <input id="reviewerCity" type="text" class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-3 focus:ring-cyan-500 focus:border-cyan-500" required />
+                            </div>
                         </div>
                         <div class="mb-6">
                             <label for="reviewText" class="block mb-2 text-sm font-medium text-gray-600">Véleménye</label>
@@ -338,10 +325,9 @@
         // Firebase SDK-k
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, Timestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, Timestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Firebase config ---
-        // FONTOS: Cseréld le a placeholder blokkot a saját Firebase projekt-beállításaidra!
         const firebaseConfig = {
             apiKey: "AIzaSyB0yin_VnilXLpth-qzNsJqpIwyalirI6M",
             authDomain: "klima-weboldal.firebaseapp.com",
@@ -364,8 +350,6 @@
 
         // DOM horgonyok
         const reviewForm = document.getElementById('reviewForm');
-        const starRatingContainer = document.getElementById('star-rating');
-        const ratingValueInput = document.getElementById('ratingValue');
         const reviewsContainer = document.getElementById('reviews-container');
 
         // Auth: anonim login, utána betöltés
@@ -384,16 +368,6 @@
             loadDefaultReviews();
         }
 
-        // Csillag értékelés
-        starRatingContainer.addEventListener('click', (e) => {
-            if (!e.target.matches('.fa-star')) return;
-            const rating = Number(e.target.dataset.value);
-            ratingValueInput.value = rating;
-            document.querySelectorAll('.star-rating .fa-star').forEach(star => {
-                star.classList.toggle('selected', Number(star.dataset.value) <= rating);
-            });
-        });
-
         // Vélemény beküldés
         reviewForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -406,27 +380,25 @@
             btn.textContent = 'Küldés...';
 
             const name = document.getElementById('reviewerName').value.trim();
-            const rating = parseInt(ratingValueInput.value || '0', 10);
+            const city = document.getElementById('reviewerCity').value.trim();
             const text = document.getElementById('reviewText').value.trim();
 
-            if (!name || !text || rating < 1 || rating > 5) {
-                alert('Töltsön ki minden mezőt és adjon 1–5 csillagot!');
+            if (!name || !text || !city) {
+                alert('Töltsön ki minden mezőt!');
                 btn.disabled = false; btn.textContent = 'Vélemény elküldése';
                 return;
             }
 
             try {
-                const reviewsPath = `reviews`; // Egyszerűsített útvonal
+                const reviewsPath = `reviews`; 
                 await addDoc(collection(db, reviewsPath), {
                     name,
-                    rating,
+                    city,
                     text,
                     createdAt: Timestamp.now()
                 });
 
                 reviewForm.reset();
-                ratingValueInput.value = '0';
-                document.querySelectorAll('.star-rating .fa-star').forEach(s => s.classList.remove('selected'));
                 alert('Köszönjük a véleményét!');
                 await loadReviews();
             } catch (err) {
@@ -449,7 +421,7 @@
                 const snap = await getDocs(qRef);
 
                 if (snap.empty) {
-                    loadDefaultReviews(); // Alapértelmezett vélemények, ha az adatbázis üres
+                    loadDefaultReviews(); 
                     return;
                 }
                 
@@ -457,9 +429,9 @@
                 snap.forEach(docSnap => {
                     const r = docSnap.data();
                     marqueeHTML += `
-                        <div class="flex-shrink-0 mx-4 text-center">
-                            <p class="text-white">"${escapeHtml(r.text)}"</p>
-                            <p class="text-sm text-gray-300 mt-1">- ${escapeHtml(r.name)}</p>
+                        <div class="flex-shrink-0 mx-6 text-center">
+                            <p class="text-white text-lg">"${escapeHtml(r.text)}"</p>
+                            <p class="text-sm text-gray-300 mt-1">- ${escapeHtml(r.name)}, ${escapeHtml(r.city)}</p>
                         </div>
                     `;
                 });
@@ -473,16 +445,16 @@
         
         function loadDefaultReviews() {
             const defaultReviews = [
-                { name: "Nagy Család, Siófok", review: "Gyorsak, profik és nagyon tisztán dolgoztak. Végre hűvös van a nappaliban!" },
-                { name: "Kiss Péter", review: "Minden a megbeszéltek szerint történt, a klíma tökéletesen működik. Csak ajánlani tudom!" },
-                { name: "Horváth Éva, Veszprém", review: "A régi, zajos klímánkat cserélték le egy újra. Hatalmas a különbség, köszönjük!" }
+                { name: "Nagy Család", city: "Siófok", review: "Gyorsak, profik és nagyon tisztán dolgoztak. Végre hűvös van a nappaliban!" },
+                { name: "Kiss Péter", city: "Székesfehérvár", review: "Minden a megbeszéltek szerint történt, a klíma tökéletesen működik. Csak ajánlani tudom!" },
+                { name: "Horváth Éva", city: "Veszprém", review: "A régi, zajos klímánkat cserélték le egy újra. Hatalmas a különbség, köszönjük!" }
             ];
             let marqueeHTML = '';
             defaultReviews.forEach(r => {
                  marqueeHTML += `
-                    <div class="flex-shrink-0 mx-4 text-center">
-                        <p class="text-white">"${r.review}"</p>
-                        <p class="text-sm text-gray-300 mt-1">- ${r.name}</p>
+                    <div class="flex-shrink-0 mx-6 text-center">
+                        <p class="text-white text-lg">"${r.review}"</p>
+                        <p class="text-sm text-gray-300 mt-1">- ${r.name}, ${r.city}</p>
                     </div>
                 `;
             });
