@@ -95,7 +95,7 @@
        
         /* Vélemény sáv animáció */
         .marquee {
-            animation: marquee 40s linear infinite;
+            animation: marquee 60s linear infinite;
         }
         @keyframes marquee {
             from { transform: translateX(0); }
@@ -213,11 +213,6 @@
                     <!-- Betöltési jelzés -->
                     <p class="text-center col-span-full">Galéria betöltése...</p>
                 </div>
-
-                <div class="mt-16 reveal-on-scroll" style="--delay: 300ms;">
-                    <h3 class="text-2xl font-bold text-center text-white mb-6">Ahol már dolgoztunk:</h3>
-                    <div id="map"></div>
-                </div>
             </div>
         </section>
 
@@ -264,25 +259,39 @@
                 </div>
             </div>
         </section>
-
-        <!-- Vélemény írása Szekció -->
+        
+        <!-- Vélemények Szekció -->
         <section id="velemeny" class="py-20">
             <div class="container mx-auto px-6">
-                <h2 class="text-4xl md:text-5xl font-black text-center mb-12 text-cyan-800 reveal-on-scroll">Mondja el a véleményét!</h2>
+                <h2 class="text-4xl md:text-5xl font-black text-center mb-12 text-cyan-800 reveal-on-scroll">Ügyfeleink mondták</h2>
                 
+                <!-- Legutóbbi vélemények -->
+                <div id="reviewsList" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                    <!-- Vélemények betöltése... -->
+                </div>
+
                 <!-- Vélemény űrlap -->
-                <form name="reviews" method="POST" action="/" data-netlify="true" class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg mb-12 reveal-on-scroll" style="--delay: 150ms;">
+                <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg reveal-on-scroll" style="--delay: 150ms;">
                     <h3 class="text-2xl font-bold text-gray-800 text-center mb-6">Ossza meg velünk tapasztalatait!</h3>
-                    <div class="mb-4">
-                        <label for="reviewerName" class="block mb-2 text-sm font-medium text-gray-600">Neve</label>
-                        <input id="reviewerName" name="name" type="text" class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-3 focus:ring-cyan-500 focus:border-cyan-500" required />
-                    </div>
-                    <div class="mb-6">
-                        <label for="reviewText" class="block mb-2 text-sm font-medium text-gray-600">Véleménye</label>
-                        <textarea id="reviewText" name="review" rows="4" class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-3 focus:ring-cyan-500 focus:border-cyan-500" required></textarea>
-                    </div>
-                    <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-6 rounded-full text-lg transition shadow-md">Vélemény elküldése</button>
-                </form>
+                    <form id="reviewForm">
+                        <div class="mb-4">
+                            <label for="reviewerName" class="block mb-2 text-sm font-medium text-gray-600">Neve</label>
+                            <input id="reviewerName" type="text" class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-3 focus:ring-cyan-500 focus:border-cyan-500" required />
+                        </div>
+                        <div class="mb-4">
+                            <label class="block mb-2 text-sm font-medium text-gray-600">Értékelés</label>
+                            <div id="star-rating" class="star-rating text-3xl text-left">
+                                <i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i>
+                            </div>
+                            <input id="ratingValue" type="hidden" value="0" />
+                        </div>
+                        <div class="mb-6">
+                            <label for="reviewText" class="block mb-2 text-sm font-medium text-gray-600">Véleménye</label>
+                            <textarea id="reviewText" rows="4" class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-3 focus:ring-cyan-500 focus:border-cyan-500" required></textarea>
+                        </div>
+                        <button id="submitReviewBtn" type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-6 rounded-full text-lg transition shadow-md">Vélemény elküldése</button>
+                    </form>
+                </div>
             </div>
         </section>
 
@@ -330,232 +339,155 @@
         </div>
     </div>
     
-    <!-- Leaflet JS for map -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script>
-        // Mobil menü kezelése
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const navLinks = mobileMenu.querySelectorAll('a');
+    <script type="module">
+        // Firebase SDK-k
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, Timestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
+        // --- Firebase config (automatikusan betöltődik) ---
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // --- Init ---
+        const app = initializeApp(firebaseConfig);
+        const db  = getFirestore(app);
+        const auth = getAuth(app);
+
+        // DOM horgonyok
+        const reviewForm = document.getElementById('reviewForm');
+        const starRatingContainer = document.getElementById('star-rating');
+        const ratingValueInput = document.getElementById('ratingValue');
+        const reviewsList = document.getElementById('reviewsList');
+        const reviewsContainer = document.getElementById('reviews-container');
+
+        // Auth: anonim login, utána betöltés
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loadReviews();
+            } else {
+                signInAnonymously(auth).catch((error) => {
+                    console.error("Anonim bejelentkezési hiba:", error);
+                });
+            }
         });
-        
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu.classList.add('hidden');
+
+        // Csillag értékelés
+        starRatingContainer.addEventListener('click', (e) => {
+            if (!e.target.matches('.fa-star')) return;
+            const rating = Number(e.target.dataset.value);
+            ratingValueInput.value = rating;
+            document.querySelectorAll('.star-rating .fa-star').forEach(star => {
+                star.classList.toggle('selected', Number(star.dataset.value) <= rating);
             });
         });
 
-        // Galéria dinamikus betöltése és Lightbox
-        const galleryContainer = document.getElementById('gallery-container');
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImage = document.getElementById('lightbox-image');
-        const lightboxTitle = document.getElementById('lightbox-title');
-        const lightboxDescription = document.getElementById('lightbox-description');
-        const closeLightboxButton = document.getElementById('close-lightbox');
+        // Vélemény beküldés
+        reviewForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitReviewBtn');
+            btn.disabled = true;
+            btn.textContent = 'Küldés...';
 
-        function openLightbox(src, title, description) {
-            lightboxImage.src = src;
-            lightboxTitle.textContent = title;
-            lightboxDescription.textContent = description;
-            lightbox.classList.remove('hidden');
-        }
+            const name = document.getElementById('reviewerName').value.trim();
+            const rating = parseInt(ratingValueInput.value || '0', 10);
+            const text = document.getElementById('reviewText').value.trim();
 
-        function closeLightbox() {
-            lightbox.classList.add('hidden');
-        }
+            if (!name || !text || rating < 1 || rating > 5) {
+                alert('Töltsön ki minden mezőt és adjon 1–5 csillagot!');
+                btn.disabled = false; btn.textContent = 'Vélemény elküldése';
+                return;
+            }
 
-        galleryContainer.addEventListener('click', (e) => {
-            const galleryItem = e.target.closest('.gallery-item');
-            if (galleryItem) {
-                openLightbox(
-                    galleryItem.dataset.src,
-                    galleryItem.dataset.title,
-                    galleryItem.dataset.description
+            try {
+                const reviewsPath = `/artifacts/${appId}/public/data/reviews`;
+                await addDoc(collection(db, reviewsPath), {
+                    name,
+                    rating,
+                    text,
+                    createdAt: Timestamp.now()
+                });
+
+                reviewForm.reset();
+                ratingValueInput.value = '0';
+                document.querySelectorAll('.star-rating .fa-star').forEach(s => s.classList.remove('selected'));
+                alert('Köszönjük a véleményét!');
+                await loadReviews();
+            } catch (err) {
+                console.error('Hiba a mentéskor:', err);
+                alert('Hiba történt a vélemény mentése során.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Vélemény elküldése';
+            }
+        });
+
+        // Vélemények betöltése
+        async function loadReviews() {
+            reviewsList.innerHTML = '';
+            reviewsContainer.innerHTML = '';
+            try {
+                const qRef = query(
+                    collection(db, `/artifacts/${appId}/public/data/reviews`),
+                    orderBy('createdAt', 'desc')
                 );
-            }
-        });
+                const snap = await getDocs(qRef);
 
-        closeLightboxButton.addEventListener('click', closeLightbox);
-        lightbox.addEventListener('click', (e) => {
-            if (e.target === lightbox) {
-                closeLightbox();
-            }
-        });
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const galleryContainer = document.getElementById('gallery-container');
-            
-            fetch('/data/gallery.json')
-                .then(response => response.json())
-                .then(data => {
-                    galleryContainer.innerHTML = ''; // Töröljük a "betöltés" üzenetet
-                    if (data.images && data.images.length > 0) {
-                        data.images.forEach((item, index) => {
-                            const card = `
-                                <div class="gallery-item group relative aspect-square overflow-hidden rounded-lg shadow-lg cursor-pointer reveal-on-scroll" 
-                                     data-src="${item.image}" 
-                                     data-title="${item.title}" 
-                                     data-description="${item.description}"
-                                     style="--delay: ${index * 100}ms">
-                                    <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                                    <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300"></div>
-                                </div>
-                            `;
-                            galleryContainer.innerHTML += card;
-                        });
-                        initializeScrollAnimation();
-                    } else {
-                        galleryContainer.innerHTML = '<p class="text-center col-span-full">Jelenleg nincsenek képek a galériában.</p>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Hiba a galéria betöltése közben:', error);
-                    galleryContainer.innerHTML = '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben.</p>';
-                });
-        });
-        
-        // Görgetés figyelő animációhoz
-        function initializeScrollAnimation() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, {
-                threshold: 0.1
-            });
-
-            const elementsToAnimate = document.querySelectorAll('.reveal-on-scroll');
-            elementsToAnimate.forEach(el => observer.observe(el));
-        }
-
-        initializeScrollAnimation();
-
-        // Fejléc és Vissza a tetejére gomb animáció
-        const toTopButton = document.getElementById('to-top-button');
-        const header = document.getElementById('main-header');
-
-        window.addEventListener('scroll', () => {
-            // Fejléc
-            if (window.scrollY > 50) {
-                header.classList.add('header-scrolled');
-            } else {
-                header.classList.remove('header-scrolled');
-            }
-
-            // Vissza a tetejére gomb
-            if (window.scrollY > window.innerHeight / 2) {
-                toTopButton.classList.remove('opacity-0', 'translate-y-5');
-            } else {
-                toTopButton.classList.add('opacity-0', 'translate-y-5');
-            }
-        });
-
-        // Popup kezelése
-        const popup = document.getElementById('palyazat-popup');
-        const popupContent = document.getElementById('popup-content');
-        const closePopupButton = document.getElementById('close-popup-button');
-        const popupContactButton = document.getElementById('popup-contact-button');
-
-        function showPopup() {
-            if (!sessionStorage.getItem('palyazatPopupShown')) {
-                popup.classList.remove('hidden');
-                setTimeout(() => {
-                    popup.classList.remove('opacity-0');
-                    popupContent.classList.remove('opacity-0', 'translate-y-5');
-                }, 50);
-                sessionStorage.setItem('palyazatPopupShown', 'true');
-            }
-        }
-
-        function hidePopup() {
-            popup.classList.add('opacity-0');
-            popupContent.classList.add('opacity-0', 'translate-y-5');
-            setTimeout(() => {
-                popup.classList.add('hidden');
-            }, 300);
-        }
-
-        setTimeout(showPopup, 2000);
-
-        closePopupButton.addEventListener('click', hidePopup);
-        popupContactButton.addEventListener('click', hidePopup);
-        popup.addEventListener('click', (e) => {
-            if (e.target === popup) {
-                hidePopup();
-            }
-        });
-        
-        // Térkép inicializálása
-        const map = L.map('map', {
-            scrollWheelZoom: true, 
-            dragging: true,      
-            zoomControl: true,   
-            attributionControl: false
-        }).setView([47.1, 18.5], 7);
-
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-        }).addTo(map);
-
-        Promise.all([
-            fetch('/data/hungary-counties.json').then(res => res.json()),
-            fetch('/data/locations.json').then(res => res.json())
-        ]).then(([geojson, locationData]) => {
-            const highlightedCounties = locationData.counties || [];
-
-            L.geoJSON(geojson, {
-                style: function(feature) {
-                    if (highlightedCounties.includes(feature.properties.name)) {
-                        return {
-                            fillColor: '#16a34a', // green-600
-                            weight: 2,
-                            opacity: 1,
-                            color: '#15803d', // sötétebb zöld
-                            fillOpacity: 0.6
-                        };
-                    } else {
-                        return {
-                            fillColor: '#e5e7eb', // gray-200
-                            weight: 1,
-                            opacity: 1,
-                            color: 'white',
-                            fillOpacity: 0.5
-                        };
-                    }
-                },
-                onEachFeature: function(feature, layer) {
-                    layer.bindTooltip(feature.properties.name, {
-                        permanent: true, 
-                        direction: 'center',
-                        className: 'county-label'
-                    }).openTooltip();
-                    
-                    layer.on({
-                        mouseover: function(e) {
-                            if (highlightedCounties.includes(feature.properties.name)) {
-                                e.target.setStyle({
-                                    fillColor: '#15803d' // green-700
-                                });
-                            }
-                        },
-                        mouseout: function(e) {
-                            if (highlightedCounties.includes(feature.properties.name)) {
-                                e.target.setStyle({
-                                    fillColor: '#16a34a' // green-600
-                                });
-                            }
-                        }
-                    });
+                if (snap.empty) {
+                    reviewsList.innerHTML = '<p class="col-span-full text-center text-gray-400">Még nincsenek vélemények. Legyen Ön az első!</p>';
+                    return;
                 }
-            }).addTo(map);
-        });
+                
+                let marqueeHTML = '';
+                let count = 0;
+                snap.forEach(docSnap => {
+                    const r = docSnap.data();
+                    
+                    // Csak az első 6 jelenik meg a listában
+                    if (count < 6) {
+                        let starsHtml = '';
+                        for (let i = 1; i <= 5; i++) {
+                            starsHtml += `<i class="fas fa-star ${i <= r.rating ? 'text-yellow-400' : 'text-gray-400'}"></i>`;
+                        }
 
+                        const card = document.createElement('div');
+                        card.className = 'bg-white p-6 rounded-lg shadow-md';
+                        card.innerHTML = `
+                            <div class="flex items-center mb-2 gap-1">${starsHtml}</div>
+                            <p class="mb-3 text-gray-600">"${escapeHtml(r.text || '')}"</p>
+                            <p class="font-semibold text-right text-gray-800">– ${escapeHtml(r.name || 'Névtelen')}</p>
+                        `;
+                        reviewsList.appendChild(card);
+                        count++;
+                    }
+
+                    // Mindegyik bekerül a futó sávba
+                    marqueeHTML += `
+                        <div class="flex-shrink-0 mx-4 text-center">
+                            <p class="text-white">"${escapeHtml(r.text)}"</p>
+                            <p class="text-sm text-gray-300 mt-1">- ${escapeHtml(r.name)}</p>
+                        </div>
+                    `;
+                });
+                reviewsContainer.innerHTML = marqueeHTML + marqueeHTML; // Duplikálás a folyamatos animációhoz
+
+            } catch (err) {
+                console.error('Betöltési hiba:', err);
+                reviewsList.innerHTML = '<p class="col-span-full text-center text-red-400">Hiba történt a vélemények betöltésekor.</p>';
+            }
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/[&<>"']/g, (match) => {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[match];
+            });
+        }
     </script>
 </body>
 </html>
