@@ -340,25 +340,23 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, Timestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Firebase config ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyB0yin_VnilXLpth-qzNsJqpIwyalirI6M",
-            authDomain: "klima-weboldal.firebaseapp.com",
-            projectId: "klima-weboldal",
-            storageBucket: "klima-weboldal.firebasestorage.app",
-            messagingSenderId: "31440003199",
-            appId: "1:31440003199:web:13ec2fcd1601861eec5f4a"
-        };
-        const appId = firebaseConfig.projectId || 'default-app-id';
+        // --- Biztonságos Firebase config betöltés ---
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         // --- Init ---
         let app, db, auth;
-        try {
-            app = initializeApp(firebaseConfig);
-            db  = getFirestore(app);
-            auth = getAuth(app);
-        } catch (e) {
-            console.error("Firebase initialization failed. Using default content.", e);
+        // Csak akkor inicializáljuk, ha a config létezik
+        if (firebaseConfig && Object.keys(firebaseConfig).length > 0) {
+            try {
+                app = initializeApp(firebaseConfig);
+                db  = getFirestore(app);
+                auth = getAuth(app);
+            } catch (e) {
+                console.error("Firebase initialization failed:", e);
+            }
+        } else {
+            console.warn("Firebase config is missing. Review functionality will be disabled.");
         }
 
         // DOM horgonyok
@@ -416,7 +414,7 @@
             }
 
             try {
-                const reviewsPath = `/artifacts/${appId}/public/data/reviews`;
+                const reviewsPath = `reviews`; // Egyszerűsített útvonal
                 await addDoc(collection(db, reviewsPath), {
                     name,
                     rating,
@@ -440,43 +438,22 @@
 
         // Vélemények betöltése
         async function loadReviews() {
-            reviewsList.innerHTML = '';
             reviewsContainer.innerHTML = '';
             try {
                 const qRef = query(
-                    collection(db, `/artifacts/${appId}/public/data/reviews`),
+                    collection(db, `reviews`),
                     orderBy('createdAt', 'desc')
                 );
                 const snap = await getDocs(qRef);
 
                 if (snap.empty) {
-                    reviewsList.innerHTML = '<p class="col-span-full text-center text-gray-400">Még nincsenek vélemények. Legyen Ön az első!</p>';
                     loadDefaultReviews(); // Alapértelmezett vélemények, ha az adatbázis üres
                     return;
                 }
                 
                 let marqueeHTML = '';
-                let count = 0;
                 snap.forEach(docSnap => {
                     const r = docSnap.data();
-                    
-                    if (count < 6) {
-                        let starsHtml = '';
-                        for (let i = 1; i <= 5; i++) {
-                            starsHtml += `<i class="fas fa-star ${i <= r.rating ? 'text-yellow-400' : 'text-gray-400'}"></i>`;
-                        }
-
-                        const card = document.createElement('div');
-                        card.className = 'bg-white p-6 rounded-lg shadow-md';
-                        card.innerHTML = `
-                            <div class="flex items-center mb-2 gap-1">${starsHtml}</div>
-                            <p class="mb-3 text-gray-600">"${escapeHtml(r.text || '')}"</p>
-                            <p class="font-semibold text-right text-gray-800">– ${escapeHtml(r.name || 'Névtelen')}</p>
-                        `;
-                        reviewsList.appendChild(card);
-                        count++;
-                    }
-
                     marqueeHTML += `
                         <div class="flex-shrink-0 mx-4 text-center">
                             <p class="text-white">"${escapeHtml(r.text)}"</p>
@@ -488,7 +465,6 @@
 
             } catch (err) {
                 console.error('Betöltési hiba:', err);
-                reviewsList.innerHTML = '<p class="col-span-full text-center text-red-400">Hiba történt a vélemények betöltésekor.</p>';
                 loadDefaultReviews();
             }
         }
