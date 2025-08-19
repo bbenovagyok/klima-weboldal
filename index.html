@@ -106,6 +106,14 @@
             font-size: 10px;
             text-shadow: 0 0 2px white, 0 0 2px white, 0 0 2px white;
         }
+        /* Vélemény sáv animáció */
+        .marquee {
+            animation: marquee 30s linear infinite;
+        }
+        @keyframes marquee {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -144,18 +152,43 @@
 
     <main>
         <!-- Hero Szekció -->
-        <section class="hero-bg text-white">
+        <section class="hero-bg text-white relative overflow-hidden">
             <div class="hero-content container mx-auto px-6 pt-32 pb-16 md:pt-40 md:pb-24 text-center">
                 <h1 class="text-4xl md:text-6xl font-black leading-tight mb-4 reveal-on-scroll">Tökéletes klíma otthonodba 48 órán belül</h1>
                 <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-gray-200 reveal-on-scroll" style="--delay: 200ms;">Forró nyarak és hideg telek ellen – mi gondoskodunk az otthonod kényelméről Siófokon és környékén.</p>
                 <div class="mt-10 reveal-on-scroll" style="--delay: 400ms;">
                     <a href="#kapcsolat" class="bg-yellow-400 text-gray-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition duration-300 shadow-xl inline-block">Ingyenes ajánlat</a>
-                    <div class="text-white text-center mt-6">
-                         <div class="text-2xl text-yellow-400">
-                            <span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span>
+                </div>
+            </div>
+            <!-- Futó vélemények sáv -->
+            <div class="absolute bottom-0 left-0 right-0 bg-black/20 backdrop-blur-sm py-4">
+                <div class="w-full flex">
+                    <div id="reviews-container" class="flex whitespace-nowrap marquee">
+                        <div class="flex-shrink-0 mx-4 text-center">
+                            <p class="text-white">"Gyorsak, profik és nagyon tisztán dolgoztak. Végre hűvös van a nappaliban!"</p>
+                            <p class="text-sm text-gray-300 mt-1">- Nagy Család, Siófok</p>
                         </div>
-                        <p class="mt-1 font-semibold">Kiemelkedő értékelés</p>
-                        <p class="text-gray-200 text-sm">Több mint 120 elégedett ügyfél</p>
+                        <div class="flex-shrink-0 mx-4 text-center">
+                            <p class="text-white">"Minden a megbeszéltek szerint történt, a klíma tökéletesen működik. Csak ajánlani tudom!"</p>
+                            <p class="text-sm text-gray-300 mt-1">- Kiss Péter</p>
+                        </div>
+                        <div class="flex-shrink-0 mx-4 text-center">
+                            <p class="text-white">"A régi, zajos klímánkat cserélték le egy újra. Hatalmas a különbség, köszönjük!"</p>
+                            <p class="text-sm text-gray-300 mt-1">- Horváth Éva, Veszprém</p>
+                        </div>
+                        <!-- Duplikált vélemények az animációhoz -->
+                        <div class="flex-shrink-0 mx-4 text-center">
+                            <p class="text-white">"Gyorsak, profik és nagyon tisztán dolgoztak. Végre hűvös van a nappaliban!"</p>
+                            <p class="text-sm text-gray-300 mt-1">- Nagy Család, Siófok</p>
+                        </div>
+                        <div class="flex-shrink-0 mx-4 text-center">
+                            <p class="text-white">"Minden a megbeszéltek szerint történt, a klíma tökéletesen működik. Csak ajánlani tudom!"</p>
+                            <p class="text-sm text-gray-300 mt-1">- Kiss Péter</p>
+                        </div>
+                        <div class="flex-shrink-0 mx-4 text-center">
+                            <p class="text-white">"A régi, zajos klímánkat cserélték le egy újra. Hatalmas a különbség, köszönjük!"</p>
+                            <p class="text-sm text-gray-300 mt-1">- Horváth Éva, Veszprém</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -258,6 +291,24 @@
                 </div>
             </div>
         </section>
+        
+        <!-- Vélemény írása Szekció -->
+        <section id="velemeny" class="py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl md:text-5xl font-black mb-4 text-cyan-800 reveal-on-scroll">Írjon véleményt!</h2>
+                <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto reveal-on-scroll" style="--delay: 150ms;">Ossza meg velünk tapasztalatait, hogy még jobbak lehessünk!</p>
+                <form name="reviews" method="POST" data-netlify="true" class="max-w-xl mx-auto reveal-on-scroll" style="--delay: 300ms;">
+                    <div class="mb-4">
+                        <input type="text" name="name" placeholder="Az Ön neve" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <textarea name="review" placeholder="Az Ön véleménye..." rows="4" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-500" required></textarea>
+                    </div>
+                    <button type="submit" class="bg-cyan-600 text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-cyan-700 transition duration-300 shadow-lg">Vélemény elküldése</button>
+                </form>
+            </div>
+        </section>
+
     </main>
 
     <!-- Lábléc -->
@@ -465,9 +516,9 @@
         
         // Térkép inicializálása
         const map = L.map('map', {
-            scrollWheelZoom: true, // Engedélyezve
-            dragging: true,      // Engedélyezve
-            zoomControl: true,   // Megjeleníti a +/- gombokat
+            scrollWheelZoom: true, 
+            dragging: true,      
+            zoomControl: true,   
             attributionControl: false
         }).setView([47.1, 18.5], 7);
 
