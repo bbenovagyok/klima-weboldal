@@ -9,510 +9,723 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome for stars -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .hero-bg { position: relative; background-image: url('https://i.postimg.cc/3J1W66pj/fdsffsf.jpg'); background-size: cover; background-position: center; }
-        .hero-bg::before { content: ''; position: absolute; inset: 0; background-color: rgba(0, 74, 111, 0.7); z-index: 1; }
-        .hero-content { position: relative; z-index: 2; }
-        .text-shadow { text-shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06); }
-        .text-shadow-md { text-shadow: 0 2px 4px rgba(0,0,0,.2); }
-        .text-shadow-strong { text-shadow: 0px 1px 4px rgba(0,0,0,.8); }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .hero-bg {
+            position: relative;
+            background-image: url('https://i.postimg.cc/3J1W66pj/fdsffsf.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 74, 111, 0.7);
+            z-index: 1;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        .text-shadow {
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+        }
+        .text-shadow-md {
+             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .text-shadow-strong {
+            text-shadow: 0px 1px 4px rgba(0, 0, 0, 0.8);
+        }
+        
+        /* Görgetésre megjelenő animációk */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            transition-delay: var(--delay, 0ms);
+        }
 
-        .reveal-on-scroll { opacity: 0; transform: translateY(30px); transition: opacity .8s ease-out, transform .8s ease-out; transition-delay: var(--delay, 0ms); }
-        .reveal-on-scroll.is-visible { opacity: 1; transform: translateY(0); }
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-        #header-container, #header-logo, #header-company-name, #main-nav, #mobile-menu-button { transition: all .5s cubic-bezier(0.65,0,0.35,1); }
-        #header-container { justify-content: space-between; }
-        #main-header .max-w-6xl { text-align: center; }
-        .header-scrolled #main-nav, .header-scrolled #mobile-menu-button { opacity: 0; max-width: 0; padding: 0; margin: 0; flex-basis: 0; overflow: hidden; }
-        .header-scrolled #header-container { display: inline-flex; justify-content: center; padding-inline: 1rem; }
-        .header-scrolled #header-logo { height: 1.75rem; }
-        .header-scrolled #header-company-name { font-size: 1.125rem; }
+        /* Fejléc animáció stílusai */
+        #header-container, #header-logo, #header-company-name, #main-nav, #mobile-menu-button {
+            transition: all 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+        
+        #header-container {
+            justify-content: space-between;
+        }
 
-        .marquee { animation: marquee 60s linear infinite; }
-        @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        #main-header .max-w-6xl {
+            text-align: center;
+        }
 
-        /* alap animáció a régi (flow) lenyitáshoz – maradhat */
-        .city-list { max-height: 0; overflow: hidden; transition: max-height .5s ease-in-out; }
-        .accordion-arrow { transition: transform .3s ease-in-out; }
-        .accordion-item.open .accordion-arrow { transform: rotate(90deg); }
+        .header-scrolled #main-nav,
+        .header-scrolled #mobile-menu-button {
+            opacity: 0;
+            max-width: 0;
+            padding: 0;
+            margin: 0;
+            flex-basis: 0;
+            overflow: hidden;
+        }
+        
+        .header-scrolled #header-container {
+            display: inline-flex;
+            justify-content: center;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        .header-scrolled #header-logo {
+            height: 1.75rem; /* 28px */
+        }
+
+        .header-scrolled #header-company-name {
+            font-size: 1.125rem; /* text-lg */
+        }
+       
+        /* Vélemény sáv animáció */
+        .marquee {
+            animation: marquee 60s linear infinite;
+        }
+        @keyframes marquee {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        /* Lenyitható lista stílusok */
+        .city-list {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .accordion-arrow {
+            transition: transform 0.3s ease-in-out;
+        }
+        .accordion-item.open .accordion-arrow {
+            transform: rotate(90deg);
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-<header id="main-header" class="fixed top-0 left-0 right-0 z-50 p-4">
-    <div class="max-w-6xl mx-auto">
-        <div id="header-container" class="bg-white/80 backdrop-blur-xl shadow-lg rounded-full px-4 sm:px-6 py-2 flex items-center">
-            <a href="#" class="flex items-center">
-                <img id="header-logo" src="https://i.postimg.cc/xTYhg4gG/image.png" alt="Cég logó" class="h-8 mr-2 sm:mr-3">
-                <span id="header-company-name" class="text-base sm:text-xl font-bold text-yellow-600 text-shadow-md">Eszes Tiszta Klíma Kft.</span>
-            </a>
-
-            <nav id="main-nav" class="hidden md:flex items-center space-x-2">
-                <a href="#szolgaltatasok" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Szolgáltatások</a>
-                <a href="#munkaink" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Munkáink</a>
-                <a href="#rolunk" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Rólunk</a>
-                <a href="#kapcsolat" class="bg-cyan-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-cyan-700 transition duration-300 shadow-md text-shadow-md">Időpontfoglalás</a>
-            </nav>
-
-            <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0, 0, 24, 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-            </button>
-        </div>
-
-        <div id="mobile-menu" class="hidden md:hidden bg-white/90 backdrop-blur-lg mt-2 rounded-2xl shadow-lg overflow-hidden">
-            <a href="#szolgaltatasok" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Szolgáltatások</a>
-            <a href="#munkaink" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Munkáink</a>
-            <a href="#rolunk" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Rólunk</a>
-            <a href="#kapcsolat" class="block text-center py-4 px-4 text-sm bg-cyan-600 text-white font-semibold hover:bg-cyan-700">Időpontfoglalás</a>
-        </div>
-    </div>
-</header>
-
-<main>
-    <section class="hero-bg text-white relative overflow-hidden">
-        <div class="hero-content container mx-auto px-6 pt-32 pb-28 md:pt-40 md:pb-24 text-center">
-            <h1 class="text-4xl md:text-6xl font-black leading-tight mb-4 reveal-on-scroll">Tökéletes klíma otthonodba 48 órán belül</h1>
-            <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-gray-200 reveal-on-scroll" style="--delay: 200ms;">Forró nyarak és hideg telek ellen – mi gondoskodunk az otthonod kényelméről Siófokon és környékén.</p>
-            <div class="mt-10 reveal-on-scroll" style="--delay: 400ms;">
-                <a href="#kapcsolat" class="bg-yellow-400 text-gray-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition duration-300 shadow-xl inline-block">Ingyenes ajánlat</a>
-            </div>
-        </div>
-        <div class="absolute bottom-0 left-0 right-0 bg-black/50 backdrop-blur-sm py-4">
-            <div class="w-full flex">
-                <div id="reviews-container" class="flex whitespace-nowrap marquee items-center"></div>
-            </div>
-        </div>
-    </section>
-
-    <section id="szolgaltatasok" class="py-20">
-        <div class="container mx-auto px-6">
-            <h2 class="text-4xl md:text-5xl font-black text-center mb-12 text-cyan-800 reveal-on-scroll">Szolgáltatásaink</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200 reveal-on-scroll">
-                    <div class="bg-cyan-100 text-cyan-700 rounded-full w-16 h-16 flex items-center justify-center mb-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
-                    </div>
-                    <h3 class="text-xl md:text-2xl font-bold mb-3">Klíma Telepítés</h3>
-                    <p class="text-gray-600 leading-relaxed">Modern, energiahatékony klímaberendezések szakszerű telepítése. Segítünk a megfelelő készülék kiválasztásában és a komplett kivitelezésben, garanciával.</p>
-                </div>
-                <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200 reveal-on-scroll" style="--delay: 150ms;">
-                    <div class="bg-cyan-100 text-cyan-700 rounded-full w-16 h-16 flex items-center justify-center mb-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
-                    </div>
-                    <h3 class="text-xl md:text-2xl font-bold mb-3">Tisztítás és Karbantartás</h3>
-                    <p class="text-gray-600 leading-relaxed"><span class="font-bold">Hogy miért fontos?</span><br>Ne legyen <strong class="text-red-600">poros, gombás, penészes</strong> a beltéri! Az elhanyagolt klíma akár <strong class="text-red-600">egészségre is káros lehet</strong>, de az elszennyeződött hőcserélő rontja a hatásfokot, <strong class="text-red-600">több energiát</strong> fogyaszt és <strong class="text-red-600">meghibásodáshoz</strong> vezethet.</p>
-                </div>
-                <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200 reveal-on-scroll" style="--delay: 300ms;">
-                    <div class="bg-cyan-100 text-cyan-700 rounded-full w-16 h-16 flex items-center justify-center mb-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
-                    </div>
-                    <h3 class="text-xl md:text-2xl font-bold mb-3">Javítás és Hibaelhárítás</h3>
-                    <p class="text-gray-600 leading-relaxed">Meghibásodott a klímája? Márkafüggetlen szervizelést biztosítunk, rövid határidővel Siófok és környékén. Hívjon bizalommal!</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="munkaink" class="py-20 bg-cyan-700 text-white overflow-hidden">
-        <div class="container mx-auto px-6">
-            <h2 class="text-4xl md:text-5xl font-black text-center mb-4 text-white reveal-on-scroll">Aktuális Munkáink</h2>
-            <p class="text-center text-lg text-cyan-100 mb-12 max-w-2xl mx-auto reveal-on-scroll" style="--delay: 150ms;">Minden klímánk mögött egy elégedett ügyfél áll!</p>
-
-            <div id="gallery-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                <p class="text-center col-span-full">Galéria betöltése...</p>
-            </div>
-
-            <div class="mt-16 reveal-on-scroll" style="--delay: 300ms;">
-                <h3 class="text-2xl font-bold text-center text-white mb-6">Ahol már dolgoztunk:</h3>
-                <!-- GRID: overlay engedélyezve -->
-                <div id="work-areas-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto items-start overflow-visible">
-                    <!-- Dinamikus lista ide -->
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="rolunk" class="py-20">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col md:flex-row items-center gap-12">
-                <div class="md:w-1/2 reveal-on-scroll">
-                    <img src="https://i.postimg.cc/4yCkJ4zj/20250705-112625.jpg" alt="Barátságos klímaszerelő csapat" class="rounded-2xl shadow-2xl w-full">
-                </div>
-                <div class="md:w-1/2 reveal-on-scroll" style="--delay: 200ms;">
-                    <h2 class="text-4xl md:text-5xl font-black mb-6 text-cyan-800 text-center">Rólunk</h2>
-                    <div class="bg-white p-6 rounded-xl shadow-lg">
-                        <div class="space-y-4 text-gray-700 text-base md:text-lg leading-relaxed">
-                            <p>Az Eszes Tiszta Klíma Kft. egy családi vállalkozás, ahol a tiszta és megbízható klímákért dolgozunk.</p>
-                            <p>Sokan nem gondolnak arra, mennyire fontos a rendszeres tisztítás és karbantartás: ez nemcsak a berendezés élettartamát és energiafogyasztását javítja, hanem az egészség megőrzésében is kulcsszerepe van.</p>
-                            <p>Egyéni vállalkozásként indultam, de a növekvő igények miatt mára fiaimmal közösen dolgozunk. Több ezer karbantartást és mosást, valamint több száz telepítést végeztünk el, mindig pontosan, tisztán és megbízhatóan.</p>
-                        </div>
-                        <blockquote class="border-l-4 border-yellow-400 pl-4 italic mt-6 text-xl text-gray-800 font-semibold">
-                            Mottónk: Legyen a te klímád is tiszta!
-                        </blockquote>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="kapcsolat" class="py-20 bg-cyan-700 text-white">
-        <div class="container mx-auto px-6 text-center">
-            <h2 class="text-4xl md:text-5xl font-black mb-4 reveal-on-scroll">Készen áll a tökéletes klímára?</h2>
-            <p class="text-xl mb-8 text-cyan-100 reveal-on-scroll" style="--delay: 150ms;">Hívjon minket bizalommal időpontért vagy egyedi ajánlatért!</p>
-            <div class="inline-block bg-white/90 text-cyan-800 rounded-xl p-8 shadow-2xl reveal-on-scroll" style="--delay: 300ms;">
-                <p class="text-lg mb-2">Időpontegyeztetés telefonon:</p>
-                <a href="tel:+36709304841" class="text-4xl font-bold hover:text-cyan-600 transition-colors duration-300 flex items-center justify-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.518.759a1.156 1.156 0 00-.43 1.659l4.592 4.592a1.156 1.156 0 001.659-.43l.759-1.518a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" /></svg>
-                    +36 70 930 4841
+    <!-- Navigáció -->
+    <header id="main-header" class="fixed top-0 left-0 right-0 z-50 p-4">
+        <div class="max-w-6xl mx-auto">
+            <div id="header-container" class="bg-white/80 backdrop-blur-xl shadow-lg rounded-full px-4 sm:px-6 py-2 flex items-center">
+                <a href="#" class="flex items-center">
+                    <img id="header-logo" src="https://i.postimg.cc/xTYhg4gG/image.png" alt="Cég logó" class="h-8 mr-2 sm:mr-3">
+                    <span id="header-company-name" class="text-base sm:text-xl font-bold text-yellow-600 text-shadow-md">Eszes Tiszta Klíma Kft.</span>
                 </a>
-                <p class="mt-4 text-sm text-gray-600">Hívható hétköznap 8:00 és 18:00 között.</p>
+                
+                <!-- Asztali nézet menü -->
+                <nav id="main-nav" class="hidden md:flex items-center space-x-2">
+                    <a href="#szolgaltatasok" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Szolgáltatások</a>
+                    <a href="#munkaink" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Munkáink</a>
+                    <a href="#rolunk" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Rólunk</a>
+                    <a href="#kapcsolat" class="bg-cyan-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-cyan-700 transition duration-300 shadow-md text-shadow-md">Időpontfoglalás</a>
+                </nav>
+
+                <!-- Mobil nézet menü gomb -->
+                <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0, 0, 24, 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
             </div>
-            <div class="mt-6 reveal-on-scroll" style="--delay: 400ms;">
-                <p class="text-cyan-200">Vagy írjon nekünk e-mailt:</p>
-                <a href="mailto:sandor.szanto@gmail.com" class="text-cyan-100 hover:text-white font-semibold transition-colors duration-300">sandor.szanto@gmail.com</a>
+            <!-- Mobil menü (alapból rejtett) -->
+            <div id="mobile-menu" class="hidden md:hidden bg-white/90 backdrop-blur-lg mt-2 rounded-2xl shadow-lg overflow-hidden">
+                <a href="#szolgaltatasok" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Szolgáltatások</a>
+                <a href="#munkaink" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Munkáink</a>
+                <a href="#rolunk" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Rólunk</a>
+                <a href="#kapcsolat" class="block text-center py-4 px-4 text-sm bg-cyan-600 text-white font-semibold hover:bg-cyan-700">Időpontfoglalás</a>
             </div>
         </div>
-    </section>
+    </header>
 
-    <section id="velemeny" class="py-20">
-        <div class="container mx-auto px-6">
-            <h2 class="text-4xl md:text-5xl font-black text-center mb-12 text-cyan-800 reveal-on-scroll">Mondja el a véleményét!</h2>
-            <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg reveal-on-scroll" style="--delay: 150ms;">
-                <h3 class="text-2xl font-bold text-gray-800 text-center mb-6">Ossza meg velünk tapasztalatait!</h3>
-                <form id="reviewForm">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label for="reviewerName" class="block mb-2 text-sm font-medium text-gray-600">Neve</label>
-                            <input id="reviewerName" type="text" class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-3 focus:ring-cyan-500 focus:border-cyan-500" required />
+    <main>
+        <!-- Hero Szekció -->
+        <section class="hero-bg text-white relative overflow-hidden">
+            <div class="hero-content container mx-auto px-6 pt-32 pb-28 md:pt-40 md:pb-24 text-center">
+                <h1 class="text-4xl md:text-6xl font-black leading-tight mb-4 reveal-on-scroll">Tökéletes klíma otthonodba 48 órán belül</h1>
+                <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-gray-200 reveal-on-scroll" style="--delay: 200ms;">Forró nyarak és hideg telek ellen – mi gondoskodunk az otthonod kényelméről Siófokon és környékén.</p>
+                <div class="mt-10 reveal-on-scroll" style="--delay: 400ms;">
+                    <a href="#kapcsolat" class="bg-yellow-400 text-gray-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition duration-300 shadow-xl inline-block">Ingyenes ajánlat</a>
+                </div>
+            </div>
+            <!-- Futó vélemények sáv -->
+            <div class="absolute bottom-0 left-0 right-0 bg-black/50 backdrop-blur-sm py-4">
+                <div class="w-full flex">
+                    <div id="reviews-container" class="flex whitespace-nowrap marquee items-center">
+                        <!-- Vélemények dinamikusan töltődnek be ide -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Szolgáltatások Szekció -->
+        <section id="szolgaltatasok" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl md:text-5xl font-black text-center mb-12 text-cyan-800 reveal-on-scroll">Szolgáltatásaink</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Szolgáltatás kártya 1: Telepítés -->
+                    <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200 reveal-on-scroll">
+                        <div class="bg-cyan-100 text-cyan-700 rounded-full w-16 h-16 flex items-center justify-center mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
                         </div>
-                        <div>
-                            <label for="reviewerCity" class="block mb-2 text-sm font-medium text-gray-600">Település</label>
-                            <input id="reviewerCity" type="text" class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-3 focus:ring-cyan-500 focus:border-cyan-500" required />
+                        <h3 class="text-xl md:text-2xl font-bold mb-3">Klíma Telepítés</h3>
+                        <p class="text-gray-600 leading-relaxed">Modern, energiahatékony klímaberendezések szakszerű telepítése. Segítünk a megfelelő készülék kiválasztásában és a komplett kivitelezésben, garanciával.</p>
+                    </div>
+                    <!-- Szolgáltatás kártya 2: Karbantartás -->
+                    <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200 reveal-on-scroll" style="--delay: 150ms;">
+                        <div class="bg-cyan-100 text-cyan-700 rounded-full w-16 h-16 flex items-center justify-center mb-6">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+                        </div>
+                        <h3 class="text-xl md:text-2xl font-bold mb-3">Tisztítás és Karbantartás</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            <span class="font-bold">Hogy miért fontos?</span><br>
+                            Ne legyen <strong class="text-red-600">poros, gombás, penészes</strong> a beltéri! Az elhanyagolt klíma akár <strong class="text-red-600">egészségre is káros lehet</strong>, de az elszennyeződött hőcserélő rontja a hatásfokot, <strong class="text-red-600">több energiát</strong> fogyaszt és <strong class="text-red-600">meghibásodáshoz</strong> vezethet.
+                        </p>
+                    </div>
+                    <!-- Szolgáltatás kártya 3: Javítás -->
+                    <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200 reveal-on-scroll" style="--delay: 300ms;">
+                         <div class="bg-cyan-100 text-cyan-700 rounded-full w-16 h-16 flex items-center justify-center mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
+                        </div>
+                        <h3 class="text-xl md:text-2xl font-bold mb-3">Javítás és Hibaelhárítás</h3>
+                        <p class="text-gray-600 leading-relaxed">Meghibásodott a klímája? Márkafüggetlen szervizelést biztosítunk, rövid határidővel Siófok és környékén. Hívjon bizalommal!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Aktuális Munkáink Szekció -->
+        <section id="munkaink" class="py-20 bg-cyan-700 text-white overflow-hidden">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl md:text-5xl font-black text-center mb-4 text-white reveal-on-scroll">Aktuális Munkáink</h2>
+                <p class="text-center text-lg text-cyan-100 mb-12 max-w-2xl mx-auto reveal-on-scroll" style="--delay: 150ms;">Minden klímánk mögött egy elégedett ügyfél áll!</p>
+                
+                <div id="gallery-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    <!-- Betöltési jelzés -->
+                    <p class="text-center col-span-full">Galéria betöltése...</p>
+                </div>
+
+                <div class="mt-16 reveal-on-scroll" style="--delay: 300ms;">
+                    <h3 class="text-2xl font-bold text-center text-white mb-6">Ahol már dolgoztunk:</h3>
+                    <!-- FIX: items-start + overflow-visible az overlay miatt -->
+                    <div id="work-areas-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto items-start overflow-visible">
+                        <!-- Munkaterületek listája ide generálódik -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Rólunk Szekció -->
+        <section id="rolunk" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col md:flex-row items-center gap-12">
+                    <div class="md:w-1/2 reveal-on-scroll">
+                        <img src="https://i.postimg.cc/4yCkJ4zj/20250705-112625.jpg" alt="Barátságos klímaszerelő csapat" class="rounded-2xl shadow-2xl w-full">
+                    </div>
+                    <div class="md:w-1/2 reveal-on-scroll" style="--delay: 200ms;">
+                        <h2 class="text-4xl md:text-5xl font-black mb-6 text-cyan-800 text-center">Rólunk</h2>
+                        <div class="bg-white p-6 rounded-xl shadow-lg">
+                            <div class="space-y-4 text-gray-700 text-base md:text-lg leading-relaxed">
+                                <p>Az Eszes Tiszta Klíma Kft. egy családi vállalkozás, ahol a tiszta és megbízható klímákért dolgozunk.</p>
+                                <p>Sokan nem gondolnak arra, mennyire fontos a rendszeres tisztítás és karbantartás: ez nemcsak a berendezés élettartamát és energiafogyasztását javítja, hanem az egészség megőrzésében is kulcsszerepe van.</p>
+                                <p>Egyéni vállalkozásként indultam, de a növekvő igények miatt mára fiaimmal közösen dolgozunk. Több ezer karbantartást és mosást, valamint több száz telepítést végeztünk el, mindig pontosan, tisztán és megbízhatóan.</p>
+                            </div>
+                            <blockquote class="border-l-4 border-yellow-400 pl-4 italic mt-6 text-xl text-gray-800 font-semibold">
+                                Mottónk: Legyen a te klímád is tiszta!
+                            </blockquote>
                         </div>
                     </div>
-                    <div class="mb-6">
-                        <label for="reviewText" class="block mb-2 text-sm font-medium text-gray-600">Véleménye</label>
-                        <textarea id="reviewText" rows="4" class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-3 focus:ring-cyan-500 focus:border-cyan-500" required></textarea>
-                    </div>
-                    <button id="submitReviewBtn" type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-6 rounded-full text-lg transition shadow-md">Vélemény elküldése</button>
-                </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Kapcsolat / Időpontfoglalás Szekció -->
+        <section id="kapcsolat" class="py-20 bg-cyan-700 text-white">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl md:text-5xl font-black mb-4 reveal-on-scroll">Készen áll a tökéletes klímára?</h2>
+                <p class="text-xl mb-8 text-cyan-100 reveal-on-scroll" style="--delay: 150ms;">Hívjon minket bizalommal időpontért vagy egyedi ajánlatért!</p>
+                <div class="inline-block bg-white/90 text-cyan-800 rounded-xl p-8 shadow-2xl reveal-on-scroll" style="--delay: 300ms;">
+                    <p class="text-lg mb-2">Időpontegyeztetés telefonon:</p>
+                    <a href="tel:+36709304841" class="text-4xl font-bold hover:text-cyan-600 transition-colors duration-300 flex items-center justify-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.518.759a1.156 1.156 0 00-.43 1.659l4.592 4.592a1.156 1.156 0 001.659-.43l.759-1.518a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" /></svg>
+                        +36 70 930 4841
+                    </a>
+                    <p class="mt-4 text-sm text-gray-600">Hívható hétköznap 8:00 és 18:00 között.</p>
+                </div>
+                 <div class="mt-6 reveal-on-scroll" style="--delay: 400ms;">
+                    <p class="text-cyan-200">Vagy írjon nekünk e-mailt:</p>
+                    <a href="mailto:sandor.szanto@gmail.com" class="text-cyan-100 hover:text-white font-semibold transition-colors duration-300">sandor.szanto@gmail.com</a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Vélemények Szekció -->
+        <section id="velemeny" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl md:text-5xl font-black text-center mb-12 text-cyan-800 reveal-on-scroll">Mondja el a véleményét!</h2>
+                
+                <!-- Vélemény űrlap -->
+                <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg reveal-on-scroll" style="--delay: 150ms;">
+                    <h3 class="text-2xl font-bold text-gray-800 text-center mb-6">Ossza meg velünk tapasztalatait!</h3>
+                    <form id="reviewForm">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label for="reviewerName" class="block mb-2 text-sm font-medium text-gray-600">Neve</label>
+                                <input id="reviewerName" type="text" class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-3 focus:ring-cyan-500 focus:border-cyan-500" required />
+                            </div>
+                             <div>
+                                <label for="reviewerCity" class="block mb-2 text-sm font-medium text-gray-600">Település</label>
+                                <input id="reviewerCity" type="text" class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-3 focus:ring-cyan-500 focus:border-cyan-500" required />
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <label for="reviewText" class="block mb-2 text-sm font-medium text-gray-600">Véleménye</label>
+                            <textarea id="reviewText" rows="4" class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-3 focus:ring-cyan-500 focus:border-cyan-500" required></textarea>
+                        </div>
+                        <button id="submitReviewBtn" type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-6 rounded-full text-lg transition shadow-md">Vélemény elküldése</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Lábléc -->
+    <footer class="bg-gray-800 text-white py-10">
+        <div class="container mx-auto px-6 text-center">
+            <p class="text-xl font-bold text-white mb-2">Eszes Tiszta Klíma Kft.</p>
+            <p class="text-gray-400">&copy; 2025 Minden jog fenntartva.</p>
+            <p class="text-sm text-gray-500 mt-4">Powered by: Berceli Bence</p>
+        </div>
+    </footer>
+
+    <!-- Vissza a tetejére gomb -->
+    <a href="#" id="to-top-button" class="fixed bottom-5 right-5 z-50 w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg hover:bg-yellow-500 transition-all duration-300 opacity-0 transform translate-y-5">
+        <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+    </a>
+
+    <!-- Pályázat Popup -->
+    <div id="palyazat-popup" class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm hidden transition-opacity duration-300">
+        <div id="popup-content" class="bg-yellow-50 rounded-xl shadow-2xl p-8 max-w-lg w-full m-4 relative transform transition-all duration-300 opacity-0 translate-y-5">
+            <button id="close-popup-button" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-yellow-800">PÁLYÁZATI LEHETŐSÉG!</h2>
+                <p class="text-5xl font-black text-cyan-800 my-4">100.000 Ft kedvezmény</p>
+                <p class="text-lg text-gray-700">A P-HEM Klíma pályázat keretében most minden magánszemély, aki meglévő fűtési rendszerét klímás fűtéssel egészítené ki, bruttó 100.000 Ft kedvezményre jogosult!</p>
+                <p class="text-gray-600 mt-2">(A pályázatban csak Polar klímák használhatók fel.)</p>
+                <a href="#kapcsolat" id="popup-contact-button" class="mt-6 bg-cyan-600 text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-cyan-700 transition duration-300 shadow-lg inline-block">Segítünk a pályázatban!</a>
             </div>
         </div>
-    </section>
-</main>
-
-<footer class="bg-gray-800 text-white py-10">
-    <div class="container mx-auto px-6 text-center">
-        <p class="text-xl font-bold text-white mb-2">Eszes Tiszta Klíma Kft.</p>
-        <p class="text-gray-400">&copy; 2025 Minden jog fenntartva.</p>
-        <p class="text-sm text-gray-500 mt-4">Powered by: Berceli Bence</p>
     </div>
-</footer>
 
-<a href="#" id="to-top-button" class="fixed bottom-5 right-5 z-50 w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg hover:bg-yellow-500 transition-all duration-300 opacity-0 transform translate-y-5">
-    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
-</a>
-
-<!-- Popup (meghagyva, inaktív) -->
-<div id="palyazat-popup" class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm hidden transition-opacity duration-300">
-    <div id="popup-content" class="bg-yellow-50 rounded-xl shadow-2xl p-8 max-w-lg w-full m-4 relative transform transition-all duration-300 opacity-0 translate-y-5">
-        <button id="close-popup-button" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-        <div class="text-center">
-            <h2 class="text-3xl font-bold text-yellow-800">PÁLYÁZATI LEHETŐSÉG!</h2>
-            <p class="text-5xl font-black text-cyan-800 my-4">100.000 Ft kedvezmény</p>
-            <p class="text-lg text-gray-700">A P-HEM Klíma pályázat keretében most minden magánszemély, aki meglévő fűtési rendszerét klímás fűtéssel egészítené ki, bruttó 100.000 Ft kedvezményre jogosult!</p>
-            <p class="text-gray-600 mt-2">(A pályázatban csak Polar klímák használhatók fel.)</p>
-            <a href="#kapcsolat" id="popup-contact-button" class="mt-6 bg-cyan-600 text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-cyan-700 transition duration-300 shadow-lg inline-block">Segítünk a pályázatban!</a>
+    <!-- Lightbox (Képnézegető) -->
+    <div id="lightbox" class="fixed inset-0 z-[110] flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm hidden transition-opacity duration-300">
+        <div id="lightbox-content" class="relative max-w-4xl max-h-[90vh] w-full p-4">
+            <button id="close-lightbox" class="absolute -top-2 -right-2 md:top-0 md:-right-10 text-white text-5xl font-bold">&times;</button>
+            <img id="lightbox-image" src="" alt="" class="max-w-full max-h-[75vh] mx-auto rounded-lg shadow-2xl">
+            <div id="lightbox-caption" class="text-center text-white mt-4">
+                <h4 id="lightbox-title" class="text-xl font-bold"></h4>
+                <p id="lightbox-description" class="text-gray-300"></p>
+            </div>
         </div>
     </div>
-</div>
+    
+    <script type="module">
+        // Firebase SDK-k
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, Timestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-<div id="lightbox" class="fixed inset-0 z-[110] flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm hidden transition-opacity duration-300">
-    <div id="lightbox-content" class="relative max-w-4xl max-h-[90vh] w-full p-4">
-        <button id="close-lightbox" class="absolute -top-2 -right-2 md:top-0 md:-right-10 text-white text-5xl font-bold">&times;</button>
-        <img id="lightbox-image" src="" alt="" class="max-w-full max-h-[75vh] mx-auto rounded-lg shadow-2xl">
-        <div id="lightbox-caption" class="text-center text-white mt-4">
-            <h4 id="lightbox-title" class="text-xl font-bold"></h4>
-            <p id="lightbox-description" class="text-gray-300"></p>
-        </div>
-    </div>
-</div>
+        // --- Firebase config ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyB0yin_VnilXLpth-qzNsJqpIwyalirI6M",
+            authDomain: "klima-weboldal.firebaseapp.com",
+            projectId: "klima-weboldal",
+            storageBucket: "klima-weboldal.appspot.com",
+            messagingSenderId: "31440003199",
+            appId: "1:31440003199:web:13ec2fcd1601861eec5f4a"
+        };
+        const appId = firebaseConfig.projectId || 'default-app-id';
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, Timestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // --- Init ---
+        let app, db, auth;
+        try {
+            app = initializeApp(firebaseConfig);
+            db  = getFirestore(app);
+            auth = getAuth(app);
+        } catch (e) {
+            console.error("Firebase initialization failed. Using default content.", e);
+        }
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyB0yin_VnilXLpth-qzNsJqpIwyalirI6M",
-        authDomain: "klima-weboldal.firebaseapp.com",
-        projectId: "klima-weboldal",
-        storageBucket: "klima-weboldal.appspot.com",
-        messagingSenderId: "31440003199",
-        appId: "1:31440003199:web:13ec2fcd1601861eec5f4a"
-    };
+        // DOM horgonyok
+        const reviewForm = document.getElementById('reviewForm');
+        const reviewsContainer = document.getElementById('reviews-container');
 
-    let app, db, auth;
-    try {
-        app = initializeApp(firebaseConfig);
-        db  = getFirestore(app);
-        auth = getAuth(app);
-    } catch (e) {
-        console.error("Firebase initialization failed. Using default content.", e);
-    }
+        // Auth: anonim login, utána betöltés
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    loadReviews();
+                } else {
+                    signInAnonymously(auth).catch((error) => {
+                        console.error("Anonim bejelentkezési hiba:", error);
+                        loadDefaultReviews();
+                    });
+                }
+            });
+        } else {
+            loadDefaultReviews();
+        }
 
-    const reviewForm = document.getElementById('reviewForm');
-    const reviewsContainer = document.getElementById('reviews-container');
+        // Vélemény beküldés
+        reviewForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!db) {
+                alert("A véleményküldés funkció jelenleg nem elérhető.");
+                return;
+            }
+            const btn = document.getElementById('submitReviewBtn');
+            btn.disabled = true;
+            btn.textContent = 'Küldés...';
 
-    if (auth) {
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                loadReviews();
-            } else {
-                signInAnonymously(auth).catch((error) => {
-                    console.error("Anonim bejelentkezési hiba:", error);
-                    loadDefaultReviews();
+            const name = document.getElementById('reviewerName').value.trim();
+            const city = document.getElementById('reviewerCity').value.trim();
+            const text = document.getElementById('reviewText').value.trim();
+
+            if (!name || !text || !city) {
+                alert('Töltsön ki minden mezőt!');
+                btn.disabled = false; btn.textContent = 'Vélemény elküldése';
+                return;
+            }
+
+            try {
+                const reviewsPath = `reviews`; 
+                await addDoc(collection(db, reviewsPath), {
+                    name,
+                    city,
+                    text,
+                    createdAt: Timestamp.now()
                 });
+
+                reviewForm.reset();
+                alert('Köszönjük a véleményét!');
+                await loadReviews();
+            } catch (err) {
+                console.error('Hiba a mentéskor:', err);
+                alert('Hiba történt a vélemény mentése során.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Vélemény elküldése';
             }
         });
-    } else {
-        loadDefaultReviews();
-    }
 
-    reviewForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!db) { alert("A véleményküldés funkció jelenleg nem elérhető."); return; }
-        const btn = document.getElementById('submitReviewBtn');
-        btn.disabled = true; btn.textContent = 'Küldés...';
+        // Vélemények betöltése
+        async function loadReviews() {
+            reviewsContainer.innerHTML = '';
+            try {
+                const qRef = query(
+                    collection(db, `reviews`),
+                    orderBy('createdAt', 'desc')
+                );
+                const snap = await getDocs(qRef);
 
-        const name = document.getElementById('reviewerName').value.trim();
-        const city = document.getElementById('reviewerCity').value.trim();
-        const text = document.getElementById('reviewText').value.trim();
+                if (snap.empty) {
+                    loadDefaultReviews(); 
+                    return;
+                }
+                
+                let marqueeHTML = '';
+                snap.forEach(docSnap => {
+                    const r = docSnap.data();
+                    marqueeHTML += `
+                        <div class="flex-shrink-0 mx-6 text-center">
+                            <p class="text-white text-lg font-semibold text-shadow-strong">"${escapeHtml(r.text)}"</p>
+                            <p class="text-base text-gray-200 mt-1 text-shadow-strong">- ${escapeHtml(r.name)}, ${escapeHtml(r.city)}</p>
+                        </div>
+                    `;
+                });
+                reviewsContainer.innerHTML = marqueeHTML + marqueeHTML; 
 
-        if (!name || !text || !city) {
-            alert('Töltsön ki minden mezőt!');
-            btn.disabled = false; btn.textContent = 'Vélemény elküldése';
-            return;
+            } catch (err) {
+                console.error('Betöltési hiba:', err);
+                loadDefaultReviews();
+            }
         }
-
-        try {
-            await addDoc(collection(db, `reviews`), { name, city, text, createdAt: Timestamp.now() });
-            reviewForm.reset();
-            alert('Köszönjük a véleményét!');
-            await loadReviews();
-        } catch (err) {
-            console.error('Hiba a mentéskor:', err);
-            alert('Hiba történt a vélemény mentése során.');
-        } finally {
-            btn.disabled = false; btn.textContent = 'Vélemény elküldése';
-        }
-    });
-
-    async function loadReviews() {
-        reviewsContainer.innerHTML = '';
-        try {
-            const qRef = query(collection(db, `reviews`), orderBy('createdAt', 'desc'));
-            const snap = await getDocs(qRef);
-            if (snap.empty) { loadDefaultReviews(); return; }
+        
+        function loadDefaultReviews() {
+            const defaultReviews = [
+                { name: "Nagy Család", city: "Siófok", review: "Gyorsak, profik és nagyon tisztán dolgoztak. Végre hűvös van a nappaliban!" },
+                { name: "Kiss Péter", city: "Székesfehérvár", review: "Minden a megbeszéltek szerint történt, a klíma tökéletesen működik. Csak ajánlani tudom!" },
+                { name: "Horváth Éva", city: "Veszprém", review: "A régi, zajos klímánkat cserélték le egy újra. Hatalmas a különbség, köszönjük!" }
+            ];
             let marqueeHTML = '';
-            snap.forEach(docSnap => {
-                const r = docSnap.data();
-                marqueeHTML += `
+            defaultReviews.forEach(r => {
+                 marqueeHTML += `
                     <div class="flex-shrink-0 mx-6 text-center">
-                        <p class="text-white text-lg font-semibold text-shadow-strong">"${escapeHtml(r.text)}"</p>
-                        <p class="text-base text-gray-200 mt-1 text-shadow-strong">- ${escapeHtml(r.name)}, ${escapeHtml(r.city)}</p>
+                        <p class="text-white text-lg font-semibold text-shadow-strong">"${r.review}"</p>
+                        <p class="text-base text-gray-200 mt-1 text-shadow-strong">- ${r.name}, ${r.city}</p>
                     </div>
                 `;
             });
             reviewsContainer.innerHTML = marqueeHTML + marqueeHTML;
-        } catch (err) {
-            console.error('Betöltési hiba:', err);
-            loadDefaultReviews();
         }
-    }
 
-    function loadDefaultReviews() {
-        const defaultReviews = [
-            { name: "Nagy Család", city: "Siófok", review: "Gyorsak, profik és nagyon tisztán dolgoztak. Végre hűvös van a nappaliban!" },
-            { name: "Kiss Péter", city: "Székesfehérvár", review: "Minden a megbeszéltek szerint történt, a klíma tökéletesen működik. Csak ajánlani tudom!" },
-            { name: "Horváth Éva", city: "Veszprém", review: "A régi, zajos klímánkat cserélték le egy újra. Hatalmas a különbség, köszönjük!" }
-        ];
-        let marqueeHTML = '';
-        defaultReviews.forEach(r => {
-            marqueeHTML += `
-                <div class="flex-shrink-0 mx-6 text-center">
-                    <p class="text-white text-lg font-semibold text-shadow-strong">"${r.review}"</p>
-                    <p class="text-base text-gray-200 mt-1 text-shadow-strong">- ${r.name}, ${r.city}</p>
-                </div>
-            `;
-        });
-        reviewsContainer.innerHTML = marqueeHTML + marqueeHTML;
-    }
-
-    function escapeHtml(str) {
-        return String(str).replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-    }
-</script>
-
-<script>
-    // Mobil menü
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const navLinks = mobileMenu.querySelectorAll('a');
-    mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
-    navLinks.forEach(link => link.addEventListener('click', () => mobileMenu.classList.add('hidden')));
-
-    // Galéria + lightbox
-    const galleryContainer = document.getElementById('gallery-container');
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImage = document.getElementById('lightbox-image');
-    const lightboxTitle = document.getElementById('lightbox-title');
-    const lightboxDescription = document.getElementById('lightbox-description');
-    const closeLightboxButton = document.getElementById('close-lightbox');
-
-    function openLightbox(src, title, description) {
-        lightboxImage.src = src; lightboxTitle.textContent = title; lightboxDescription.textContent = description;
-        lightbox.classList.remove('hidden');
-    }
-    function closeLightbox() { lightbox.classList.add('hidden'); }
-    galleryContainer.addEventListener('click', (e) => {
-        const galleryItem = e.target.closest('.gallery-item');
-        if (galleryItem) openLightbox(galleryItem.dataset.src, galleryItem.dataset.title, galleryItem.dataset.description);
-    });
-    closeLightboxButton.addEventListener('click', closeLightbox);
-    lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
-
-    window.addEventListener('DOMContentLoaded', () => {
-        const galleryContainer = document.getElementById('gallery-container');
-        const workAreasContainer = document.getElementById('work-areas-container');
-
-        fetch('/data/gallery.json')
-            .then(r => r.json())
-            .then(data => {
-                galleryContainer.innerHTML = '';
-                if (data.images?.length) {
-                    data.images.forEach((item, i) => {
-                        galleryContainer.innerHTML += `
-                            <div class="gallery-item group relative aspect-square overflow-hidden rounded-lg shadow-lg cursor-pointer reveal-on-scroll" 
-                                data-src="${item.image}" data-title="${item.title}" data-description="${item.description}"
-                                style="--delay: ${i * 100}ms">
-                                <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                                <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300"></div>
-                            </div>`;
-                    });
-                    initializeScrollAnimation();
-                } else {
-                    galleryContainer.innerHTML = '<p class="text-center col-span-full">Jelenleg nincsenek képek a galériában.</p>';
-                }
-            })
-            .catch(() => galleryContainer.innerHTML = '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben.</p>');
-
-        fetch('/data/locations.json')
-            .then(r => r.json())
-            .then(data => {
-                workAreasContainer.innerHTML = '';
-                if (data.counties?.length) {
-                    data.counties.forEach(county => {
-                        const item = document.createElement('div');
-                        // FONTOS: relative + overlay működéséhez
-                        item.className = 'accordion-item relative bg-white/20 rounded-lg';
-
-                        let cityListHTML = '';
-                        county.cities?.forEach(city => {
-                            cityListHTML += `
-                                <div class="flex items-center py-2 px-4">
-                                    ${city.completed ? '<div class="w-2 h-2 rounded-full bg-green-400 mr-3"></div>' : '<div class="w-2 h-2 rounded-full bg-gray-400 mr-3"></div>'}
-                                    <span>${city.city_name}</span>
-                                </div>`;
-                        });
-
-                        item.innerHTML = `
-                            <button class="accordion-header w-full text-left p-4 flex justify-between items-center">
-                                <div class="flex items-center">
-                                    <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    <span class="font-bold text-lg">${county.county_name}</span>
-                                </div>
-                                <svg class="w-5 h-5 accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                            </button>
-                            <!-- OVERLAY: abszolút, nem tolja le a többieket -->
-                            <div class="city-list absolute left-0 right-0 top-full mt-2 z-50
-                                        bg-white/20 backdrop-blur-md rounded-lg shadow-xl
-                                        max-h-0 overflow-hidden transition-[max-height] duration-500 ease-in-out
-                                        pl-8 pr-4 pb-2">
-                                ${cityListHTML}
-                            </div>`;
-                        workAreasContainer.appendChild(item);
-                    });
-
-                    // Egyszerre csak 1 nyíljon + overlay marad
-                    document.querySelectorAll('.accordion-header').forEach(button => {
-                        button.addEventListener('click', () => {
-                            const accordionItem = button.parentElement;
-                            const isOpen = accordionItem.classList.contains('open');
-
-                            // mind zár
-                            document.querySelectorAll('.accordion-item').forEach(item => {
-                                item.classList.remove('open');
-                                const list = item.querySelector('.city-list');
-                                if (list) list.style.maxHeight = 0;
-                            });
-
-                            // nyit ha nem volt nyitva
-                            if (!isOpen) {
-                                accordionItem.classList.add('open');
-                                const cityList = accordionItem.querySelector('.city-list');
-                                if (cityList) cityList.style.maxHeight = cityList.scrollHeight + 'px';
-                            }
-                        });
-                    });
-                }
-            })
-            .catch(() => workAreasContainer.innerHTML = '<p class="text-center text-white">Hiba történt a területek betöltésekor.</p>');
-    });
-
-    function initializeScrollAnimation() {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    observer.unobserve(entry.target);
-                }
+        function escapeHtml(str) {
+            return String(str).replace(/[&<>"']/g, (match) => {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[match];
             });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
-    }
-    initializeScrollAnimation();
-
-    const toTopButton = document.getElementById('to-top-button');
-    const header = document.getElementById('main-header');
-
-    window.addEventListener('scroll', () => {
-        header.classList.toggle('header-scrolled', window.scrollY > 50);
-        if (window.scrollY > window.innerHeight / 2) {
-            toTopButton.classList.remove('opacity-0', 'translate-y-5');
-        } else {
-            toTopButton.classList.add('opacity-0', 'translate-y-5');
         }
-    });
+    </script>
+    <script>
+        // UI scriptek, amik nem függnek a Firebase-től
+        // Mobil menü kezelése
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navLinks = mobileMenu.querySelectorAll('a');
 
-    const popup = document.getElementById('palyazat-popup');
-    const popupContent = document.getElementById('popup-content');
-    const closePopupButton = document.getElementById('close-popup-button');
-    const popupContactButton = document.getElementById('popup-contact-button');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
 
-    function hidePopup() {
-        popup.classList.add('opacity-0');
-        popupContent.classList.add('opacity-0', 'translate-y-5');
-        setTimeout(() => popup.classList.add('hidden'), 300);
-    }
-    closePopupButton?.addEventListener('click', hidePopup);
-    popupContactButton?.addEventListener('click', hidePopup);
-    popup?.addEventListener('click', (e) => { if (e.target === popup) hidePopup(); });
-</script>
+        // Galéria dinamikus betöltése és Lightbox
+        const galleryContainer = document.getElementById('gallery-container');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImage = document.getElementById('lightbox-image');
+        const lightboxTitle = document.getElementById('lightbox-title');
+        const lightboxDescription = document.getElementById('lightbox-description');
+        const closeLightboxButton = document.getElementById('close-lightbox');
+
+        function openLightbox(src, title, description) {
+            lightboxImage.src = src;
+            lightboxTitle.textContent = title;
+            lightboxDescription.textContent = description;
+            lightbox.classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            lightbox.classList.add('hidden');
+        }
+
+        galleryContainer.addEventListener('click', (e) => {
+            const galleryItem = e.target.closest('.gallery-item');
+            if (galleryItem) {
+                openLightbox(
+                    galleryItem.dataset.src,
+                    galleryItem.dataset.title,
+                    galleryItem.dataset.description
+                );
+            }
+        });
+
+        closeLightboxButton.addEventListener('click', closeLightbox);
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) {
+                closeLightbox();
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const galleryContainer = document.getElementById('gallery-container');
+            const workAreasContainer = document.getElementById('work-areas-container');
+            
+            fetch('/data/gallery.json')
+                .then(response => response.json())
+                .then(data => {
+                    galleryContainer.innerHTML = ''; // Töröljük a "betöltés" üzenetet
+                    if (data.images && data.images.length > 0) {
+                        data.images.forEach((item, index) => {
+                            const card = `
+                                <div class="gallery-item group relative aspect-square overflow-hidden rounded-lg shadow-lg cursor-pointer reveal-on-scroll" 
+                                     data-src="${item.image}" 
+                                     data-title="${item.title}" 
+                                     data-description="${item.description}"
+                                     style="--delay: ${index * 100}ms">
+                                    <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                    <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300"></div>
+                                </div>
+                            `;
+                            galleryContainer.innerHTML += card;
+                        });
+                        initializeScrollAnimation();
+                    } else {
+                        galleryContainer.innerHTML = '<p class="text-center col-span-full">Jelenleg nincsenek képek a galériában.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Hiba a galéria betöltése közben:', error);
+                    galleryContainer.innerHTML = '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben.</p>';
+                });
+            
+            fetch('/data/locations.json')
+                .then(response => response.json())
+                .then(data => {
+                    workAreasContainer.innerHTML = '';
+                    if (data.counties && data.counties.length > 0) {
+                        data.counties.forEach(county => {
+                            const item = document.createElement('div');
+                            /* FIX 1: kártya legyen relative az overlay-hez */
+                            item.className = 'accordion-item relative bg-white/20 rounded-lg';
+                            
+                            let cityListHTML = '';
+                            if(county.cities && county.cities.length > 0) {
+                                county.cities.forEach(city => {
+                                    cityListHTML += `
+                                        <div class="flex items-center py-2 px-4">
+                                            ${city.completed ? '<div class="w-2 h-2 rounded-full bg-green-400 mr-3"></div>' : '<div class="w-2 h-2 rounded-full bg-gray-400 mr-3"></div>'}
+                                            <span>${city.city_name}</span>
+                                        </div>
+                                    `;
+                                });
+                            }
+
+                            /* FIX 2: city-list abszolút overlay + z-50 */
+                            item.innerHTML = `
+                                <button class="accordion-header w-full text-left p-4 flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        <span class="font-bold text-lg">${county.county_name}</span>
+                                    </div>
+                                    <svg class="w-5 h-5 accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </button>
+                                <div class="city-list absolute left-0 right-0 top-full mt-2 z-50
+                                            bg-white/20 backdrop-blur-md rounded-lg shadow-xl
+                                            max-h-0 overflow-hidden transition-[max-height] duration-500 ease-in-out
+                                            pl-8 pr-4 pb-2">
+                                    ${cityListHTML}
+                                </div>
+                            `;
+                            workAreasContainer.appendChild(item);
+                        });
+
+                        /* FIX 3: egyszerre csak 1 nyíljon – overlay marad */
+                        document.querySelectorAll('.accordion-header').forEach(button => {
+                            button.addEventListener('click', () => {
+                                const accordionItem = button.parentElement;
+                                const isOpen = accordionItem.classList.contains('open');
+                                
+                                document.querySelectorAll('.accordion-item').forEach(item => {
+                                    item.classList.remove('open');
+                                    const list = item.querySelector('.city-list');
+                                    if (list) list.style.maxHeight = 0;
+                                });
+
+                                if (!isOpen) {
+                                    accordionItem.classList.add('open');
+                                    const cityList = accordionItem.querySelector('.city-list');
+                                    if (cityList) cityList.style.maxHeight = cityList.scrollHeight + "px";
+                                }
+                            });
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Hiba a munkaterületek betöltése közben:', error);
+                    workAreasContainer.innerHTML = '<p class="text-center text-white">Hiba történt a területek betöltésekor.</p>';
+                });
+        });
+        
+        // Görgetés figyelő animációhoz
+        function initializeScrollAnimation() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+
+            const elementsToAnimate = document.querySelectorAll('.reveal-on-scroll');
+            elementsToAnimate.forEach(el => observer.observe(el));
+        }
+
+        initializeScrollAnimation();
+
+        // Fejléc és Vissza a tetejére gomb animáció
+        const toTopButton = document.getElementById('to-top-button');
+        const header = document.getElementById('main-header');
+
+        window.addEventListener('scroll', () => {
+            // Fejléc
+            if (window.scrollY > 50) {
+                header.classList.add('header-scrolled');
+            } else {
+                header.classList.remove('header-scrolled');
+            }
+
+            // Vissza a tetejére gomb
+            if (window.scrollY > window.innerHeight / 2) {
+                toTopButton.classList.remove('opacity-0', 'translate-y-5');
+            } else {
+                toTopButton.classList.add('opacity-0', 'translate-y-5');
+            }
+        });
+
+        // Popup kezelése
+        const popup = document.getElementById('palyazat-popup');
+        const popupContent = document.getElementById('popup-content');
+        const closePopupButton = document.getElementById('close-popup-button');
+        const popupContactButton = document.getElementById('popup-contact-button');
+
+        function showPopup() {
+            if (!sessionStorage.getItem('palyazatPopupShown')) {
+                popup.classList.remove('hidden');
+                setTimeout(() => {
+                    popup.classList.remove('opacity-0');
+                    popupContent.classList.remove('opacity-0', 'translate-y-5');
+                }, 50);
+                sessionStorage.setItem('palyazatPopupShown', 'true');
+            }
+        }
+
+        function hidePopup() {
+            popup.classList.add('opacity-0');
+            popupContent.classList.add('opacity-0', 'translate-y-5');
+            setTimeout(() => {
+                popup.classList.add('hidden');
+            }, 300);
+        }
+
+        // setTimeout(showPopup, 2000); // Popup ideiglenesen kikapcsolva
+
+        closePopupButton.addEventListener('click', hidePopup);
+        popupContactButton.addEventListener('click', hidePopup);
+        popup.addEventListener('click', (e) => {
+            if (e.target === popup) {
+                hidePopup();
+            }
+        });
+    </script>
 </body>
 </html>
