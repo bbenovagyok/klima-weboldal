@@ -623,12 +623,18 @@
                         document.querySelectorAll('.accordion-header').forEach(button => {
                             button.addEventListener('click', () => {
                                 const accordionItem = button.parentElement;
-                                accordionItem.classList.toggle('open');
-                                const cityList = accordionItem.querySelector('.city-list');
+                                
                                 if (accordionItem.classList.contains('open')) {
-                                    cityList.style.maxHeight = cityList.scrollHeight + "px";
+                                    accordionItem.classList.remove('open');
+                                    accordionItem.querySelector('.city-list').style.maxHeight = 0;
                                 } else {
-                                    cityList.style.maxHeight = 0;
+                                    document.querySelectorAll('.accordion-item').forEach(item => {
+                                        item.classList.remove('open');
+                                        item.querySelector('.city-list').style.maxHeight = 0;
+                                    });
+                                    accordionItem.classList.add('open');
+                                    const cityList = accordionItem.querySelector('.city-list');
+                                    cityList.style.maxHeight = cityList.scrollHeight + "px";
                                 }
                             });
                         });
