@@ -583,7 +583,7 @@
                     console.error('Hiba a galéria betöltése közben:', error);
                     galleryContainer.innerHTML = '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben.</p>';
                 });
-
+            
             fetch('/data/locations.json')
                 .then(response => response.json())
                 .then(data => {
