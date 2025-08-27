@@ -156,7 +156,7 @@
     <main>
         <!-- Hero Szekció -->
         <section class="hero-bg text-white relative overflow-hidden">
-            <div class="hero-content container mx-auto px-6 pt-32 pb-16 md:pt-40 md:pb-24 text-center">
+            <div class="hero-content container mx-auto px-6 pt-32 pb-28 md:pt-40 md:pb-24 text-center">
                 <h1 class="text-4xl md:text-6xl font-black leading-tight mb-4 reveal-on-scroll">Tökéletes klíma otthonodba 48 órán belül</h1>
                 <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-gray-200 reveal-on-scroll" style="--delay: 200ms;">Forró nyarak és hideg telek ellen – mi gondoskodunk az otthonod kényelméről Siófokon és környékén.</p>
                 <div class="mt-10 reveal-on-scroll" style="--delay: 400ms;">
@@ -623,15 +623,14 @@
                         document.querySelectorAll('.accordion-header').forEach(button => {
                             button.addEventListener('click', () => {
                                 const accordionItem = button.parentElement;
+                                const isOpen = accordionItem.classList.contains('open');
                                 
-                                if (accordionItem.classList.contains('open')) {
-                                    accordionItem.classList.remove('open');
-                                    accordionItem.querySelector('.city-list').style.maxHeight = 0;
-                                } else {
-                                    document.querySelectorAll('.accordion-item').forEach(item => {
-                                        item.classList.remove('open');
-                                        item.querySelector('.city-list').style.maxHeight = 0;
-                                    });
+                                document.querySelectorAll('.accordion-item').forEach(item => {
+                                    item.classList.remove('open');
+                                    item.querySelector('.city-list').style.maxHeight = 0;
+                                });
+
+                                if (!isOpen) {
                                     accordionItem.classList.add('open');
                                     const cityList = accordionItem.querySelector('.city-list');
                                     cityList.style.maxHeight = cityList.scrollHeight + "px";
