@@ -19,10 +19,6 @@
         {
           "city_name": "Veszprém",
           "completed": true
-        },
-        {
-          "city_name": "Balatonfüred",
-          "completed": false
         }
       ]
     },
