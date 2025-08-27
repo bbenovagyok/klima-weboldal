@@ -6,16 +6,16 @@ media_folder: "img/uploads" # Ide menti a feltöltött képeket
 public_folder: "/img/uploads" # Innen fogja a weboldal betölteni a képeket
 
 collections:
-  - name: "gallery" # A kollekció belső neve
-    label: "Galéria" # Ez jelenik meg az admin felületen
+  - name: "gallery"
+    label: "Galéria"
     files:
       - label: "Munkáink Galéria"
         name: "munkaink"
-        file: "data/gallery.json" # Az adatfájl, ahova a képek adatait menti
+        file: "data/gallery.json"
         fields:
           - label: "Galéria Képek"
             name: "images"
-            widget: "list" # Lista, mert több képet is fel lehet tölteni
+            widget: "list"
             fields:
               - { label: "Kép", name: "image", widget: "image" }
               - { label: "Cím", name: "title", widget: "string" }
@@ -23,11 +23,18 @@ collections:
   - name: "locations"
     label: "Munkaterületek"
     files:
-      - label: "Megye Lista"
-        name: "counties"
+      - label: "Helyszínek"
+        name: "locations"
         file: "data/locations.json"
         fields:
           - label: "Megyék"
             name: "counties"
             widget: "list"
-            field: { label: "Megye neve", name: "county", widget: "string" }
+            fields:
+              - { label: "Megye neve", name: "county_name", widget: "string" }
+              - label: "Városok"
+                name: "cities"
+                widget: "list"
+                fields:
+                  - { label: "Város neve", name: "city_name", widget: "string" }
+                  - { label: "Már dolgoztunk itt?", name: "completed", widget: "boolean", default: false }
