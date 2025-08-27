@@ -554,6 +554,7 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             const galleryContainer = document.getElementById('gallery-container');
+            const workAreasContainer = document.getElementById('work-areas-container');
             
             fetch('/data/gallery.json')
                 .then(response => response.json())
@@ -581,6 +582,61 @@
                 .catch(error => {
                     console.error('Hiba a galéria betöltése közben:', error);
                     galleryContainer.innerHTML = '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben.</p>';
+                });
+
+            fetch('/data/locations.json')
+                .then(response => response.json())
+                .then(data => {
+                    workAreasContainer.innerHTML = '';
+                    if (data.counties && data.counties.length > 0) {
+                        data.counties.forEach(county => {
+                            const item = document.createElement('div');
+                            item.className = 'accordion-item bg-white/20 rounded-lg';
+                            
+                            let cityListHTML = '';
+                            if(county.cities && county.cities.length > 0) {
+                                county.cities.forEach(city => {
+                                    cityListHTML += `
+                                        <div class="flex items-center py-2 px-4">
+                                            ${city.completed ? '<div class="w-2 h-2 rounded-full bg-green-400 mr-3"></div>' : '<div class="w-2 h-2 rounded-full bg-gray-400 mr-3"></div>'}
+                                            <span>${city.city_name}</span>
+                                        </div>
+                                    `;
+                                });
+                            }
+
+                            item.innerHTML = `
+                                <button class="accordion-header w-full text-left p-4 flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        <span class="font-bold text-lg">${county.county_name}</span>
+                                    </div>
+                                    <svg class="w-5 h-5 accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </button>
+                                <div class="city-list pl-8 pr-4 pb-2">
+                                    ${cityListHTML}
+                                </div>
+                            `;
+                            workAreasContainer.appendChild(item);
+                        });
+
+                        document.querySelectorAll('.accordion-header').forEach(button => {
+                            button.addEventListener('click', () => {
+                                const accordionItem = button.parentElement;
+                                accordionItem.classList.toggle('open');
+                                const cityList = accordionItem.querySelector('.city-list');
+                                if (accordionItem.classList.contains('open')) {
+                                    cityList.style.maxHeight = cityList.scrollHeight + "px";
+                                } else {
+                                    cityList.style.maxHeight = 0;
+                                }
+                            });
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Hiba a munkaterületek betöltése közben:', error);
+                    workAreasContainer.innerHTML = '<p class="text-center text-white">Hiba történt a területek betöltésekor.</p>';
                 });
         });
         
