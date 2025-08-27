@@ -34,7 +34,7 @@
     .marquee{animation:marquee 60s linear infinite}
     @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-    /* alap accordion anim (max-height) – az overlay-es megoldásnál osztályokkal bővítjük JS-ből */
+    /* alap: csukva ne legyen „szellemsáv” */
     .city-list{max-height:0;overflow:hidden;transition:max-height .5s ease-in-out}
     .accordion-arrow{transition:transform .3s ease-in-out}
     .accordion-item.open .accordion-arrow{transform:rotate(90deg)}
@@ -133,10 +133,7 @@
 
         <div class="mt-16 reveal-on-scroll" style="--delay:300ms">
           <h3 class="text-2xl font-bold text-center text-white mb-6">Ahol már dolgoztunk:</h3>
-          <!-- fontos: overflow-visible, hogy az overlay ne vágódjon le -->
-          <div id="work-areas-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto items-start overflow-visible">
-            <!-- ide jön a dinamika -->
-          </div>
+          <div id="work-areas-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto items-start overflow-visible"></div>
         </div>
       </div>
     </section>
@@ -173,7 +170,7 @@
         <div class="inline-block bg-white/90 text-cyan-800 rounded-xl p-8 shadow-2xl reveal-on-scroll" style="--delay:300ms">
           <p class="text-lg mb-2">Időpontegyeztetés telefonon:</p>
           <a href="tel:+36709304841" class="text-4xl font-bold hover:text-cyan-600 transition-colors duration-300 flex items-center justify-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.518.759a1.156 1.156 0 00-.43 1.659l4.592 4.592a1.156 1.156 0 001.659-.43l.759-1.518a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.518.759a1.156 1.156 0 00-.43 1.659l4.592 4.592a1 1 0 001.659-.43l.759-1.518a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
             +36 70 930 4841
           </a>
           <p class="mt-4 text-sm text-gray-600">Hívható hétköznap 8:00 és 18:00 között.</p>
@@ -225,7 +222,7 @@
     <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
   </a>
 
-  <!-- Popup (meghagyva) -->
+  <!-- Popup -->
   <div id="palyazat-popup" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-opacity duration-300">
     <div id="popup-content" class="bg-yellow-50 rounded-xl shadow-2xl p-8 max-w-lg w-full m-4 relative transform transition-all duration-300 opacity-0 translate-y-5">
       <button id="close-popup-button" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">
@@ -384,7 +381,6 @@
           if(data.counties?.length){
             data.counties.forEach(county=>{
               const item=document.createElement('div');
-              // kártya legyen relative (overlay ehhez igazodik)
               item.className='accordion-item relative bg-white/20 rounded-lg';
 
               let cityListHTML='';
@@ -392,24 +388,25 @@
                 cityListHTML+=`
                   <div class="flex items-center py-2">
                     ${c.completed?'<div class="w-2 h-2 rounded-full bg-green-400 mr-3"></div>':'<div class="w-2 h-2 rounded-full bg-gray-400 mr-3"></div>'}
-                    <span>${c.city_name}</span>
+                    <span class="text-white/90">${c.city_name}</span>
                   </div>`;
               });
 
-              // FONTOS: csukva nincs mt/shadow → nem lesz „csík”
+              /* CSUKVA: nincs háttér/ring/árnyék → nincs szellemsáv
+                 NYITVA: osztályok JS-ből kerülnek rá (glass, gradient, ring, shadow) */
               item.innerHTML = `
                 <button class="accordion-header w-full text-left p-4 flex justify-between items-center">
                   <div class="flex items-center">
                     <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <span class="font-bold text-lg">${county.county_name}</span>
+                    <span class="font-bold text-lg"> ${county.county_name}</span>
                   </div>
                   <svg class="w-5 h-5 accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </button>
 
                 <div class="city-list absolute left-0 right-0 top-full z-50
-                            bg-white/80 backdrop-blur-xl rounded-xl
+                            rounded-xl
                             max-h-0 overflow-hidden transition-[max-height,opacity,transform] duration-300 ease-out
-                            opacity-0 pointer-events-none translate-y-1">
+                            opacity-0 pointer-events-none translate-y-1 text-white">
                   <div class="py-3 pl-8 pr-4">
                     ${cityListHTML}
                   </div>
@@ -418,7 +415,7 @@
               workAreasContainer.appendChild(item);
             });
 
-            // egyszerre csak 1 nyíljon ki + nyitva kap árnyékot/ringet + kis felúszás
+            // egyszerre csak 1 nyíljon ki + nyitva kap „glass” stílust
             document.querySelectorAll('.accordion-header').forEach(btn=>{
               btn.addEventListener('click',()=>{
                 const acc = btn.parentElement;
@@ -429,7 +426,12 @@
                   const list=it.querySelector('.city-list');
                   if(list){
                     list.style.maxHeight=0;
-                    list.classList.remove('mt-2','opacity-100','pointer-events-auto','translate-y-0','shadow-xl','ring-1','ring-white/30');
+                    list.classList.remove(
+                      'mt-2','opacity-100','pointer-events-auto','translate-y-0',
+                      'shadow-2xl','ring-1','ring-white/15',
+                      'bg-cyan-900/20','backdrop-blur-lg',
+                      'bg-gradient-to-b','from-white/10','to-white/5'
+                    );
                     list.classList.add('opacity-0','pointer-events-none','translate-y-1');
                   }
                 });
@@ -439,7 +441,12 @@
                   const list=acc.querySelector('.city-list');
                   if(list){
                     list.style.maxHeight=list.scrollHeight+'px';
-                    list.classList.add('mt-2','opacity-100','pointer-events-auto','translate-y-0','shadow-xl','ring-1','ring-white/30');
+                    list.classList.add(
+                      'mt-2','opacity-100','pointer-events-auto','translate-y-0',
+                      'shadow-2xl','ring-1','ring-white/15',
+                      'bg-cyan-900/20','backdrop-blur-lg',
+                      'bg-gradient-to-b','from-white/10','to-white/5'
+                    );
                     list.classList.remove('opacity-0','pointer-events-none','translate-y-1');
                   }
                 }
