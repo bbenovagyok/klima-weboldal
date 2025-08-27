@@ -445,27 +445,26 @@
 
                     // >>> Itt a FIX: egyszerre csak 1 nyílik + kifeszül egy teljes sorra
                     document.querySelectorAll('.accordion-header').forEach(button => {
-                        button.addEventListener('click', () => {
-                            const accordionItem = button.parentElement;
-                            const isOpen = accordionItem.classList.contains('open');
+  button.addEventListener('click', () => {
+    const accordionItem = button.parentElement;
+    const isOpen = accordionItem.classList.contains('open');
 
-                            // Minden más zár + vissza 1 oszlopra
-                            document.querySelectorAll('.accordion-item').forEach(item => {
-                                item.classList.remove('open', 'md:col-span-2', 'lg:col-span-3');
-                                item.classList.add('col-span-1');
-                                const list = item.querySelector('.city-list');
-                                if (list) list.style.maxHeight = 0;
-                            });
+    // először minden bezár
+    document.querySelectorAll('.accordion-item').forEach(item => {
+      item.classList.remove('open');
+      const list = item.querySelector('.city-list');
+      if (list) list.style.maxHeight = 0;
+    });
 
-                            // Ha most nyitjuk, feszítsd ki a sort
-                            if (!isOpen) {
-                                accordionItem.classList.add('open', 'md:col-span-2', 'lg:col-span-3');
-                                accordionItem.classList.remove('col-span-1');
-                                const cityList = accordionItem.querySelector('.city-list');
-                                if (cityList) cityList.style.maxHeight = cityList.scrollHeight + 'px';
-                            }
-                        });
-                    });
+    // majd ha nem volt nyitva, ezt kinyitjuk
+    if (!isOpen) {
+      accordionItem.classList.add('open');
+      const cityList = accordionItem.querySelector('.city-list');
+      if (cityList) cityList.style.maxHeight = cityList.scrollHeight + 'px';
+    }
+  });
+});
+
                 }
             })
             .catch(() => workAreasContainer.innerHTML = '<p class="text-center text-white">Hiba történt a területek betöltésekor.</p>');
@@ -513,3 +512,4 @@
 </script>
 </body>
 </html>
+
