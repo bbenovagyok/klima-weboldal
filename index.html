@@ -355,26 +355,54 @@
       const moreBtn=document.getElementById('more-btn');
 
       // Galéria (dummy fetch)
-      fetch('/data/gallery.json')
-        .then(r=>r.json())
-        .then(data=>{
-          galleryContainer.innerHTML='';
-          if(data.images?.length){
-            data.images.forEach((it,i)=>{
-              galleryContainer.innerHTML += `
-                <div class="gallery-item group relative aspect-square overflow-hidden rounded-lg shadow-lg cursor-pointer reveal-on-scroll" 
-                     data-src="${it.image}" data-title="${it.title}" data-description="${it.description}"
-                     style="--delay:${i*100}ms">
-                  <img src="${it.image}" alt="${it.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                  <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300"></div>
-                </div>`;
-            });
-            initializeScrollAnimation();
-          } else {
-            galleryContainer.innerHTML='<p class="text-center col-span-full">Jelenleg nincsenek képek a galériában.</p>';
-          }
-        })
-        .catch(()=>{ galleryContainer.innerHTML='<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben.</p>'; });
+     fetch('/data/gallery.json')
+  .then(r => r.json())
+  .then(data => {
+    galleryContainer.innerHTML = '';
+    if (data.images?.length) {
+      const safe = s => String(s ?? '').replace(/"/g, '&quot;');
+
+      data.images.forEach((item, i) => {
+        // kulcsnevek fallback: title/cim, description/leiras
+        const title = item.title || item.cim || '';
+        const desc  = item.description || item.leiras || '';
+
+        galleryContainer.innerHTML += `
+          <div
+            class="gallery-item group relative aspect-square overflow-hidden rounded-lg shadow-lg cursor-pointer reveal-on-scroll"
+            data-src="${safe(item.image)}"
+            data-title="${safe(title)}"
+            data-description="${safe(desc)}"
+            style="--delay:${i * 100}ms"
+          >
+            <img src="${safe(item.image)}" alt="${safe(title)}"
+                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+
+            <!-- enyhe sötétítés hoverre -->
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors duration-300"></div>
+
+            <!-- felirat: mobilon ALAPBÓL látszik, nagyobb nézetben hoverre -->
+            <div class="absolute inset-x-0 bottom-0 p-3">
+              <div class="backdrop-blur-md bg-black/40 text-white rounded-md px-3 py-2 shadow-md
+                          opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
+                <h4 class="text-sm font-semibold truncate">${safe(title)}</h4>
+                <p class="hidden sm:block text-xs text-white/85 mt-0.5">${safe(desc)}</p>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      initializeScrollAnimation();
+    } else {
+      galleryContainer.innerHTML =
+        '<p class="text-center col-span-full">Jelenleg nincsenek képek a galériában.</p>';
+    }
+  })
+  .catch(() => {
+    galleryContainer.innerHTML =
+      '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben.</p>';
+  });
 
       // Megyék
       fetch('/data/locations.json')
@@ -469,3 +497,4 @@
   </script>
 </body>
 </html>
+
