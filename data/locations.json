@@ -43,6 +43,12 @@
           "city_name": "Győr"
         }
       ]
+    },
+    {
+      "county_name": "Vas megye"
+    },
+    {
+      "county_name": "Zala megye"
     }
   ]
 }
