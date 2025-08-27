@@ -39,13 +39,22 @@
     .accordion-arrow{transition:transform .3s ease-in-out}
     .accordion-item.open .accordion-arrow{transform:rotate(90deg)}
 
+    /* Overlay dropdown look (üveges, teal) */
+    .city-list.glass{
+      background: linear-gradient(to bottom, rgba(255,255,255,.12), rgba(255,255,255,.06));
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 14px;
+      box-shadow: 0 20px 40px rgba(0,0,0,.25);
+      border: 1px solid rgba(255,255,255,.15);
+    }
+
     /* Mobile compact mode */
     @media (max-width:640px){
-      #work-areas-toolbar{margin-bottom:.75rem}
-      #work-areas-container{gap:.625rem}          /* ~gap-2.5 */
+      #work-areas-container{gap:.625rem}
       .accordion-item{border-radius:14px}
-      .accordion-header{padding:.75rem 1rem}      /* kisebb padding */
-      .accordion-header .font-bold{font-size:1.125rem} /* text-lg */
+      .accordion-header{padding:.75rem 1rem}
+      .accordion-header .font-bold{font-size:1.125rem}
       .accordion-header .w-5.h-5{width:18px;height:18px}
     }
   </style>
@@ -134,29 +143,26 @@
     <!-- Munkáink -->
     <section id="munkaink" class="py-20 bg-cyan-700 text-white overflow-hidden">
       <div class="container mx-auto px-6">
-        <h2 class="text-4xl md:text-5xl font-black text-center mb-4 text-white reveal-on-scroll">Ahol már dolgoztunk:</h2>
-        <p class="text-center text-lg text-cyan-100 mb-6 max-w-2xl mx-auto reveal-on-scroll" style="--delay:150ms">Minden klímánk mögött egy elégedett ügyfél áll!</p>
+        <h2 class="text-4xl md:text-5xl font-black text-center mb-4 text-white reveal-on-scroll">Aktuális Munkáink</h2>
+        <p class="text-center text-lg text-cyan-100 mb-12 max-w-2xl mx-auto reveal-on-scroll" style="--delay:150ms">Minden klímánk mögött egy elégedett ügyfél áll!</p>
 
-        <!-- Toolbar: kereső + mutass még (mobil) -->
-        <div id="work-areas-toolbar" class="max-w-5xl mx-auto mb-4">
-          <div class="flex items-center gap-2">
-            <input id="county-search" type="text"
-                   class="flex-1 rounded-xl bg-white/10 border border-white/10 text-white placeholder-white/60 px-4 py-2 backdrop-blur focus:outline-none focus:ring-2 focus:ring-white/30"
-                   placeholder="Megyék keresése…">
-            <button id="more-btn"
-                    class="sm:hidden px-4 py-2 rounded-full border border-white/10 bg-white/10 text-white/90 backdrop-blur hover:bg-white/20 transition">
-              Mutass még
-            </button>
-          </div>
-        </div>
-
-        <div id="gallery-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-10">
+        <div id="gallery-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           <p class="text-center col-span-full">Galéria betöltése...</p>
         </div>
 
-        <div class="reveal-on-scroll" style="--delay:300ms;">
+        <div class="mt-16 reveal-on-scroll" style="--delay:300ms;">
+          <h3 class="text-2xl font-bold text-center text-white mb-6">Ahol már dolgoztunk:</h3>
+
           <div id="work-areas-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto items-start overflow-visible">
-            <!-- Dinamikusan építjük -->
+            <!-- Dinamikusan épül -->
+          </div>
+
+          <!-- Csak mobilon látszik, 4 kártya után -->
+          <div class="max-w-5xl mx-auto mt-3 sm:hidden">
+            <button id="more-btn"
+              class="w-full inline-flex items-center justify-center px-5 py-3 rounded-full bg-yellow-400 text-gray-900 font-semibold shadow-md hover:bg-yellow-300 transition">
+              Több…
+            </button>
           </div>
         </div>
       </div>
@@ -192,7 +198,7 @@
         <div class="inline-block bg-white/90 text-cyan-800 rounded-xl p-8 shadow-2xl reveal-on-scroll" style="--delay:300ms">
           <p class="text-lg mb-2">Időpontegyeztetés telefonon:</p>
           <a href="tel:+36709304841" class="text-4xl font-bold hover:text-cyan-600 transition-colors duration-300 flex items-center justify-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.518.759a1.156 1.156 0 00-.43 1.659l4.592 4.592a1.156 1.156 0 001.659-.43l.759-1.518a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.518.759a1.156 1.156 0 00-.43 1.659l4.592 4.592a1 1 0 001.659-.43l.759-1.518a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
             +36 70 930 4841
           </a>
           <p class="mt-4 text-sm text-gray-600">Hívható hétköznap 8:00 és 18:00 között.</p>
@@ -347,7 +353,6 @@
     window.addEventListener('DOMContentLoaded',()=>{
       const workAreasContainer=document.getElementById('work-areas-container');
       const moreBtn=document.getElementById('more-btn');
-      const searchInput=document.getElementById('county-search');
 
       // Galéria (dummy fetch)
       fetch('/data/gallery.json')
@@ -395,15 +400,13 @@
               <button class="accordion-header w-full text-left p-4 flex justify-between items-center">
                 <div class="flex items-center">
                   <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                  <span class="county-title font-bold text-lg"> ${county.county_name}</span>
+                  <span class="county-title font-bold text-lg">${county.county_name}</span>
                 </div>
                 <svg class="w-5 h-5 accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
               </button>
 
               <!-- overlay dropdown -->
-              <div class="city-list absolute left-0 right-0 top-full z-50
-                          rounded-xl
-                          opacity-0 pointer-events-none translate-y-1 text-white">
+              <div class="city-list absolute left-0 right-0 top-full z-50 rounded-xl opacity-0 pointer-events-none translate-y-1 text-white glass">
                 <div class="py-3 pl-8 pr-4">
                   ${cityListHTML}
                 </div>
@@ -412,7 +415,7 @@
             workAreasContainer.appendChild(item);
           });
 
-          // csak 1 nyíljon
+          // csak 1 nyíljon + overlay anim
           document.querySelectorAll('.accordion-header').forEach(btn=>{
             btn.addEventListener('click',()=>{
               const acc = btn.parentElement;
@@ -423,12 +426,7 @@
                 const list=it.querySelector('.city-list');
                 if(list){
                   list.style.maxHeight=0;
-                  list.classList.remove(
-                    'mt-2','opacity-100','pointer-events-auto','translate-y-0',
-                    'shadow-2xl','ring-1','ring-white/15',
-                    'bg-cyan-900/20','backdrop-blur-lg',
-                    'bg-gradient-to-b','from-white/10','to-white/5'
-                  );
+                  list.classList.remove('opacity-100','pointer-events-auto','translate-y-0');
                   list.classList.add('opacity-0','pointer-events-none','translate-y-1');
                 }
               });
@@ -438,49 +436,33 @@
                 const list=acc.querySelector('.city-list');
                 if(list){
                   list.style.maxHeight=list.scrollHeight+'px';
-                  list.classList.add(
-                    'mt-2','opacity-100','pointer-events-auto','translate-y-0',
-                    'shadow-2xl','ring-1','ring-white/15',
-                    'bg-cyan-900/20','backdrop-blur-lg',
-                    'bg-gradient-to-b','from-white/10','to-white/5'
-                  );
+                  list.classList.add('opacity-100','pointer-events-auto','translate-y-0');
                   list.classList.remove('opacity-0','pointer-events-none','translate-y-1');
                 }
               }
             });
           });
 
-          // --- Mobil: limit + "Mutass még" ---
+          // --- Mobil: csak 4 megye + Több… gomb
           const isMobile = window.matchMedia('(max-width: 640px)').matches;
           const limit = 4;
           let expanded = false;
 
           function applyMobileLimit(){
-            if(!isMobile) return;
+            if(!isMobile){ moreBtn?.classList.add('hidden'); return; }
             const items=[...document.querySelectorAll('#work-areas-container .accordion-item')];
             items.forEach((it,i)=>{
               if(!expanded && i>=limit){ it.classList.add('hidden'); }
               else { it.classList.remove('hidden'); }
             });
-            moreBtn.textContent = expanded ? 'Kevesebb' : 'Mutass még';
+            if(items.length<=limit){ moreBtn?.classList.add('hidden'); }
+            else{
+              moreBtn?.classList.remove('hidden');
+              moreBtn.textContent = expanded ? 'Kevesebb' : 'Több…';
+            }
           }
           applyMobileLimit();
           moreBtn?.addEventListener('click',()=>{ expanded=!expanded; applyMobileLimit(); });
-
-          // --- Kereső ---
-          function applySearch(q){
-            const items=[...document.querySelectorAll('#work-areas-container .accordion-item')];
-            const needle=q.trim().toLowerCase();
-            items.forEach((it,i)=>{
-              const name=it.querySelector('.county-title')?.textContent.toLowerCase() || '';
-              const match = name.includes(needle);
-              it.dataset.matches = match ? '1':'0';
-              it.classList.toggle('hidden', !match && (!expanded && i>=limit) && isMobile);
-              if(match){ it.classList.remove('hidden'); }
-              if(!needle && isMobile && !expanded && i>=limit){ it.classList.add('hidden'); }
-            });
-          }
-          searchInput?.addEventListener('input',()=>applySearch(searchInput.value||''));
         })
         .catch(()=>{ workAreasContainer.innerHTML='<p class="text-center text-white">Hiba történt a területek betöltésekor.</p>'; });
     });
