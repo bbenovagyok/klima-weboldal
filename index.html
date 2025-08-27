@@ -31,8 +31,56 @@
     .header-scrolled #header-logo{height:1.75rem}
     .header-scrolled #header-company-name{font-size:1.125rem}
 
-    .marquee{animation:marquee 60s linear infinite}
-    @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+    /* ----- Reviews ticker: látvány + olvashatóság ----- */
+    .reviews-strip{
+      position: relative;
+      background: linear-gradient(to bottom, rgba(0,50,70,.65), rgba(0,50,70,.88));
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      overflow: hidden;
+    }
+    .reviews-strip::before,
+    .reviews-strip::after{
+      content:"";
+      position:absolute; top:0; bottom:0; width:72px; z-index:2;
+      pointer-events:none;
+    }
+    .reviews-strip::before{
+      left:0;
+      background: linear-gradient(to right, rgba(0,50,70,1), rgba(0,50,70,0));
+    }
+    .reviews-strip::after{
+      right:0;
+      background: linear-gradient(to left, rgba(0,50,70,1), rgba(0,50,70,0));
+    }
+    #reviews-container{
+      display:inline-flex;
+      gap:1rem;
+      align-items:center;
+      padding-inline:1rem;
+      white-space:nowrap;
+    }
+    .review-card{
+      display:inline-flex; align-items:center; gap:.6rem;
+      color:#fff;
+      background: linear-gradient(to bottom, rgba(255,255,255,.18), rgba(255,255,255,.10));
+      border:1px solid rgba(255,255,255,.28);
+      border-radius:9999px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.22);
+      padding:.55rem .9rem;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    .review-quote{
+      width:26px;height:26px;border-radius:9999px;
+      display:inline-flex;align-items:center;justify-content:center;
+      background: rgba(255,255,255,.22);
+    }
+    .review-text{ font-weight:700; letter-spacing:.1px; }
+    .review-meta{ opacity:.95; font-weight:600; }
+    .marquee{ animation: marquee 40s linear infinite; will-change: transform; }
+    @media (hover:hover){ .marquee:hover{ animation-play-state: paused; } }
+    @keyframes marquee{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
 
     /* Accordion base */
     .city-list{max-height:0;overflow:hidden;transition:max-height .3s ease, opacity .2s ease, transform .2s ease}
@@ -101,9 +149,10 @@
           <a href="#kapcsolat" class="bg-yellow-400 text-gray-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition duration-300 shadow-xl inline-block">Ingyenes ajánlat</a>
         </div>
       </div>
-      <div class="absolute bottom-0 left-0 right-0 bg-black/50 backdrop-blur-sm py-4">
+      <!-- ÚJ: üveges, chip-es reviews sáv -->
+      <div class="reviews-strip absolute bottom-0 left-0 right-0 py-4">
         <div class="w-full flex">
-          <div id="reviews-container" class="flex whitespace-nowrap marquee items-center"></div>
+          <div id="reviews-container" class="marquee items-center"></div>
         </div>
       </div>
     </section>
@@ -210,7 +259,7 @@
       </div>
     </section>
 
-    <!-- Vélemény -->
+    <!-- Vélemény űrlap -->
     <section id="velemeny" class="py-20">
       <div class="container mx-auto px-6">
         <h2 class="text-4xl md:text-5xl font-black text-center mb-12 text-cyan-800 reveal-on-scroll">Mondja el a véleményét!</h2>
@@ -238,6 +287,18 @@
     </section>
   </main>
 
+  <!-- Lightbox (Képnézegető) -->
+  <div id="lightbox" class="fixed inset-0 z-[110] flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm hidden transition-opacity duration-300">
+    <div id="lightbox-content" class="relative max-w-4xl max-h-[90vh] w-full p-4">
+      <button id="close-lightbox" class="absolute -top-2 -right-2 md:top-0 md:-right-10 text-white text-5xl font-bold">&times;</button>
+      <img id="lightbox-image" src="" alt="" class="max-w-full max-h-[75vh] mx-auto rounded-lg shadow-2xl">
+      <div id="lightbox-caption" class="text-center text-white mt-4">
+        <h4 id="lightbox-title" class="text-xl font-bold"></h4>
+        <p id="lightbox-description" class="text-gray-300"></p>
+      </div>
+    </div>
+  </div>
+
   <footer class="bg-gray-800 text-white py-10">
     <div class="container mx-auto px-6 text-center">
       <p class="text-xl font-bold text-white mb-2">Eszes Tiszta Klíma Kft.</p>
@@ -250,7 +311,7 @@
     <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
   </a>
 
-  <!-- Lightbox + Firebase + UI JS -->
+  <!-- Firebase + Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -272,18 +333,23 @@
     const reviewForm = document.getElementById('reviewForm');
     const reviewsContainer = document.getElementById('reviews-container');
 
+    // helper a „chip” kártyához
+    const buildReview = (text, name, city) => `
+      <div class="review-card">
+        <span class="review-quote"><i class="fa-solid fa-quote-left text-xs"></i></span>
+        <span class="review-text">"${text}"</span>
+        <span class="review-meta">– ${name}, ${city}</span>
+      </div>
+    `;
+
     const loadDefaultReviews = () => {
       const def = [
         {name:"Nagy Család",city:"Siófok",review:"Gyorsak, profik és nagyon tisztán dolgoztak. Végre hűvös van a nappaliban!"},
         {name:"Kiss Péter",city:"Székesfehérvár",review:"Minden a megbeszéltek szerint történt, a klíma tökéletesen működik. Csak ajánlani tudom!"},
         {name:"Horváth Éva",city:"Veszprém",review:"A régi, zajos klímánkat cserélték le egy újra. Hatalmas a különbség, köszönjük!"}
       ];
-      let html=''; def.forEach(r=>{ html+=`
-        <div class="flex-shrink-0 mx-6 text-center">
-          <p class="text-white text-lg font-semibold text-shadow-strong">"${r.review}"</p>
-          <p class="text-base text-gray-200 mt-1 text-shadow-strong">- ${r.name}, ${r.city}</p>
-        </div>`;});
-      reviewsContainer.innerHTML = html+html;
+      let lane=''; def.forEach(r=> lane += buildReview(r.review, r.name, r.city));
+      reviewsContainer.innerHTML = lane + lane; // végtelen
     };
 
     const escapeHtml = s => String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -293,14 +359,11 @@
       try{
         const snap = await getDocs(query(collection(db,'reviews'),orderBy('createdAt','desc')));
         if (snap.empty){ loadDefaultReviews(); return; }
-        let html=''; snap.forEach(doc=>{
+        let lane=''; snap.forEach(doc=>{
           const r=doc.data();
-          html+=`<div class="flex-shrink-0 mx-6 text-center">
-            <p class="text-white text-lg font-semibold text-shadow-strong">"${escapeHtml(r.text)}"</p>
-            <p class="text-base text-gray-200 mt-1 text-shadow-strong">- ${escapeHtml(r.name)}, ${escapeHtml(r.city)}</p>
-          </div>`;
+          lane += buildReview(escapeHtml(r.text), escapeHtml(r.name), escapeHtml(r.city));
         });
-        reviewsContainer.innerHTML = html+html;
+        reviewsContainer.innerHTML = lane + lane;
       }catch{ loadDefaultReviews(); }
     }
 
@@ -310,16 +373,42 @@
         else signInAnonymously(auth).catch(()=>loadDefaultReviews());
       });
     } else { loadDefaultReviews(); }
+
+    // review form mentés
+    reviewForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!db) { alert("A véleményküldés funkció jelenleg nem elérhető."); return; }
+      const btn = document.getElementById('submitReviewBtn');
+      btn.disabled = true; btn.textContent = 'Küldés...';
+
+      const name = document.getElementById('reviewerName').value.trim();
+      const city = document.getElementById('reviewerCity').value.trim();
+      const text = document.getElementById('reviewText').value.trim();
+      if (!name || !text || !city) { alert('Töltsön ki minden mezőt!'); btn.disabled=false; btn.textContent='Vélemény elküldése'; return; }
+
+      try {
+        await addDoc(collection(db, 'reviews'), { name, city, text, createdAt: Timestamp.now() });
+        reviewForm.reset();
+        alert('Köszönjük a véleményét!');
+        await loadReviews();
+      } catch (err) {
+        console.error('Hiba a mentéskor:', err);
+        alert('Hiba történt a vélemény mentése során.');
+      } finally {
+        btn.disabled=false; btn.textContent='Vélemény elküldése';
+      }
+    });
   </script>
 
+  <!-- UI / Galéria / Megyék -->
   <script>
-    // mobil menü
+    // Mobil menü
     const mobileMenuButton=document.getElementById('mobile-menu-button');
     const mobileMenu=document.getElementById('mobile-menu');
     mobileMenuButton?.addEventListener('click',()=>mobileMenu.classList.toggle('hidden'));
     mobileMenu?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>mobileMenu.classList.add('hidden')));
 
-    // lightbox
+    // Lightbox
     const galleryContainer=document.getElementById('gallery-container');
     const lightbox=document.getElementById('lightbox');
     const lightboxImage=document.getElementById('lightbox-image');
@@ -332,7 +421,7 @@
     closeLightboxButton?.addEventListener('click',closeLightbox);
     lightbox?.addEventListener('click',e=>{ if(e.target===lightbox) closeLightbox(); });
 
-    // scroll anim
+    // Scroll animáció
     function initializeScrollAnimation(){
       const obs=new IntersectionObserver((entries)=>{
         entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('is-visible'); obs.unobserve(e.target);} });
@@ -349,77 +438,69 @@
       else { toTopButton.classList.add('opacity-0','translate-y-5'); }
     });
 
-    /* ---------- ALOKCIÓK / MEGYÉK ---------- */
-    window.addEventListener('DOMContentLoaded',()=>{
-      const workAreasContainer=document.getElementById('work-areas-container');
-      const moreBtn=document.getElementById('more-btn');
+    /* ---------- Galéria betöltése (cím + leírás overlay) ---------- */
+    window.addEventListener('DOMContentLoaded', () => {
+      const workAreasContainer = document.getElementById('work-areas-container');
+      const moreBtn = document.getElementById('more-btn');
 
-      // Galéria (dummy fetch)
-     fetch('/data/gallery.json')
-  .then(r => r.json())
-  .then(data => {
-    galleryContainer.innerHTML = '';
-    if (data.images?.length) {
-      const safe = s => String(s ?? '').replace(/"/g, '&quot;');
+      fetch('/data/gallery.json')
+        .then(r => r.json())
+        .then(data => {
+          galleryContainer.innerHTML = '';
+          if (data.images?.length) {
+            const safe = s => String(s ?? '').replace(/"/g, '&quot;');
+            data.images.forEach((item, i) => {
+              const title = item.title || item.cim || '';
+              const desc  = item.description || item.leiras || '';
 
-      data.images.forEach((item, i) => {
-        // kulcsnevek fallback: title/cim, description/leiras
-        const title = item.title || item.cim || '';
-        const desc  = item.description || item.leiras || '';
+              galleryContainer.innerHTML += `
+                <div
+                  class="gallery-item group relative aspect-square overflow-hidden rounded-lg shadow-lg cursor-pointer reveal-on-scroll"
+                  data-src="${safe(item.image)}"
+                  data-title="${safe(title)}"
+                  data-description="${safe(desc)}"
+                  style="--delay:${i * 100}ms"
+                >
+                  <img src="${safe(item.image)}" alt="${safe(title)}"
+                      class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
 
-        galleryContainer.innerHTML += `
-          <div
-            class="gallery-item group relative aspect-square overflow-hidden rounded-lg shadow-lg cursor-pointer reveal-on-scroll"
-            data-src="${safe(item.image)}"
-            data-title="${safe(title)}"
-            data-description="${safe(desc)}"
-            style="--delay:${i * 100}ms"
-          >
-            <img src="${safe(item.image)}" alt="${safe(title)}"
-                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                  <div class="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors duration-300"></div>
 
-            <!-- enyhe sötétítés hoverre -->
-            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors duration-300"></div>
+                  <div class="absolute inset-x-0 bottom-0 p-3">
+                    <div class="backdrop-blur-md bg-black/40 text-white rounded-md px-3 py-2 shadow-md
+                                opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
+                      <h4 class="text-sm font-semibold truncate">${safe(title)}</h4>
+                      <p class="hidden sm:block text-xs text-white/85 mt-0.5">${safe(desc)}</p>
+                    </div>
+                  </div>
+                </div>
+              `;
+            });
+            initializeScrollAnimation();
+          } else {
+            galleryContainer.innerHTML = '<p class="text-center col-span-full">Jelenleg nincsenek képek a galériában.</p>';
+          }
+        })
+        .catch(() => {
+          galleryContainer.innerHTML = '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben.</p>';
+        });
 
-            <!-- felirat: mobilon ALAPBÓL látszik, nagyobb nézetben hoverre -->
-            <div class="absolute inset-x-0 bottom-0 p-3">
-              <div class="backdrop-blur-md bg-black/40 text-white rounded-md px-3 py-2 shadow-md
-                          opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
-                <h4 class="text-sm font-semibold truncate">${safe(title)}</h4>
-                <p class="hidden sm:block text-xs text-white/85 mt-0.5">${safe(desc)}</p>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-
-      initializeScrollAnimation();
-    } else {
-      galleryContainer.innerHTML =
-        '<p class="text-center col-span-full">Jelenleg nincsenek képek a galériában.</p>';
-    }
-  })
-  .catch(() => {
-    galleryContainer.innerHTML =
-      '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben.</p>';
-  });
-
-      // Megyék
+      /* ---------- Megyék (overlay dropdown + 1 nyitva) ---------- */
       fetch('/data/locations.json')
-        .then(r=>r.json())
-        .then(data=>{
-          workAreasContainer.innerHTML='';
+        .then(r => r.json())
+        .then(data => {
+          workAreasContainer.innerHTML = '';
           const counties = data.counties || [];
 
-          counties.forEach(county=>{
-            const item=document.createElement('div');
-            item.className='accordion-item relative bg-white/20 rounded-lg';
+          counties.forEach(county => {
+            const item = document.createElement('div');
+            item.className = 'accordion-item relative bg-white/20 rounded-lg';
 
-            let cityListHTML='';
-            (county.cities||[]).forEach(c=>{
-              cityListHTML+=`
+            let cityListHTML = '';
+            (county.cities || []).forEach(c => {
+              cityListHTML += `
                 <div class="flex items-center py-2">
-                  ${c.completed?'<div class="w-2 h-2 rounded-full bg-green-400 mr-3"></div>':'<div class="w-2 h-2 rounded-full bg-gray-400 mr-3"></div>'}
+                  ${c.completed ? '<div class="w-2 h-2 rounded-full bg-green-400 mr-3"></div>' : '<div class="w-2 h-2 rounded-full bg-gray-400 mr-3"></div>'}
                   <span class="text-white/90">${c.city_name}</span>
                 </div>`;
             });
@@ -473,8 +554,7 @@
 
           // --- Mobil: csak 4 megye + Több… gomb
           const isMobile = window.matchMedia('(max-width: 640px)').matches;
-          const limit = 4;
-          let expanded = false;
+          const limit = 4; let expanded = false;
 
           function applyMobileLimit(){
             if(!isMobile){ moreBtn?.classList.add('hidden'); return; }
@@ -492,9 +572,8 @@
           applyMobileLimit();
           moreBtn?.addEventListener('click',()=>{ expanded=!expanded; applyMobileLimit(); });
         })
-        .catch(()=>{ workAreasContainer.innerHTML='<p class="text-center text-white">Hiba történt a területek betöltésekor.</p>'; });
+        .catch(() => { workAreasContainer.innerHTML = '<p class="text-center text-white">Hiba történt a területek betöltésekor.</p>'; });
     });
   </script>
 </body>
 </html>
-
