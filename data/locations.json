@@ -36,7 +36,13 @@
       ]
     },
     {
-      "county_name": "Győr-Moson-Sopron"
+      "county_name": "Győr-Moson-Sopron",
+      "cities": [
+        {
+          "completed": true,
+          "city_name": "Győr"
+        }
+      ]
     }
   ]
 }
