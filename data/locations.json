@@ -1,15 +1,43 @@
 {
   "counties": [
-    "Somogy",
-    "Veszprém",
-    "Fejér",
-    "Tolna",
-    "Baranya",
-    "Zala",
-    "Győr-Moson-Sopron",
-    "Vas",
-    "Komárom-Esztergom",
-    "Bács-Kiskun",
-    "Pest"
+    {
+      "county_name": "Somogy",
+      "cities": [
+        {
+          "city_name": "Siófok",
+          "completed": true
+        },
+        {
+          "city_name": "Kaposvár",
+          "completed": true
+        }
+      ]
+    },
+    {
+      "county_name": "Veszprém",
+      "cities": [
+        {
+          "city_name": "Veszprém",
+          "completed": true
+        },
+        {
+          "city_name": "Balatonfüred",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "county_name": "Bács-Kiskun",
+      "cities": [
+        {
+          "city_name": "Kecskemét",
+          "completed": true
+        },
+        {
+          "city_name": "Solt",
+          "completed": true
+        }
+      ]
+    }
   ]
 }
