@@ -31,10 +31,10 @@
     .header-scrolled #header-logo{height:1.75rem}
     .header-scrolled #header-company-name{font-size:1.125rem}
 
-    /* ----- Reviews ticker: látvány + olvashatóság ----- */
+    /* ====== Reviews ticker – láthatóság up ====== */
     .reviews-strip{
       position: relative;
-      background: linear-gradient(to bottom, rgba(0,50,70,.65), rgba(0,50,70,.88));
+      background: linear-gradient(to bottom, rgba(0,64,92,.85), rgba(0,64,92,.93));
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
       overflow: hidden;
@@ -42,52 +42,59 @@
     .reviews-strip::before,
     .reviews-strip::after{
       content:"";
-      position:absolute; top:0; bottom:0; width:72px; z-index:2;
-      pointer-events:none;
+      position:absolute; top:0; bottom:0; width:72px; z-index:2; pointer-events:none;
     }
-    .reviews-strip::before{
-      left:0;
-      background: linear-gradient(to right, rgba(0,50,70,1), rgba(0,50,70,0));
-    }
-    .reviews-strip::after{
-      right:0;
-      background: linear-gradient(to left, rgba(0,50,70,1), rgba(0,50,70,0));
-    }
+    .reviews-strip::before{ left:0;  background: linear-gradient(to right, rgba(0,64,92,1), rgba(0,64,92,0)); }
+    .reviews-strip::after { right:0; background: linear-gradient(to left,  rgba(0,64,92,1), rgba(0,64,92,0)); }
+
+    /* A mozgó sín */
     #reviews-container{
-      display:inline-flex;
-      gap:1rem;
-      align-items:center;
-      padding-inline:1rem;
-      white-space:nowrap;
+      display:inline-flex; gap: 0.75rem; align-items:center; padding-inline:1rem;
+      white-space: nowrap; /* a track ne törjön */
     }
-    .review-card{
-      display:inline-flex; align-items:center; gap:.6rem;
-      color:#fff;
-      background: linear-gradient(to bottom, rgba(255,255,255,.18), rgba(255,255,255,.10));
-      border:1px solid rgba(255,255,255,.28);
-      border-radius:9999px;
-      box-shadow: 0 6px 18px rgba(0,0,0,.22);
-      padding:.55rem .9rem;
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-    }
-    .review-quote{
-      width:26px;height:26px;border-radius:9999px;
-      display:inline-flex;align-items:center;justify-content:center;
-      background: rgba(255,255,255,.22);
-    }
-    .review-text{ font-weight:700; letter-spacing:.1px; }
-    .review-meta{ opacity:.95; font-weight:600; }
     .marquee{ animation: marquee 40s linear infinite; will-change: transform; }
     @media (hover:hover){ .marquee:hover{ animation-play-state: paused; } }
     @keyframes marquee{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
 
-    /* Accordion base */
+    /* A kártya most 100%-os, fehér háttér, sötét szöveg – brutál olvasható */
+    .review-card{
+      display:inline-flex; align-items:center; gap:.6rem;
+      color:#0f3340;
+      background: rgba(255,255,255,0.98);
+      border:1px solid rgba(255,255,255,1);
+      border-radius:9999px;
+      box-shadow: 0 8px 22px rgba(0,0,0,.25);
+      padding:.55rem .9rem;
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      max-width: 720px;
+    }
+    .review-quote{
+      width:26px;height:26px;border-radius:9999px;
+      display:inline-flex;align-items:center;justify-content:center;
+      background: rgba(15,51,64,.08);
+    }
+    /* >>> nagyon fontos: a kártyán belül engedjük a tördelést */
+    .review-card, .review-card * { white-space: normal; }
+
+    .review-body{ display:flex; gap:.35rem; align-items:baseline; }
+    .review-text{ font-weight:800; letter-spacing:.1px; }
+    .review-meta{ font-weight:600; opacity:.9; }
+
+    /* Mobil: mehet két sorba a szöveg, név külön sor, max szélesség */
+    @media (max-width:640px){
+      .review-card{ max-width: 88vw; }
+      .review-body{ flex-direction:column; align-items:flex-start; }
+      .review-text{
+        display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+        overflow:hidden;
+      }
+    }
+
+    /* ====== Accordion / megye lista ====== */
     .city-list{max-height:0;overflow:hidden;transition:max-height .3s ease, opacity .2s ease, transform .2s ease}
     .accordion-arrow{transition:transform .3s ease-in-out}
     .accordion-item.open .accordion-arrow{transform:rotate(90deg)}
-
-    /* Overlay dropdown look (üveges, teal) */
     .city-list.glass{
       background: linear-gradient(to bottom, rgba(255,255,255,.12), rgba(255,255,255,.06));
       backdrop-filter: blur(10px);
@@ -96,8 +103,6 @@
       box-shadow: 0 20px 40px rgba(0,0,0,.25);
       border: 1px solid rgba(255,255,255,.15);
     }
-
-    /* Mobile compact mode */
     @media (max-width:640px){
       #work-areas-container{gap:.625rem}
       .accordion-item{border-radius:14px}
@@ -149,7 +154,7 @@
           <a href="#kapcsolat" class="bg-yellow-400 text-gray-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition duration-300 shadow-xl inline-block">Ingyenes ajánlat</a>
         </div>
       </div>
-      <!-- ÚJ: üveges, chip-es reviews sáv -->
+      <!-- Reviews sáv -->
       <div class="reviews-strip absolute bottom-0 left-0 right-0 py-4">
         <div class="w-full flex">
           <div id="reviews-container" class="marquee items-center"></div>
@@ -247,7 +252,7 @@
         <div class="inline-block bg-white/90 text-cyan-800 rounded-xl p-8 shadow-2xl reveal-on-scroll" style="--delay:300ms">
           <p class="text-lg mb-2">Időpontegyeztetés telefonon:</p>
           <a href="tel:+36709304841" class="text-4xl font-bold hover:text-cyan-600 transition-colors duration-300 flex items-center justify-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.518.759a1.156 1.156 0 00-.43 1.659l4.592 4.592a1 1 0 001.659-.43l.759-1.518a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.518.759a1 1 0 00-.43 1.659l4.592 4.592a1 1 0 001.659-.43l.759-1.518a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
             +36 70 930 4841
           </a>
           <p class="mt-4 text-sm text-gray-600">Hívható hétköznap 8:00 és 18:00 között.</p>
@@ -287,7 +292,7 @@
     </section>
   </main>
 
-  <!-- Lightbox (Képnézegető) -->
+  <!-- Lightbox -->
   <div id="lightbox" class="fixed inset-0 z-[110] flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm hidden transition-opacity duration-300">
     <div id="lightbox-content" class="relative max-w-4xl max-h-[90vh] w-full p-4">
       <button id="close-lightbox" class="absolute -top-2 -right-2 md:top-0 md:-right-10 text-white text-5xl font-bold">&times;</button>
@@ -311,7 +316,7 @@
     <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
   </a>
 
-  <!-- Firebase + Logic -->
+  <!-- Firebase + Reviews logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -333,15 +338,20 @@
     const reviewForm = document.getElementById('reviewForm');
     const reviewsContainer = document.getElementById('reviews-container');
 
-    // helper a „chip” kártyához
+    const escapeHtml = s => String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+    // kártya builder – új, tördelhető markup
     const buildReview = (text, name, city) => `
       <div class="review-card">
         <span class="review-quote"><i class="fa-solid fa-quote-left text-xs"></i></span>
-        <span class="review-text">"${text}"</span>
-        <span class="review-meta">– ${name}, ${city}</span>
+        <div class="review-body">
+          <span class="review-text">"${text}"</span>
+          <span class="review-meta">– ${name}, ${city}</span>
+        </div>
       </div>
     `;
 
+    // ha nincs adat, dobjunk pár alapértelmezettet
     const loadDefaultReviews = () => {
       const def = [
         {name:"Nagy Család",city:"Siófok",review:"Gyorsak, profik és nagyon tisztán dolgoztak. Végre hűvös van a nappaliban!"},
@@ -349,10 +359,16 @@
         {name:"Horváth Éva",city:"Veszprém",review:"A régi, zajos klímánkat cserélték le egy újra. Hatalmas a különbség, köszönjük!"}
       ];
       let lane=''; def.forEach(r=> lane += buildReview(r.review, r.name, r.city));
-      reviewsContainer.innerHTML = lane + lane; // végtelen
+      reviewsContainer.innerHTML = lane + lane; // végtelenítés
     };
 
-    const escapeHtml = s => String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    async function ensureAuth(){
+      if(!auth) return;
+      if(!auth.currentUser){
+        try{ await signInAnonymously(auth); }
+        catch(e){ console.error('Anon auth hiba:', e); }
+      }
+    }
 
     async function loadReviews(){
       reviewsContainer.innerHTML='';
@@ -364,17 +380,20 @@
           lane += buildReview(escapeHtml(r.text), escapeHtml(r.name), escapeHtml(r.city));
         });
         reviewsContainer.innerHTML = lane + lane;
-      }catch{ loadDefaultReviews(); }
+      }catch(e){
+        console.error('Betöltési hiba:', e);
+        loadDefaultReviews();
+      }
     }
 
     if (auth){
       onAuthStateChanged(auth,(user)=>{
         if(user) loadReviews();
-        else signInAnonymously(auth).catch(()=>loadDefaultReviews());
+        else signInAnonymously(auth).then(loadReviews).catch(()=>loadDefaultReviews());
       });
     } else { loadDefaultReviews(); }
 
-    // review form mentés
+    // űrlap – előbb auth, aztán mentés, aztán frissítés
     reviewForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!db) { alert("A véleményküldés funkció jelenleg nem elérhető."); return; }
@@ -387,13 +406,14 @@
       if (!name || !text || !city) { alert('Töltsön ki minden mezőt!'); btn.disabled=false; btn.textContent='Vélemény elküldése'; return; }
 
       try {
+        await ensureAuth();
         await addDoc(collection(db, 'reviews'), { name, city, text, createdAt: Timestamp.now() });
         reviewForm.reset();
         alert('Köszönjük a véleményét!');
         await loadReviews();
       } catch (err) {
         console.error('Hiba a mentéskor:', err);
-        alert('Hiba történt a vélemény mentése során.');
+        alert('Hopp, valami elcsúszott a mentésnél. Ellenőrizze az internetet, vagy próbálja újra pár perc múlva.');
       } finally {
         btn.disabled=false; btn.textContent='Vélemény elküldése';
       }
@@ -463,9 +483,7 @@
                 >
                   <img src="${safe(item.image)}" alt="${safe(title)}"
                       class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-
                   <div class="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors duration-300"></div>
-
                   <div class="absolute inset-x-0 bottom-0 p-3">
                     <div class="backdrop-blur-md bg-black/40 text-white rounded-md px-3 py-2 shadow-md
                                 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
@@ -554,6 +572,7 @@
 
           // --- Mobil: csak 4 megye + Több… gomb
           const isMobile = window.matchMedia('(max-width: 640px)').matches;
+          const moreBtn = document.getElementById('more-btn');
           const limit = 4; let expanded = false;
 
           function applyMobileLimit(){
