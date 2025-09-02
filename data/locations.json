@@ -6,10 +6,6 @@
         {
           "city_name": "Siófok",
           "completed": true
-        },
-        {
-          "city_name": "Tab",
-          "completed": false
         }
       ]
     },
