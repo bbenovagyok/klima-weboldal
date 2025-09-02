@@ -55,6 +55,15 @@
     },
     {
       "county_name": "Tolna"
+    },
+    {
+      "county_name": "Fejér",
+      "cities": [
+        {
+          "completed": true,
+          "city_name": "Székesfehérvár"
+        }
+      ]
     }
   ]
 }
