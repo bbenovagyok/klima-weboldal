@@ -159,7 +159,7 @@
         <!-- TÉRKÉP -->
         <div class="mt-16 reveal-on-scroll" style="--delay:300ms;">
           <h3 class="text-2xl font-bold text-center text-white mb-6">Ahol már dolgoztunk (megye térkép)</h3>
-          <div id="work-map" class="mx-auto max-w-5xl"></div>
+          <div id="work-map" class="mx-auto max-w-[1100px]"></div>
 
           <div class="flex items-center justify-center gap-4 mt-4 text-cyan-100 text-sm">
             <span class="inline-flex items-center gap-2">
@@ -430,40 +430,50 @@
     });
   </script>
 
- <!-- TÉRKÉP – feliratmentes alap, HU-ra fitelve -->
+<!-- TÉRKÉP – HU-ra rászabva, tizedes zoommal, minimális paddinggel -->
 <script>
   const initWorkMap = async () => {
     const mapEl = document.getElementById('work-map');
     if (!mapEl) return;
 
-    // ideiglenes nézet, amíg betöltünk
+    // ideiglenes HU keret, amíg a GeoJSON nem tölt be
     const HU_BOUNDS = L.latLngBounds([45.6, 16.0], [48.7, 22.95]);
+
     const map = L.map('work-map', {
-      zoomControl: false, dragging: false, scrollWheelZoom: false,
-      doubleClickZoom: false, touchZoom: false, boxZoom: false,
-      keyboard: false, attributionControl: false
+      zoomControl: false,
+      dragging: false,
+      scrollWheelZoom: false,
+      doubleClickZoom: false,
+      touchZoom: false,
+      boxZoom: false,
+      keyboard: false,
+      attributionControl: false,
+      // fontos: tizedes zoom engedélyezése, hogy TÉNYLEG rá tudjon feszülni
+      zoomSnap: 0,
+      zoomDelta: 0.1
     });
 
-    // *** feliratmentes alapréteg (így a külföldi feliratok eltűnnek) ***
+    // feliratmentes csempék – így a külföldi feliratok eleve eltűnnek
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; OpenStreetMap & CARTO'
     }).addTo(map);
 
-    // ideiglenes HU keret
-    const z0 = map.getBoundsZoom(HU_BOUNDS);
-    map.setView(HU_BOUNDS.getCenter(), z0);
-    map.setMinZoom(z0); map.setMaxZoom(z0);
-    map.setMaxBounds(HU_BOUNDS.pad(0.02));
-    map.options.maxBoundsViscosity = 1.0;
+    // ideiglenes nézet a keretre
+    map.fitBounds(HU_BOUNDS, { padding: [0, 0] });
 
-    // ---- helpers ----
+    // ---- helper-ek a fetch-hez ----
     const tryUrls = (file) => [ `data/${file}`, `/data/${file}`, new URL(`data/${file}`, document.baseURI).href ];
     const parseJsonSafe = (txt) => { const noBom = txt.charCodeAt(0)===0xFEFF ? txt.slice(1) : txt; return JSON.parse(noBom); };
     const fetchFirstOk = async (cands) => {
-      let lastErr; for (const u of cands) {
-        try { const r = await fetch(u, { cache:'no-store' }); if(!r.ok) throw new Error(`HTTP ${r.status}`); return parseJsonSafe(await r.text()); }
-        catch(e){ lastErr=e; }
-      } throw lastErr || new Error('Betöltési hiba');
+      let lastErr;
+      for (const u of cands) {
+        try {
+          const r = await fetch(u, { cache:'no-store' });
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          return parseJsonSafe(await r.text());
+        } catch(e){ lastErr = e; }
+      }
+      throw lastErr || new Error('Betöltési hiba');
     };
 
     // ---- adatok ----
@@ -495,7 +505,7 @@
     };
     const getCountyName = (f) => { const raw=getCountyNameRaw(f); return { display:String(raw).trim(), key:clean(raw) }; };
 
-    // ---- jelölések összerakása ----
+    // ---- kiemelés + számlálás ----
     const highlightedKeys = new Set();
     const completedCount = {};
     const geoDisplayByKey = new Map();
@@ -552,17 +562,18 @@
       }
     }).addTo(map);
 
-    // *** RÁZOOMOLÁS MAGYARORSZÁGRA ***
-    const hBounds = layer.getBounds();          // GeoJSON határ
-    const fitZ = map.getBoundsZoom(hBounds.pad(0.04), true); // kis belső margó
-    map.setView(hBounds.getCenter(), fitZ);
-    map.setMinZoom(fitZ);
-    map.setMaxZoom(fitZ);
-    map.setMaxBounds(hBounds.pad(0.02));        // ne lehessen eltolni (amúgy is tiltva)
+    // ---- IGAZI "rászabás": minimális padding + tizedes zoom ----
+    const b = layer.getBounds();
+    map.fitBounds(b, { padding: [2, 2] });       // szinte nulla perem
+    const z = map.getZoom();                     // lehet tizedes
+    map.setMinZoom(z);
+    map.setMaxZoom(z);
+    map.setMaxBounds(b.pad(0.005));              // tényleg csak picit engedünk túl
   };
 
   window.addEventListener('DOMContentLoaded', initWorkMap);
 </script>
 </body>
 </html>
+
 
