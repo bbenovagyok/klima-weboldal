@@ -34,12 +34,10 @@ collections:
             fields:
               - { label: "Megye neve", name: "county_name", widget: "string" }
 
-              # ÚJ: megye-szintű jelölés
-              - { label: "Megye szinten jelölt?", name: "completed", widget: "boolean", default: false }
-
               - label: "Városok"
                 name: "cities"
                 widget: "list"
                 fields:
                   - { label: "Város neve", name: "city_name", widget: "string" }
                   - { label: "Már dolgoztunk itt?", name: "completed", widget: "boolean", default: false }
+
