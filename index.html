@@ -554,7 +554,7 @@
         lyr.on('click', () => {
           const b = lyr.getBounds();
           const msg = highlightedKeys.has(key)
-            ? `<b>${displayName}</b><br>Jelölések száma: <b>${count}</b>`
+            ? `<b>${displayName}</b><br>Városok száma: <b>${count}</b>`
             : `<b>${displayName}</b><br>Még nincs jelölt munka.`;
           L.popup({ closeButton:true, autoClose:true })
             .setLatLng(b.getCenter()).setContent(msg).openOn(map);
@@ -575,5 +575,6 @@
 </script>
 </body>
 </html>
+
 
 
