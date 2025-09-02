@@ -474,15 +474,13 @@
 
 <!-- TÉRKÉP külön scriptben (EZ HIÁNYZOTT, itt volt a hiba) -->
 <script>
-  // ====== Megye térkép (Leaflet) – fix Magyarország nézet + zölddel jelölt megyék ======
+  // ====== Megye térkép (Leaflet) – fix HU nézet + ékezet- és county-szint támogatás ======
   const initWorkMap = async () => {
     const mapEl = document.getElementById('work-map');
     if (!mapEl) return;
 
-    // 0) Magyarország nézethatár (durva bbox)
     const HU_BOUNDS = L.latLngBounds([45.6, 16.0], [48.7, 22.95]);
 
-    // 1) Térkép: minden interakció ki, fix HU nézet
     const map = L.map('work-map', {
       zoomControl: false,
       dragging: false,
@@ -498,7 +496,6 @@
       attribution: '&copy; OpenStreetMap & CARTO'
     }).addTo(map);
 
-    // első nézet: teljes Magyarország
     const z0 = map.getBoundsZoom(HU_BOUNDS);
     map.setView(HU_BOUNDS.getCenter(), z0);
     map.setMinZoom(z0);
@@ -506,7 +503,7 @@
     map.setMaxBounds(HU_BOUNDS.pad(0.02));
     map.options.maxBoundsViscosity = 1.0;
 
-    // 2) Helper: elérési út próbák + JSON BOM fix
+    // ------------ fetch helpers -------------
     const tryUrls = (file) => [ `data/${file}`, `/data/${file}`, new URL(`data/${file}`, document.baseURI).href ];
     const parseJsonSafe = (txt, url) => {
       const noBom = txt.charCodeAt(0) === 0xFEFF ? txt.slice(1) : txt;
@@ -533,105 +530,96 @@
       mapEl.innerHTML = `<p class="text-center text-white">Betöltési hiba: ${e?.message || e}</p>`;
       return;
     }
-
     if (!geojson?.type || !Array.isArray(geojson?.features)) {
       console.error('Hibás GeoJSON szerkezet:', geojson);
       mapEl.innerHTML = '<p class="text-center text-white">Hibás GeoJSON (features hiányzik).</p>';
       return;
     }
 
-    // 3) Név normalizáló + név kinyerő több kulcsból / kódból
-    const norm = (s) => String(s || '').replace(/\bmegye\b/gi,'').replace(/\s+/g,' ').trim();
+    // ------------ név normalizálás -------------
+    const stripDiacritics = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    const clean = (s) => stripDiacritics(String(s||''))
+      .replace(/\bmegye\b/gi,'')
+      .replace(/\s+/g,' ')
+      .trim()
+      .toLowerCase();
 
-    const getCountyName = (feature) => {
+    const getCountyNameRaw = (feature) => {
       const p = feature?.properties || {};
-      // Gyakoribb kulcsok (ha a te fájlodban más, ide felvehető)
-      const direct =
-        p.name || p.NAME || p.NAME_1 || p.megye || p.megye_nev || p.megyeNev ||
-        p.county || p.County || p.COUNTY || p.MEGYE || p.NEV || p.Név || p.nev ||
-        p.NUTS_NAME || p.NUTS_NAME_HU || p.TER_NEV || p.TERNEV || p.megye_name;
-      if (direct) return norm(direct);
-
-      // Kód -> név (ha csak kód van a properties-ben)
-      const code = String(p.KSH_KOD ?? p.KSH_KÓD ?? p.KSH_CODE ?? p.NUTS_ID ?? p.NUTS3 ?? p.ID ?? p.id ?? '')
-        .trim();
-      const CODE2NAME = {
-        '01':'Baranya','02':'Bács-Kiskun','03':'Békés','04':'Borsod-Abaúj-Zemplén','05':'Csongrád-Csanád',
-        '06':'Fejér','07':'Győr-Moson-Sopron','08':'Hajdú-Bihar','09':'Heves','10':'Jász-Nagykun-Szolnok',
-        '11':'Komárom-Esztergom','12':'Nógrád','13':'Pest','14':'Somogy','15':'Szabolcs-Szatmár-Bereg',
-        '16':'Tolna','17':'Vas','18':'Veszprém','19':'Zala','20':'Budapest',
-        'HU110':'Budapest','HU120':'Pest','HU231':'Somogy','HU213':'Veszprém','HU232':'Zala'
-      };
-      if (code && CODE2NAME[code]) return CODE2NAME[code];
-
-      // fallback: properties értékei közt “megye” szó
-      for (const v of Object.values(p)) {
-        if (typeof v === 'string' && /megye/i.test(v)) return norm(v);
-      }
-      return '';
+      return p.name || p.NAME || p.NAME_1 || p.megye || p.megye_nev || p.megyeNev ||
+             p.county || p.County || p.COUNTY || p.MEGYE || p.NEV || p.Név || p.nev ||
+             p.NUTS_NAME || p.NUTS_NAME_HU || p.TER_NEV || p.TERNEV || p.megye_name || '';
+    };
+    const getCountyName = (feature) => {
+      const raw = getCountyNameRaw(feature);
+      return { display: String(raw).trim(), key: clean(raw) };
     };
 
-    // 4) Jelölt megyék kigyűjtése a locations.json-ból
-    const highlighted = new Set();
+    // ------------ jelölések kigyűjtése -------------
+    // Kettős map: key (tisztított) -> display (szép név a GeoJSON-ból)
+    const geoDisplayByKey = new Map();
+    geojson.features.forEach(f => {
+      const { display, key } = getCountyName(f);
+      if (key) geoDisplayByKey.set(key, display);
+    });
+
+    const highlightedKeys = new Set();
     const completedCount = {};
-    const addCompleted = (countyRaw) => {
-      const county = norm(countyRaw);
-      if (!county) return;
-      highlighted.add(county);
-      completedCount[county] = (completedCount[county] || 0) + 1;
+
+    const markCounty = (nameLike) => {
+      const key = clean(nameLike);
+      if (!key) return;
+      highlightedKeys.add(key);
+      completedCount[key] = (completedCount[key] || 0) + 1;
     };
 
+    // locations.json – county szint ÉS/vagy város szint elfogadva
     if (Array.isArray(loc?.counties)) {
       loc.counties.forEach(co => {
-        const cname = co.county_name || co.name || co.megye || co.megye_nev;
-        (co.cities || []).forEach(c => { if (c?.completed) addCompleted(cname); });
+        const cName = co.county_name || co.name || co.megye || co.megye_nev || '';
+        if (co.completed === true) markCounty(cName); // county-szintű completed támogatás
+        (co.cities || []).forEach(city => {
+          if (city?.completed) markCounty(cName);
+        });
       });
     } else if (Array.isArray(loc)) {
-      loc.forEach(row => { const cname = row.county_name || row.county || row.megye; if (row?.completed) addCompleted(cname); });
+      loc.forEach(row => {
+        const cName = row.county_name || row.county || row.megye || '';
+        if (row?.completed) markCounty(cName);
+      });
     }
 
-    // 5) Stílus: nem jelölt = átlátszó (csak kontúr), jelölt = zöld kitöltés
-    const baseStyle = {
-      fillColor: '#e5e7eb',
-      fillOpacity: 0.0,
-      color: '#cbd5e1',
-      weight: 1,
-      opacity: 1,
-      className: 'county-outline'
-    };
-    const hotStyle = {
-      fillColor: '#16a34a',
-      fillOpacity: 0.6,
-      color: '#15803d',
-      weight: 2,
-      opacity: 1,
-      className: 'county-outline'
-    };
+    // ------------ stílusok + réteg -------------
+    const baseStyle = { fillColor:'#e5e7eb', fillOpacity:0.0, color:'#cbd5e1', weight:1, opacity:1, className:'county-outline' };
+    const hotStyle  = { fillColor:'#16a34a', fillOpacity:0.6, color:'#15803d', weight:2, opacity:1, className:'county-outline' };
 
-    // 6) Réteg felrajzolása
     const layer = L.geoJSON(geojson, {
-      style: f => highlighted.has(norm(getCountyName(f))) ? hotStyle : baseStyle,
+      style: f => {
+        const { key } = getCountyName(f);
+        return highlightedKeys.has(key) ? hotStyle : baseStyle;
+      },
       onEachFeature: (feature, lyr) => {
-        const name = getCountyName(feature) || 'Ismeretlen megye';
-        const count = completedCount[name] || 0;
+        const { key } = getCountyName(feature);
+        const displayName = geoDisplayByKey.get(key) || 'Ismeretlen megye';
+        const count = completedCount[key] || 0;
 
-        lyr.bindTooltip(name, { permanent:true, direction:'center', className:'county-label' }).openTooltip();
+        lyr.bindTooltip(displayName, { permanent:true, direction:'center', className:'county-label' }).openTooltip();
 
-        lyr.on('mouseover', () => highlighted.has(name) ? lyr.setStyle({ fillColor:'#15803d' }) : null);
-        lyr.on('mouseout',  () => highlighted.has(name) ? lyr.setStyle({ fillColor:'#16a34a' }) : null);
+        lyr.on('mouseover', () => highlightedKeys.has(key) ? lyr.setStyle({ fillColor:'#15803d' }) : null);
+        lyr.on('mouseout',  () => highlightedKeys.has(key) ? lyr.setStyle({ fillColor:'#16a34a' }) : null);
 
         lyr.on('click', () => {
           const b = lyr.getBounds();
-          const msg = highlighted.has(name)
-            ? `<b>${name}</b><br>Jelölt települések száma: <b>${count}</b>`
-            : `<b>${name}</b><br>Még nincs jelölt munka.`;
+          const msg = highlightedKeys.has(key)
+            ? `<b>${displayName}</b><br>Jelölt települések / jelölések: <b>${count}</b>`
+            : `<b>${displayName}</b><br>Még nincs jelölt munka.`;
           L.popup({ closeButton:true, autoClose:true })
             .setLatLng(b.getCenter()).setContent(msg).openOn(map);
         });
       }
     }).addTo(map);
 
-    // 7) Nézetet újra HU egészére “lockoljuk”
+    // HU teljes nézet zárás
     const z1 = map.getBoundsZoom(HU_BOUNDS);
     map.setView(HU_BOUNDS.getCenter(), z1);
     map.setMinZoom(z1);
@@ -651,6 +639,7 @@
 
 </body>
 </html>
+
 
 
 
