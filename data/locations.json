@@ -7,7 +7,8 @@
           "city_name": "Siófok",
           "completed": true
         }
-      ]
+      ],
+      "completed": true
     },
     {
       "county_name": "Veszprém",
@@ -20,10 +21,12 @@
           "city_name": "Balatonfüred",
           "completed": true
         }
-      ]
+      ],
+      "completed": true
     },
     {
-      "county_name": "Fejér"
+      "county_name": "Fejér",
+      "completed": true
     }
   ]
 }
