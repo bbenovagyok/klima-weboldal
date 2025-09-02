@@ -58,6 +58,10 @@
     },
     {
       "county_name": "Fejér"
+    },
+    {
+      "county_name": "Komárom-Esztergom",
+      "cities": []
     }
   ]
 }
