@@ -398,124 +398,100 @@
     });
   </script>
 
-  <!-- UI / Galéria / Térkép -->
-  <script>
-    // Mobil menü
-    const mobileMenuButton=document.getElementById('mobile-menu-button');
-    const mobileMenu=document.getElementById('mobile-menu');
-    mobileMenuButton?.addEventListener('click',()=>mobileMenu.classList.toggle('hidden'));
-    mobileMenu?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>mobileMenu.classList.add('hidden')));
+ <!-- UI / Galéria -->
+<script>
+  // Mobil menü
+  const mobileMenuButton=document.getElementById('mobile-menu-button');
+  const mobileMenu=document.getElementById('mobile-menu');
+  mobileMenuButton?.addEventListener('click',()=>mobileMenu.classList.toggle('hidden'));
+  mobileMenu?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>mobileMenu.classList.add('hidden')));
 
-    // Lightbox
-    const galleryContainer=document.getElementById('gallery-container');
-    const lightbox=document.getElementById('lightbox');
-    const lightboxImage=document.getElementById('lightbox-image');
-    const lightboxTitle=document.getElementById('lightbox-title');
-    const lightboxDescription=document.getElementById('lightbox-description');
-    const closeLightboxButton=document.getElementById('close-lightbox');
-    function openLightbox(src,t,d){ lightboxImage.src=src; lightboxTitle.textContent=t; lightboxDescription.textContent=d; lightbox.classList.remove('hidden'); }
-    function closeLightbox(){ lightbox.classList.add('hidden'); }
-    galleryContainer?.addEventListener('click',e=>{ const el=e.target.closest('.gallery-item'); if(el) openLightbox(el.dataset.src,el.dataset.title,el.dataset.description);});
-    closeLightboxButton?.addEventListener('click',closeLightbox);
-    lightbox?.addEventListener('click',e=>{ if(e.target===lightbox) closeLightbox(); });
+  // Lightbox
+  const galleryContainer=document.getElementById('gallery-container');
+  const lightbox=document.getElementById('lightbox');
+  const lightboxImage=document.getElementById('lightbox-image');
+  const lightboxTitle=document.getElementById('lightbox-title');
+  const lightboxDescription=document.getElementById('lightbox-description');
+  const closeLightboxButton=document.getElementById('close-lightbox');
+  function openLightbox(src,t,d){ lightboxImage.src=src; lightboxTitle.textContent=t; lightboxDescription.textContent=d; lightbox.classList.remove('hidden'); }
+  function closeLightbox(){ lightbox.classList.add('hidden'); }
+  galleryContainer?.addEventListener('click',e=>{ const el=e.target.closest('.gallery-item'); if(el) openLightbox(el.dataset.src,el.dataset.title,el.dataset.description);});
+  closeLightboxButton?.addEventListener('click',closeLightbox);
+  lightbox?.addEventListener('click',e=>{ if(e.target===lightbox) closeLightbox(); });
 
-    // Scroll animáció
-    function initializeScrollAnimation(){
-      const obs=new IntersectionObserver((entries)=>{
-        entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('is-visible'); obs.unobserve(e.target);} });
-      },{threshold:.1});
-      document.querySelectorAll('.reveal-on-scroll').forEach(el=>obs.observe(el));
-    }
-    initializeScrollAnimation();
+  // Scroll animáció
+  function initializeScrollAnimation(){
+    const obs=new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('is-visible'); obs.unobserve(e.target);} });
+    },{threshold:.1});
+    document.querySelectorAll('.reveal-on-scroll').forEach(el=>obs.observe(el));
+  }
+  initializeScrollAnimation();
 
-    const toTopButton=document.getElementById('to-top-button');
-    const header=document.getElementById('main-header');
-    window.addEventListener('scroll',()=>{
-      header.classList.toggle('header-scrolled',window.scrollY>50);
-      if(window.scrollY>window.innerHeight/2){ toTopButton.classList.remove('opacity-0','translate-y-5'); }
-      else { toTopButton.classList.add('opacity-0','translate-y-5'); }
-    });
+  const toTopButton=document.getElementById('to-top-button');
+  const header=document.getElementById('main-header');
+  window.addEventListener('scroll',()=>{
+    header.classList.toggle('header-scrolled',window.scrollY>50);
+    if(window.scrollY>window.innerHeight/2){ toTopButton.classList.remove('opacity-0','translate-y-5'); }
+    else { toTopButton.classList.add('opacity-0','translate-y-5'); }
+  });
 
-    /* ---------- Galéria betöltése ---------- */
-    window.addEventListener('DOMContentLoaded', () => {
-      fetch('data/gallery.json')
-        .then(r => r.json())
-        .then(data => {
-          galleryContainer.innerHTML = '';
-          if (data.images?.length) {
-            const safe = s => String(s ?? '').replace(/"/g, '&quot;');
-            data.images.forEach((item, i) => {
-              const title = item.title || item.cim || '';
-              const desc  = item.description || item.leiras || '';
-
-              galleryContainer.innerHTML += `
-                <div
-                  class="gallery-item group relative aspect-square overflow-hidden rounded-lg shadow-lg cursor-pointer reveal-on-scroll"
-                  data-src="${safe(item.image)}"
-                  data-title="${safe(title)}"
-                  data-description="${safe(desc)}"
-                  style="--delay:${i * 100}ms"
-                >
-                  <img src="${safe(item.image)}" alt="${safe(title)}"
-                      class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-
-                  <div class="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors duration-300"></div>
-
-                  <div class="absolute inset-x-0 bottom-0 p-3">
-                    <div class="backdrop-blur-md bg-black/40 text-white rounded-md px-3 py-2 shadow-md
-                                opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
-                      <h4 class="text-sm font-semibold truncate">${safe(title)}</h4>
-                      <p class="hidden sm:block text-xs text-white/85 mt-0.5">${safe(desc)}</p>
-                    </div>
+  // Galéria betöltése
+  window.addEventListener('DOMContentLoaded', () => {
+    fetch('data/gallery.json')
+      .then(r => r.json())
+      .then(data => {
+        galleryContainer.innerHTML = '';
+        if (data.images?.length) {
+          const safe = s => String(s ?? '').replace(/"/g, '&quot;');
+          data.images.forEach((item, i) => {
+            const title = item.title || item.cim || '';
+            const desc  = item.description || item.leiras || '';
+            galleryContainer.innerHTML += `
+              <div class="gallery-item group relative aspect-square overflow-hidden rounded-lg shadow-lg cursor-pointer reveal-on-scroll"
+                   data-src="${safe(item.image)}" data-title="${safe(title)}" data-description="${safe(desc)}"
+                   style="--delay:${i * 100}ms">
+                <img src="${safe(item.image)}" alt="${safe(title)}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors duration-300"></div>
+                <div class="absolute inset-x-0 bottom-0 p-3">
+                  <div class="backdrop-blur-md bg-black/40 text-white rounded-md px-3 py-2 shadow-md opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
+                    <h4 class="text-sm font-semibold truncate">${safe(title)}</h4>
+                    <p class="hidden sm:block text-xs text-white/85 mt-0.5">${safe(desc)}</p>
                   </div>
                 </div>
-              `;
-            });
-            initializeScrollAnimation();
-          } else {
-            galleryContainer.innerHTML = '<p class="text-center col-span-full">Jelenleg nincsenek képek a galériában.</p>';
-          }
-        })
-        .catch(() => {
-          galleryContainer.innerHTML = '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben.</p>';
-        });
-    });
+              </div>`;
+          });
+          initializeScrollAnimation();
+        } else {
+          galleryContainer.innerHTML = '<p class="text-center col-span-full">Jelenleg nincsenek képek a galériában.</p>';
+        }
+      })
+      .catch(() => {
+        galleryContainer.innerHTML = '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben.</p>';
+      });
+  });
+</script>
 
+<!-- TÉRKÉP külön scriptben (EZ HIÁNYZOTT, itt volt a hiba) -->
 <script>
-  // ====== Megye térkép (Leaflet) – path fallback + BOM fix + name normalizer ======
+  // Megye térkép – path fallback + BOM fix + név normalizálás
   const initWorkMap = async () => {
     const mapEl = document.getElementById('work-map');
     if (!mapEl) return;
 
-    const map = L.map('work-map', {
-      scrollWheelZoom: true,
-      dragging: true,
-      zoomControl: true,
-      attributionControl: false
-    }).setView([47.1, 18.5], 7);
+    const map = L.map('work-map', { scrollWheelZoom:true, dragging:true, zoomControl:true, attributionControl:false })
+                 .setView([47.1, 18.5], 7);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap & CARTO'
-    }).addTo(map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap & CARTO' }).addTo(map);
 
-    // ---- több path próba: relatív + abszolút ----
-    const tryUrls = (file) => ([
-      `data/${file}`,
-      `/data/${file}`,
-      new URL(`data/${file}`, document.baseURI).href
-    ]);
+    const tryUrls = (file) => [ `data/${file}`, `/data/${file}`, new URL(`data/${file}`, document.baseURI).href ];
 
-    // BOM levágás + JSON parse
     const parseJsonSafe = (txt, url) => {
       const noBom = txt.charCodeAt(0) === 0xFEFF ? txt.slice(1) : txt;
       try { return JSON.parse(noBom); }
-      catch (e) {
-        console.error('JSON parse hiba ->', url, e, 'minta:', noBom.slice(0, 300));
-        throw new Error(`JSON parse hiba – ${url}`);
-      }
+      catch (e) { console.error('JSON parse hiba ->', url, e, noBom.slice(0,300)); throw new Error(`JSON parse hiba – ${url}`); }
     };
 
-    // több URL-t próbál sorban, az első sikerest visszaadja
     const fetchFirstOk = async (candidates) => {
       let lastErr;
       for (const url of candidates) {
@@ -526,12 +502,9 @@
           const json = parseJsonSafe(txt, url);
           console.info('Betöltve:', url);
           return json;
-        } catch (e) {
-          console.warn('Sikertelen:', url, e.message);
-          lastErr = e;
-        }
+        } catch (e) { console.warn('Sikertelen:', url, e.message); lastErr = e; }
       }
-      throw lastErr || new Error('Nem sikerült betölteni egyetlen forrásból sem.');
+      throw lastErr || new Error('Nem sikerült betölteni.');
     };
 
     let geojson, loc;
@@ -546,23 +519,16 @@
       return;
     }
 
-    // GeoJSON valid?
     if (!geojson?.type || !Array.isArray(geojson?.features)) {
       console.error('Hibás GeoJSON szerkezet:', geojson);
       mapEl.innerHTML = '<p class="text-center text-white">Hibás GeoJSON (features hiányzik).</p>';
       return;
     }
 
-    // Név normalizáló: "Somogy megye" -> "Somogy", trim, duplaszóköz out
-    const norm = (s) => String(s || '')
-      .replace(/\bmegye\b/gi, '')
-      .replace(/\s+/g, ' ')
-      .trim();
+    const norm = (s) => String(s || '').replace(/\bmegye\b/gi,'').replace(/\s+/g,' ').trim();
 
-    // Kiemelendő megyék kigyűjtése a locations-ból
     const highlighted = new Set();
     const completedCount = {};
-
     const addCompleted = (countyRaw) => {
       const county = norm(countyRaw);
       if (!county) return;
@@ -576,44 +542,32 @@
         (co.cities || []).forEach(c => { if (c?.completed) addCompleted(cname); });
       });
     } else if (Array.isArray(loc)) {
-      loc.forEach(row => {
-        const cname = row.county_name || row.county || row.megye;
-        if (row?.completed) addCompleted(cname);
-      });
+      loc.forEach(row => { const cname = row.county_name || row.county || row.megye; if (row?.completed) addCompleted(cname); });
     } else {
       console.warn('locations.json nem várt struktúra:', loc);
     }
 
-    // Stílusok
     const baseStyle = { fillColor:'#e5e7eb', weight:1, color:'#ffffff', opacity:1, fillOpacity:0.5, className:'county-outline' };
     const hotStyle  = { fillColor:'#16a34a', weight:2, color:'#15803d', opacity:1, fillOpacity:0.6, className:'county-outline' };
 
-    // Réteg felrajzolás
     const layer = L.geoJSON(geojson, {
-      style: f => {
-        const name = norm(f?.properties?.name);
-        return highlighted.has(name) ? hotStyle : baseStyle;
-      },
+      style: f => highlighted.has(norm(f?.properties?.name)) ? hotStyle : baseStyle,
       onEachFeature: (feature, lyr) => {
         const name = norm(feature?.properties?.name) || 'Ismeretlen megye';
         const count = completedCount[name] || 0;
 
-        // középre fixált tooltip
         lyr.bindTooltip(name, { permanent:true, direction:'center', className:'county-label' }).openTooltip();
 
-        // hover
         lyr.on('mouseover', () => highlighted.has(name) ? lyr.setStyle({ fillColor:'#15803d' }) : lyr.setStyle({ fillOpacity:0.65 }));
         lyr.on('mouseout',  () => highlighted.has(name) ? lyr.setStyle({ fillColor:'#16a34a' }) : lyr.setStyle({ fillOpacity:0.5  }));
 
-        // click -> zoom + popup
         lyr.on('click', () => {
           const b = lyr.getBounds();
           map.fitBounds(b, { padding:[20,20] });
           const msg = highlighted.has(name)
             ? `<b>${name}</b><br>Jelölt települések száma: <b>${count}</b>`
             : `<b>${name}</b><br>Még nincs jelölt munka.`;
-          L.popup({ closeButton:true, autoClose:true })
-            .setLatLng(b.getCenter()).setContent(msg).openOn(map);
+          L.popup({ closeButton:true, autoClose:true }).setLatLng(b.getCenter()).setContent(msg).openOn(map);
         });
       }
     }).addTo(map);
@@ -626,4 +580,5 @@
 
 </body>
 </html>
+
 
