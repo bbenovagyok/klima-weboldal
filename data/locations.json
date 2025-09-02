@@ -3,66 +3,15 @@
     {
       "county_name": "Somogy",
       "cities": [
-        {
-          "city_name": "Siófok",
-          "completed": true
-        },
-        {
-          "city_name": "Kaposvár",
-          "completed": true
-        }
+        { "city_name": "Siófok", "completed": true },
+        { "city_name": "Tab", "completed": false }
       ]
     },
     {
       "county_name": "Veszprém",
       "cities": [
-        {
-          "city_name": "Veszprém",
-          "completed": true
-        }
-      ]
-    },
-    {
-      "county_name": "Bács-Kiskun",
-      "cities": [
-        {
-          "city_name": "Kecskemét",
-          "completed": true
-        },
-        {
-          "city_name": "Solt",
-          "completed": true
-        }
-      ]
-    },
-    {
-      "county_name": "Győr-Moson-Sopron",
-      "cities": [
-        {
-          "completed": true,
-          "city_name": "Győr"
-        }
-      ]
-    },
-    {
-      "county_name": "Vas"
-    },
-    {
-      "county_name": "Zala"
-    },
-    {
-      "county_name": "Baranya"
-    },
-    {
-      "county_name": "Tolna"
-    },
-    {
-      "county_name": "Fejér",
-      "cities": [
-        {
-          "completed": true,
-          "city_name": "Székesfehérvár"
-        }
+        { "city_name": "Veszprém", "completed": true },
+        { "city_name": "Balatonfüred", "completed": true }
       ]
     }
   ]
