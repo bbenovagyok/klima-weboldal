@@ -474,12 +474,15 @@
 
 <!-- TÉRKÉP külön scriptben (EZ HIÁNYZOTT, itt volt a hiba) -->
 <script>
-  // ====== Megye térkép (Leaflet) – fix HU nézet + zöld megyék jelölve ======
+  // ====== Megye térkép (Leaflet) – fix Magyarország nézet + zölddel jelölt megyék ======
   const initWorkMap = async () => {
     const mapEl = document.getElementById('work-map');
     if (!mapEl) return;
 
-    // Interakciók KI, fix nézet
+    // 0) Magyarország nézethatár (durva bbox)
+    const HU_BOUNDS = L.latLngBounds([45.6, 16.0], [48.7, 22.95]);
+
+    // 1) Térkép: minden interakció ki, fix HU nézet
     const map = L.map('work-map', {
       zoomControl: false,
       dragging: false,
@@ -495,17 +498,15 @@
       attribution: '&copy; OpenStreetMap & CARTO'
     }).addTo(map);
 
-    // Magyarország durva határdoboz (D–Ny, É–K)
-    const HU_BOUNDS = L.latLngBounds([45.6, 16.0], [48.7, 22.95]);
-    // első nézet beállítása HU-ra
-    const z = map.getBoundsZoom(HU_BOUNDS);
-    map.setView(HU_BOUNDS.getCenter(), z);
-    map.setMinZoom(z);
-    map.setMaxZoom(z);
+    // első nézet: teljes Magyarország
+    const z0 = map.getBoundsZoom(HU_BOUNDS);
+    map.setView(HU_BOUNDS.getCenter(), z0);
+    map.setMinZoom(z0);
+    map.setMaxZoom(z0);
     map.setMaxBounds(HU_BOUNDS.pad(0.02));
     map.options.maxBoundsViscosity = 1.0;
 
-    // ---- töltsük be az adatokat ----
+    // 2) Helper: elérési út próbák + JSON BOM fix
     const tryUrls = (file) => [ `data/${file}`, `/data/${file}`, new URL(`data/${file}`, document.baseURI).href ];
     const parseJsonSafe = (txt, url) => {
       const noBom = txt.charCodeAt(0) === 0xFEFF ? txt.slice(1) : txt;
@@ -515,6 +516,7 @@
     const fetchFirstOk = async (cands) => {
       let lastErr; for (const u of cands) {
         try { const r = await fetch(u,{cache:'no-store'}); if(!r.ok) throw new Error(`HTTP ${r.status}`);
+          console.info('Betöltve:', u);
           return parseJsonSafe(await r.text(), u);
         } catch(e){ console.warn('Sikertelen:', u, e.message); lastErr=e; }
       } throw lastErr||new Error('Betöltési hiba');
@@ -538,9 +540,38 @@
       return;
     }
 
+    // 3) Név normalizáló + név kinyerő több kulcsból / kódból
     const norm = (s) => String(s || '').replace(/\bmegye\b/gi,'').replace(/\s+/g,' ').trim();
 
-    // jelölt megyék kigyűjtése
+    const getCountyName = (feature) => {
+      const p = feature?.properties || {};
+      // Gyakoribb kulcsok (ha a te fájlodban más, ide felvehető)
+      const direct =
+        p.name || p.NAME || p.NAME_1 || p.megye || p.megye_nev || p.megyeNev ||
+        p.county || p.County || p.COUNTY || p.MEGYE || p.NEV || p.Név || p.nev ||
+        p.NUTS_NAME || p.NUTS_NAME_HU || p.TER_NEV || p.TERNEV || p.megye_name;
+      if (direct) return norm(direct);
+
+      // Kód -> név (ha csak kód van a properties-ben)
+      const code = String(p.KSH_KOD ?? p.KSH_KÓD ?? p.KSH_CODE ?? p.NUTS_ID ?? p.NUTS3 ?? p.ID ?? p.id ?? '')
+        .trim();
+      const CODE2NAME = {
+        '01':'Baranya','02':'Bács-Kiskun','03':'Békés','04':'Borsod-Abaúj-Zemplén','05':'Csongrád-Csanád',
+        '06':'Fejér','07':'Győr-Moson-Sopron','08':'Hajdú-Bihar','09':'Heves','10':'Jász-Nagykun-Szolnok',
+        '11':'Komárom-Esztergom','12':'Nógrád','13':'Pest','14':'Somogy','15':'Szabolcs-Szatmár-Bereg',
+        '16':'Tolna','17':'Vas','18':'Veszprém','19':'Zala','20':'Budapest',
+        'HU110':'Budapest','HU120':'Pest','HU231':'Somogy','HU213':'Veszprém','HU232':'Zala'
+      };
+      if (code && CODE2NAME[code]) return CODE2NAME[code];
+
+      // fallback: properties értékei közt “megye” szó
+      for (const v of Object.values(p)) {
+        if (typeof v === 'string' && /megye/i.test(v)) return norm(v);
+      }
+      return '';
+    };
+
+    // 4) Jelölt megyék kigyűjtése a locations.json-ból
     const highlighted = new Set();
     const completedCount = {};
     const addCompleted = (countyRaw) => {
@@ -559,17 +590,17 @@
       loc.forEach(row => { const cname = row.county_name || row.county || row.megye; if (row?.completed) addCompleted(cname); });
     }
 
-    // Stílusok: alap – átlátszó (csak kontúr), jelölt – zöld kitöltés
+    // 5) Stílus: nem jelölt = átlátszó (csak kontúr), jelölt = zöld kitöltés
     const baseStyle = {
       fillColor: '#e5e7eb',
-      fillOpacity: 0.0,      // átlátszó alap
-      color: '#cbd5e1',      // halvány kontúr
+      fillOpacity: 0.0,
+      color: '#cbd5e1',
       weight: 1,
       opacity: 1,
       className: 'county-outline'
     };
     const hotStyle = {
-      fillColor: '#16a34a',  // green-600
+      fillColor: '#16a34a',
       fillOpacity: 0.6,
       color: '#15803d',
       weight: 2,
@@ -577,19 +608,18 @@
       className: 'county-outline'
     };
 
+    // 6) Réteg felrajzolása
     const layer = L.geoJSON(geojson, {
-      style: f => highlighted.has(norm(f?.properties?.name)) ? hotStyle : baseStyle,
+      style: f => highlighted.has(norm(getCountyName(f))) ? hotStyle : baseStyle,
       onEachFeature: (feature, lyr) => {
-        const name = norm(feature?.properties?.name) || 'Ismeretlen megye';
+        const name = getCountyName(feature) || 'Ismeretlen megye';
         const count = completedCount[name] || 0;
 
         lyr.bindTooltip(name, { permanent:true, direction:'center', className:'county-label' }).openTooltip();
 
-        // hover csak a jelöltet sötétíti picit
         lyr.on('mouseover', () => highlighted.has(name) ? lyr.setStyle({ fillColor:'#15803d' }) : null);
         lyr.on('mouseout',  () => highlighted.has(name) ? lyr.setStyle({ fillColor:'#16a34a' }) : null);
 
-        // katt: popup infó – zoom nem lesz (fix a nézet)
         lyr.on('click', () => {
           const b = lyr.getBounds();
           const msg = highlighted.has(name)
@@ -601,14 +631,12 @@
       }
     }).addTo(map);
 
-    // Mindenképp HU teljes nézet marad
-    const z2 = map.getBoundsZoom(HU_BOUNDS);
-    map.setView(HU_BOUNDS.getCenter(), z2);
-    map.setMinZoom(z2);
-    map.setMaxZoom(z2);
+    // 7) Nézetet újra HU egészére “lockoljuk”
+    const z1 = map.getBoundsZoom(HU_BOUNDS);
+    map.setView(HU_BOUNDS.getCenter(), z1);
+    map.setMinZoom(z1);
+    map.setMaxZoom(z1);
     map.setMaxBounds(HU_BOUNDS.pad(0.02));
-
-    // betonbiztos tiltasok (ha valami visszakapcsolná)
     map.dragging.disable();
     map.scrollWheelZoom.disable();
     map.doubleClickZoom.disable();
@@ -623,6 +651,7 @@
 
 </body>
 </html>
+
 
 
 
