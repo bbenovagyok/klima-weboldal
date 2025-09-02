@@ -555,39 +555,57 @@
       return { display: String(raw).trim(), key: clean(raw) };
     };
 
-    // ------------ jelölések kigyűjtése -------------
-    // Kettős map: key (tisztított) -> display (szép név a GeoJSON-ból)
-    const geoDisplayByKey = new Map();
-    geojson.features.forEach(f => {
-      const { display, key } = getCountyName(f);
-      if (key) geoDisplayByKey.set(key, display);
-    });
+// ------------ jelölések kigyűjtése (MEGYE LISTA = JELÖLT) -------------
+const highlightedKeys = new Set();
+const completedCount = {};
+const geoDisplayByKey = new Map();
 
-    const highlightedKeys = new Set();
-    const completedCount = {};
+// már meglévő helperjeid:
+const stripDiacritics = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const clean = (s) => stripDiacritics(String(s||''))
+  .replace(/\bmegye\b/gi,'')
+  .replace(/\s+/g,' ')
+  .trim()
+  .toLowerCase();
 
-    const markCounty = (nameLike) => {
-      const key = clean(nameLike);
-      if (!key) return;
-      highlightedKeys.add(key);
-      completedCount[key] = (completedCount[key] || 0) + 1;
-    };
+const getCountyNameRaw = (feature) => {
+  const p = feature?.properties || {};
+  return p.name || p.NAME || p.NAME_1 || p.megye || p.megye_nev || p.megyeNev ||
+         p.county || p.County || p.COUNTY || p.MEGYE || p.NEV || p.Név || p.nev ||
+         p.NUTS_NAME || p.NUTS_NAME_HU || p.TER_NEV || p.TERNEV || p.megye_name || '';
+};
+const getCountyName = (feature) => {
+  const raw = getCountyNameRaw(feature);
+  return { display: String(raw).trim(), key: clean(raw) };
+};
 
-    // locations.json – county szint ÉS/vagy város szint elfogadva
-    if (Array.isArray(loc?.counties)) {
-      loc.counties.forEach(co => {
-        const cName = co.county_name || co.name || co.megye || co.megye_nev || '';
-        if (co.completed === true) markCounty(cName); // county-szintű completed támogatás
-        (co.cities || []).forEach(city => {
-          if (city?.completed) markCounty(cName);
-        });
-      });
-    } else if (Array.isArray(loc)) {
-      loc.forEach(row => {
-        const cName = row.county_name || row.county || row.megye || '';
-        if (row?.completed) markCounty(cName);
-      });
-    }
+// GeoJSON megyenevek (szép feliratokhoz)
+geojson.features.forEach(f => {
+  const { display, key } = getCountyName(f);
+  if (key) geoDisplayByKey.set(key, display);
+});
+
+// Ezt hívd minden megye nevén
+const markCounty = (nameLike) => {
+  const key = clean(nameLike);
+  if (!key) return;
+  highlightedKeys.add(key);
+  completedCount[key] = (completedCount[key] || 0) + 1;
+};
+
+// ❶ Ha locations.counties tömb van: minden benne szereplő megye legyen zöld
+if (Array.isArray(loc?.counties)) {
+  loc.counties.forEach(co => {
+    const cName = co.county_name || co.name || co.megye || co.megye_nev || '';
+    if (cName) markCounty(cName);
+  });
+// ❷ Ha a locations gyökérlista (másik struktúra), ugyanaz az elv:
+} else if (Array.isArray(loc)) {
+  loc.forEach(row => {
+    const cName = row.county_name || row.county || row.megye || '';
+    if (cName) markCounty(cName);
+  });
+}
 
     // ------------ stílusok + réteg -------------
     const baseStyle = { fillColor:'#e5e7eb', fillOpacity:0.0, color:'#cbd5e1', weight:1, opacity:1, className:'county-outline' };
@@ -639,6 +657,7 @@
 
 </body>
 </html>
+
 
 
 
