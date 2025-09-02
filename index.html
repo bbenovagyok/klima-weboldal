@@ -11,6 +11,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 
+  <!-- Leaflet (térkép) -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
   <style>
     body{font-family:'Inter',sans-serif}
     .hero-bg{position:relative;background-image:url('https://i.postimg.cc/3J1W66pj/fdsffsf.jpg');background-size:cover;background-position:center}
@@ -81,7 +94,17 @@
     @media (hover:hover){ .marquee:hover{ animation-play-state: paused; } }
     @keyframes marquee{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
 
-    /* Accordion base + overlay look */
+    /* --- Térkép stílus --- */
+    #work-map{ width:100%; height:520px; border-radius:16px; box-shadow:0 20px 45px rgba(0,0,0,.25); overflow:hidden; }
+    @media (max-width:640px){ #work-map{ height:400px; } }
+    .leaflet-tooltip.county-label{
+      background:transparent; border:none; box-shadow:none;
+      color:#0b1f2a; font-weight:800; letter-spacing:.2px; text-shadow:0 1px 2px rgba(255,255,255,.8);
+    }
+    .leaflet-container .leaflet-control-attribution{ display:none; }
+    .county-outline{ filter: drop-shadow(0 2px 8px rgba(0,0,0,.35)); }
+
+    /* Accordion base (NINCS már használva, csak ha visszahoznád) */
     .city-list{max-height:0;overflow:hidden;transition:max-height .3s ease, opacity .2s ease, transform .2s ease}
     .accordion-arrow{transition:transform .3s ease-in-out}
     .accordion-item.open .accordion-arrow{transform:rotate(90deg)}
@@ -196,19 +219,21 @@
           <p class="text-center col-span-full">Galéria betöltése...</p>
         </div>
 
+        <!-- ÚJ: Térkép blokk -->
         <div class="mt-16 reveal-on-scroll" style="--delay:300ms;">
-          <h3 class="text-2xl font-bold text-center text-white mb-6">Ahol már dolgoztunk:</h3>
+          <h3 class="text-2xl font-bold text-center text-white mb-6">Ahol már dolgoztunk (megye térkép)</h3>
 
-          <div id="work-areas-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto items-start overflow-visible">
-            <!-- Dinamikusan épül -->
-          </div>
+          <div id="work-map" class="mx-auto max-w-5xl"></div>
 
-          <!-- Csak mobilon látszik, 4 kártya után -->
-          <div class="max-w-5xl mx-auto mt-3 sm:hidden">
-            <button id="more-btn"
-              class="w-full inline-flex items-center justify-center px-5 py-3 rounded-full bg-yellow-400 text-gray-900 font-semibold shadow-md hover:bg-yellow-300 transition">
-              Több…
-            </button>
+          <div class="flex items-center justify-center gap-4 mt-4 text-cyan-100 text-sm">
+            <span class="inline-flex items-center gap-2">
+              <span class="inline-block w-4 h-4 rounded-sm" style="background:#16a34a; border:1px solid #15803d"></span>
+              Volt munkánk ebben a megyében
+            </span>
+            <span class="inline-flex items-center gap-2">
+              <span class="inline-block w-4 h-4 rounded-sm" style="background:#e5e7eb; border:1px solid #ffffff"></span>
+              Még nincs jelölés
+            </span>
           </div>
         </div>
       </div>
@@ -397,7 +422,7 @@
     });
   </script>
 
-  <!-- UI / Galéria / Megyék -->
+  <!-- UI / Galéria / Térkép -->
   <script>
     // Mobil menü
     const mobileMenuButton=document.getElementById('mobile-menu-button');
@@ -437,9 +462,6 @@
 
     /* ---------- Galéria betöltése (cím + leírás overlay) ---------- */
     window.addEventListener('DOMContentLoaded', () => {
-      const workAreasContainer = document.getElementById('work-areas-container');
-      const moreBtn = document.getElementById('more-btn');
-
       fetch('/data/gallery.json')
         .then(r => r.json())
         .then(data => {
@@ -481,96 +503,135 @@
         .catch(() => {
           galleryContainer.innerHTML = '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben.</p>';
         });
-
-      /* ---------- Megyék (overlay dropdown + 1 nyitva) ---------- */
-      fetch('/data/locations.json')
-        .then(r => r.json())
-        .then(data => {
-          workAreasContainer.innerHTML = '';
-          const counties = data.counties || [];
-
-          counties.forEach(county => {
-            const item = document.createElement('div');
-            item.className = 'accordion-item relative bg-white/20 rounded-lg';
-
-            let cityListHTML = '';
-            (county.cities || []).forEach(c => {
-              cityListHTML += `
-                <div class="flex items-center py-2">
-                  ${c.completed ? '<div class="w-2 h-2 rounded-full bg-green-400 mr-3"></div>' : '<div class="w-2 h-2 rounded-full bg-gray-400 mr-3"></div>'}
-                  <span class="text-white/90">${c.city_name}</span>
-                </div>`;
-            });
-
-            item.innerHTML = `
-              <button class="accordion-header w-full text-left p-4 flex justify-between items-center">
-                <div class="flex items-center">
-                  <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                  <span class="county-title font-bold text-lg">${county.county_name}</span>
-                </div>
-                <svg class="w-5 h-5 accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-              </button>
-
-              <!-- overlay dropdown -->
-              <div class="city-list absolute left-0 right-0 top-full z-50 rounded-xl opacity-0 pointer-events-none translate-y-1 text-white glass">
-                <div class="py-3 pl-8 pr-4">
-                  ${cityListHTML}
-                </div>
-              </div>
-            `;
-            workAreasContainer.appendChild(item);
-          });
-
-          // csak 1 nyíljon + overlay anim
-          document.querySelectorAll('.accordion-header').forEach(btn=>{
-            btn.addEventListener('click',()=>{
-              const acc = btn.parentElement;
-              const openNow = acc.classList.contains('open');
-
-              document.querySelectorAll('.accordion-item').forEach(it=>{
-                it.classList.remove('open');
-                const list=it.querySelector('.city-list');
-                if(list){
-                  list.style.maxHeight=0;
-                  list.classList.remove('opacity-100','pointer-events-auto','translate-y-0');
-                  list.classList.add('opacity-0','pointer-events-none','translate-y-1');
-                }
-              });
-
-              if(!openNow){
-                acc.classList.add('open');
-                const list=acc.querySelector('.city-list');
-                if(list){
-                  list.style.maxHeight=list.scrollHeight+'px';
-                  list.classList.add('opacity-100','pointer-events-auto','translate-y-0');
-                  list.classList.remove('opacity-0','pointer-events-none','translate-y-1');
-                }
-              }
-            });
-          });
-
-          // --- Mobil: csak 4 megye + Több… gomb
-          const isMobile = window.matchMedia('(max-width: 640px)').matches;
-          const limit = 4; let expanded = false;
-
-          function applyMobileLimit(){
-            if(!isMobile){ moreBtn?.classList.add('hidden'); return; }
-            const items=[...document.querySelectorAll('#work-areas-container .accordion-item')];
-            items.forEach((it,i)=>{
-              if(!expanded && i>=limit){ it.classList.add('hidden'); }
-              else { it.classList.remove('hidden'); }
-            });
-            if(items.length<=limit){ moreBtn?.classList.add('hidden'); }
-            else{
-              moreBtn?.classList.remove('hidden');
-              moreBtn.textContent = expanded ? 'Kevesebb' : 'Több…';
-            }
-          }
-          applyMobileLimit();
-          moreBtn?.addEventListener('click',()=>{ expanded=!expanded; applyMobileLimit(); });
-        })
-        .catch(() => { workAreasContainer.innerHTML = '<p class="text-center text-white">Hiba történt a területek betöltésekor.</p>'; });
     });
+
+    // ====== Megye térkép (Leaflet) ======
+    const initWorkMap = async () => {
+      const mapEl = document.getElementById('work-map');
+      if(!mapEl) return;
+
+      // Map init
+      const map = L.map('work-map', {
+        scrollWheelZoom: true,
+        dragging: true,
+        zoomControl: true,
+        attributionControl: false
+      }).setView([47.1, 18.5], 7);
+
+      // Light basemap
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap & CARTO'
+      }).addTo(map);
+
+      // Adatok betöltése
+      let geojson, loc;
+      try{
+        [geojson, loc] = await Promise.all([
+          fetch('/data/hungary-counties.json').then(r=>r.json()),
+          fetch('/data/locations.json').then(r=>r.json())
+        ]);
+      }catch(e){
+        console.error('Nem sikerült betölteni a térkép adatait', e);
+        mapEl.innerHTML = '<p class="text-center text-white">Hiba történt a térkép adatok betöltésekor.</p>';
+        return;
+      }
+
+      // Kiemelendő megyék a locations alapján
+      const highlightedSet = new Set();
+      const completedCount = {}; // { "Veszprém": 6, ... }
+
+      const addCompleted = (countyName) => {
+        if(!countyName) return;
+        highlightedSet.add(countyName);
+        completedCount[countyName] = (completedCount[countyName] || 0) + 1;
+      };
+
+      if (Array.isArray(loc?.counties)) {
+        loc.counties.forEach(co => {
+          const cname = co.county_name || co.name || co.megye || co.megye_nev;
+          if (Array.isArray(co.cities)) {
+            co.cities.forEach(c => {
+              if (c?.completed) addCompleted(cname);
+            });
+          }
+        });
+      } else if (Array.isArray(loc)) {
+        loc.forEach(row => {
+          const cname = row.county_name || row.county || row.megye;
+          if (row?.completed) addCompleted(cname);
+        });
+      }
+
+      // Stílusok
+      const baseStyle = {
+        fillColor: '#e5e7eb', // gray-200
+        weight: 1,
+        color: '#ffffff',
+        opacity: 1,
+        fillOpacity: 0.5,
+        className: 'county-outline'
+      };
+      const hotStyle = {
+        fillColor: '#16a34a', // green-600
+        weight: 2,
+        color: '#15803d',     // outline
+        opacity: 1,
+        fillOpacity: 0.6,
+        className: 'county-outline'
+      };
+
+      const layer = L.geoJSON(geojson, {
+        style: feature => {
+          const name = feature?.properties?.name;
+          return highlightedSet.has(name) ? hotStyle : baseStyle;
+        },
+        onEachFeature: (feature, lyr) => {
+          const name = feature?.properties?.name || 'Ismeretlen megye';
+          const count = completedCount[name] || 0;
+
+          // Tooltip középre
+          lyr.bindTooltip(name, {
+            permanent: true,
+            direction: 'center',
+            className: 'county-label'
+          }).openTooltip();
+
+          // Hover effektek
+          lyr.on('mouseover', () => {
+            if (highlightedSet.has(name)) {
+              lyr.setStyle({ fillColor: '#15803d' }); // green-700
+            } else {
+              lyr.setStyle({ fillOpacity: 0.65 });
+            }
+          });
+          lyr.on('mouseout', () => {
+            if (highlightedSet.has(name)) {
+              lyr.setStyle({ fillColor: '#16a34a' });
+            } else {
+              lyr.setStyle({ fillOpacity: 0.5 });
+            }
+          });
+
+          // Click – zoom + popup
+          lyr.on('click', () => {
+            const b = lyr.getBounds();
+            map.fitBounds(b, { padding: [20,20] });
+            const msg = highlightedSet.has(name)
+              ? `<b>${name}</b><br>Jelölt települések száma: <b>${count}</b>`
+              : `<b>${name}</b><br>Még nincs jelölt munka.`;
+            L.popup({ closeButton:true, autoClose:true })
+              .setLatLng(b.getCenter())
+              .setContent(msg)
+              .openOn(map);
+          });
+        }
+      }).addTo(map);
+
+      // Auto-fit
+      try { map.fitBounds(layer.getBounds(), { padding:[10,10] }); } catch {}
+    };
+
+    window.addEventListener('DOMContentLoaded', initWorkMap);
   </script>
 </body>
 </html>
