@@ -1,9 +1,9 @@
 backend:
   name: git-gateway
-  branch: main # Vagy 'master', attól függően, mi a fő branch neve a Git repódban
+  branch: main  # vagy 'master', ha az a fő ág
 
-media_folder: "img/uploads" # Ide menti a feltöltött képeket
-public_folder: "/img/uploads" # Innen fogja a weboldal betölteni a képeket
+media_folder: "img/uploads"     # Ide menti a feltöltött képeket
+public_folder: "/img/uploads"   # Ezen az úton éri el a site
 
 collections:
   - name: "gallery"
@@ -20,6 +20,7 @@ collections:
               - { label: "Kép", name: "image", widget: "image" }
               - { label: "Cím", name: "title", widget: "string" }
               - { label: "Leírás", name: "description", widget: "string" }
+
   - name: "locations"
     label: "Munkaterületek"
     files:
@@ -32,6 +33,10 @@ collections:
             widget: "list"
             fields:
               - { label: "Megye neve", name: "county_name", widget: "string" }
+
+              # ÚJ: megye-szintű jelölés
+              - { label: "Megye szinten jelölt?", name: "completed", widget: "boolean", default: false }
+
               - label: "Városok"
                 name: "cities"
                 widget: "list"
