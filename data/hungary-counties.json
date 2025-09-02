@@ -1,0 +1,15 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type":"Feature",
+      "properties":{"name":"Somogy"},
+      "geometry":{"type":"MultiPolygon","coordinates":[ /* ... */ ]}
+    },
+    {
+      "type":"Feature",
+      "properties":{"name":"Veszprém"},
+      "geometry":{"type":"MultiPolygon","coordinates":[ /* ... */ ]}
+    }
+  ]
+}
