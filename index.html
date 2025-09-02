@@ -481,105 +481,149 @@
         });
     });
 
-    // ====== Megye térkép (Leaflet) – relatív path + debug ======
-    const initWorkMap = async () => {
-      const mapEl = document.getElementById('work-map');
-      if(!mapEl) return;
+<script>
+  // ====== Megye térkép (Leaflet) – path fallback + BOM fix + name normalizer ======
+  const initWorkMap = async () => {
+    const mapEl = document.getElementById('work-map');
+    if (!mapEl) return;
 
-      const map = L.map('work-map', {
-        scrollWheelZoom: true,
-        dragging: true,
-        zoomControl: true,
-        attributionControl: false
-      }).setView([47.1, 18.5], 7);
+    const map = L.map('work-map', {
+      scrollWheelZoom: true,
+      dragging: true,
+      zoomControl: true,
+      attributionControl: false
+    }).setView([47.1, 18.5], 7);
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap & CARTO'
-      }).addTo(map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap & CARTO'
+    }).addTo(map);
 
-      const countiesUrl  = 'data/hungary-counties.json';
-      const locationsUrl = 'data/locations.json';
+    // ---- több path próba: relatív + abszolút ----
+    const tryUrls = (file) => ([
+      `data/${file}`,
+      `/data/${file}`,
+      new URL(`data/${file}`, document.baseURI).href
+    ]);
 
-      const getJson = async (url) => {
-        const res = await fetch(url, { cache: 'no-store' });
-        if (!res.ok) throw new Error(`HTTP ${res.status} – ${url}`);
-        try { return await res.json(); }
-        catch {
-          const txt = await res.text();
-          console.error('JSON parse hiba:', url, txt.slice(0,500));
-          throw new Error(`JSON parse hiba – ${url}`);
-        }
-      };
-
-      let geojson, loc;
-      try{
-        [geojson, loc] = await Promise.all([ getJson(countiesUrl), getJson(locationsUrl) ]);
-        console.info('hungary-counties.json OK', geojson);
-        console.info('locations.json OK', loc);
-      }catch(e){
-        console.error('Térkép betöltési hiba:', e);
-        mapEl.innerHTML = '<p class="text-center text-white">Hiba történt a térkép adatok betöltésekor.</p>';
-        return;
+    // BOM levágás + JSON parse
+    const parseJsonSafe = (txt, url) => {
+      const noBom = txt.charCodeAt(0) === 0xFEFF ? txt.slice(1) : txt;
+      try { return JSON.parse(noBom); }
+      catch (e) {
+        console.error('JSON parse hiba ->', url, e, 'minta:', noBom.slice(0, 300));
+        throw new Error(`JSON parse hiba – ${url}`);
       }
-
-      if (!geojson?.type || !Array.isArray(geojson?.features)) {
-        console.error('Hibás GeoJSON szerkezet:', geojson);
-        mapEl.innerHTML = '<p class="text-center text-white">Hibás GeoJSON (features hiányzik).</p>';
-        return;
-      }
-
-      const highlightedSet = new Set();
-      const completedCount = {};
-      const addCompleted = (countyName) => {
-        if(!countyName) return;
-        highlightedSet.add(countyName);
-        completedCount[countyName] = (completedCount[countyName] || 0) + 1;
-      };
-
-      if (Array.isArray(loc?.counties)) {
-        loc.counties.forEach(co => {
-          const cname = co.county_name || co.name || co.megye || co.megye_nev;
-          (co.cities || []).forEach(c => { if (c?.completed) addCompleted(cname); });
-        });
-      } else if (Array.isArray(loc)) {
-        loc.forEach(row => {
-          const cname = row.county_name || row.county || row.megye;
-          if (row?.completed) addCompleted(cname);
-        });
-      } else {
-        console.warn('locations.json nem várt struktúra:', loc);
-      }
-
-      const baseStyle = { fillColor:'#e5e7eb', weight:1, color:'#ffffff', opacity:1, fillOpacity:0.5, className:'county-outline' };
-      const hotStyle  = { fillColor:'#16a34a', weight:2, color:'#15803d', opacity:1, fillOpacity:0.6, className:'county-outline' };
-
-      const layer = L.geoJSON(geojson, {
-        style: f => highlightedSet.has(f?.properties?.name) ? hotStyle : baseStyle,
-        onEachFeature: (feature, lyr) => {
-          const name = feature?.properties?.name || 'Ismeretlen megye';
-          const count = completedCount[name] || 0;
-
-          lyr.bindTooltip(name, { permanent:true, direction:'center', className:'county-label' }).openTooltip();
-
-          lyr.on('mouseover', () => highlightedSet.has(name) ? lyr.setStyle({ fillColor:'#15803d' }) : lyr.setStyle({ fillOpacity:0.65 }));
-          lyr.on('mouseout',  () => highlightedSet.has(name) ? lyr.setStyle({ fillColor:'#16a34a' }) : lyr.setStyle({ fillOpacity:0.5  }));
-
-          lyr.on('click', () => {
-            const b = lyr.getBounds();
-            map.fitBounds(b, { padding:[20,20] });
-            const msg = highlightedSet.has(name)
-              ? `<b>${name}</b><br>Jelölt települések száma: <b>${count}</b>`
-              : `<b>${name}</b><br>Még nincs jelölt munka.`;
-            L.popup({ closeButton:true, autoClose:true })
-              .setLatLng(b.getCenter()).setContent(msg).openOn(map);
-          });
-        }
-      }).addTo(map);
-
-      try { map.fitBounds(layer.getBounds(), { padding:[10,10] }); } catch {}
     };
 
-    window.addEventListener('DOMContentLoaded', initWorkMap);
-  </script>
+    // több URL-t próbál sorban, az első sikerest visszaadja
+    const fetchFirstOk = async (candidates) => {
+      let lastErr;
+      for (const url of candidates) {
+        try {
+          const res = await fetch(url, { cache: 'no-store' });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const txt = await res.text();
+          const json = parseJsonSafe(txt, url);
+          console.info('Betöltve:', url);
+          return json;
+        } catch (e) {
+          console.warn('Sikertelen:', url, e.message);
+          lastErr = e;
+        }
+      }
+      throw lastErr || new Error('Nem sikerült betölteni egyetlen forrásból sem.');
+    };
+
+    let geojson, loc;
+    try {
+      [geojson, loc] = await Promise.all([
+        fetchFirstOk(tryUrls('hungary-counties.json')),
+        fetchFirstOk(tryUrls('locations.json'))
+      ]);
+    } catch (e) {
+      console.error('Térkép betöltési hiba:', e);
+      mapEl.innerHTML = '<p class="text-center text-white">Hiba történt a térkép adatok betöltésekor.</p>';
+      return;
+    }
+
+    // GeoJSON valid?
+    if (!geojson?.type || !Array.isArray(geojson?.features)) {
+      console.error('Hibás GeoJSON szerkezet:', geojson);
+      mapEl.innerHTML = '<p class="text-center text-white">Hibás GeoJSON (features hiányzik).</p>';
+      return;
+    }
+
+    // Név normalizáló: "Somogy megye" -> "Somogy", trim, duplaszóköz out
+    const norm = (s) => String(s || '')
+      .replace(/\bmegye\b/gi, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    // Kiemelendő megyék kigyűjtése a locations-ból
+    const highlighted = new Set();
+    const completedCount = {};
+
+    const addCompleted = (countyRaw) => {
+      const county = norm(countyRaw);
+      if (!county) return;
+      highlighted.add(county);
+      completedCount[county] = (completedCount[county] || 0) + 1;
+    };
+
+    if (Array.isArray(loc?.counties)) {
+      loc.counties.forEach(co => {
+        const cname = co.county_name || co.name || co.megye || co.megye_nev;
+        (co.cities || []).forEach(c => { if (c?.completed) addCompleted(cname); });
+      });
+    } else if (Array.isArray(loc)) {
+      loc.forEach(row => {
+        const cname = row.county_name || row.county || row.megye;
+        if (row?.completed) addCompleted(cname);
+      });
+    } else {
+      console.warn('locations.json nem várt struktúra:', loc);
+    }
+
+    // Stílusok
+    const baseStyle = { fillColor:'#e5e7eb', weight:1, color:'#ffffff', opacity:1, fillOpacity:0.5, className:'county-outline' };
+    const hotStyle  = { fillColor:'#16a34a', weight:2, color:'#15803d', opacity:1, fillOpacity:0.6, className:'county-outline' };
+
+    // Réteg felrajzolás
+    const layer = L.geoJSON(geojson, {
+      style: f => {
+        const name = norm(f?.properties?.name);
+        return highlighted.has(name) ? hotStyle : baseStyle;
+      },
+      onEachFeature: (feature, lyr) => {
+        const name = norm(feature?.properties?.name) || 'Ismeretlen megye';
+        const count = completedCount[name] || 0;
+
+        // középre fixált tooltip
+        lyr.bindTooltip(name, { permanent:true, direction:'center', className:'county-label' }).openTooltip();
+
+        // hover
+        lyr.on('mouseover', () => highlighted.has(name) ? lyr.setStyle({ fillColor:'#15803d' }) : lyr.setStyle({ fillOpacity:0.65 }));
+        lyr.on('mouseout',  () => highlighted.has(name) ? lyr.setStyle({ fillColor:'#16a34a' }) : lyr.setStyle({ fillOpacity:0.5  }));
+
+        // click -> zoom + popup
+        lyr.on('click', () => {
+          const b = lyr.getBounds();
+          map.fitBounds(b, { padding:[20,20] });
+          const msg = highlighted.has(name)
+            ? `<b>${name}</b><br>Jelölt települések száma: <b>${count}</b>`
+            : `<b>${name}</b><br>Még nincs jelölt munka.`;
+          L.popup({ closeButton:true, autoClose:true })
+            .setLatLng(b.getCenter()).setContent(msg).openOn(map);
+        });
+      }
+    }).addTo(map);
+
+    try { map.fitBounds(layer.getBounds(), { padding:[10,10] }); } catch {}
+  };
+
+  window.addEventListener('DOMContentLoaded', initWorkMap);
+</script>
+
 </body>
 </html>
+
