@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 
-  <!-- Leaflet (térkép) -->
+  <!-- Leaflet (map) -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -103,28 +103,6 @@
     }
     .leaflet-container .leaflet-control-attribution{ display:none; }
     .county-outline{ filter: drop-shadow(0 2px 8px rgba(0,0,0,.35)); }
-
-    /* Accordion base (NINCS már használva, csak ha visszahoznád) */
-    .city-list{max-height:0;overflow:hidden;transition:max-height .3s ease, opacity .2s ease, transform .2s ease}
-    .accordion-arrow{transition:transform .3s ease-in-out}
-    .accordion-item.open .accordion-arrow{transform:rotate(90deg)}
-    .city-list.glass{
-      background: linear-gradient(to bottom, rgba(255,255,255,.12), rgba(255,255,255,.06));
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-radius: 14px;
-      box-shadow: 0 20px 40px rgba(0,0,0,.25);
-      border: 1px solid rgba(255,255,255,.15);
-    }
-
-    /* Mobile compact mode */
-    @media (max-width:640px){
-      #work-areas-container{gap:.625rem}
-      .accordion-item{border-radius:14px}
-      .accordion-header{padding:.75rem 1rem}
-      .accordion-header .font-bold{font-size:1.125rem}
-      .accordion-header .w-5.h-5{width:18px;height:18px}
-    }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -169,7 +147,7 @@
           <a href="#kapcsolat" class="bg-yellow-400 text-gray-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition duration-300 shadow-xl inline-block">Ingyenes ajánlat</a>
         </div>
       </div>
-      <!-- Üveges, chip-es reviews sáv (max láthatóság) -->
+      <!-- Reviews sáv -->
       <div class="reviews-strip absolute bottom-0 left-0 right-0 py-4">
         <div class="w-full flex">
           <div id="reviews-container" class="marquee items-center"></div>
@@ -355,7 +333,6 @@
     const reviewForm = document.getElementById('reviewForm');
     const reviewsContainer = document.getElementById('reviews-container');
 
-    // helper a „chip” kártyához
     const buildReview = (text, name, city) => `
       <div class="review-card">
         <span class="review-quote"><i class="fa-solid fa-quote-left text-xs"></i></span>
@@ -371,7 +348,7 @@
         {name:"Horváth Éva",city:"Veszprém",review:"A régi, zajos klímánkat cserélték le egy újra. Hatalmas a különbség, köszönjük!"}
       ];
       let lane=''; def.forEach(r=> lane += buildReview(r.review, r.name, r.city));
-      reviewsContainer.innerHTML = lane + lane; // végtelen
+      reviewsContainer.innerHTML = lane + lane;
     };
 
     const escapeHtml = s => String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -396,7 +373,6 @@
       });
     } else { loadDefaultReviews(); }
 
-    // review form mentés
     reviewForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!db) { alert("A véleményküldés funkció jelenleg nem elérhető."); return; }
@@ -460,9 +436,9 @@
       else { toTopButton.classList.add('opacity-0','translate-y-5'); }
     });
 
-    /* ---------- Galéria betöltése (cím + leírás overlay) ---------- */
+    /* ---------- Galéria betöltése ---------- */
     window.addEventListener('DOMContentLoaded', () => {
-      fetch('/data/gallery.json')
+      fetch('data/gallery.json')
         .then(r => r.json())
         .then(data => {
           galleryContainer.innerHTML = '';
@@ -505,12 +481,11 @@
         });
     });
 
-    // ====== Megye térkép (Leaflet) ======
+    // ====== Megye térkép (Leaflet) – relatív path + debug ======
     const initWorkMap = async () => {
       const mapEl = document.getElementById('work-map');
       if(!mapEl) return;
 
-      // Map init
       const map = L.map('work-map', {
         scrollWheelZoom: true,
         dragging: true,
@@ -518,28 +493,43 @@
         attributionControl: false
       }).setView([47.1, 18.5], 7);
 
-      // Light basemap
       L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; OpenStreetMap & CARTO'
       }).addTo(map);
 
-      // Adatok betöltése
+      const countiesUrl  = 'data/hungary-counties.json';
+      const locationsUrl = 'data/locations.json';
+
+      const getJson = async (url) => {
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status} – ${url}`);
+        try { return await res.json(); }
+        catch {
+          const txt = await res.text();
+          console.error('JSON parse hiba:', url, txt.slice(0,500));
+          throw new Error(`JSON parse hiba – ${url}`);
+        }
+      };
+
       let geojson, loc;
       try{
-        [geojson, loc] = await Promise.all([
-          fetch('/data/hungary-counties.json').then(r=>r.json()),
-          fetch('/data/locations.json').then(r=>r.json())
-        ]);
+        [geojson, loc] = await Promise.all([ getJson(countiesUrl), getJson(locationsUrl) ]);
+        console.info('hungary-counties.json OK', geojson);
+        console.info('locations.json OK', loc);
       }catch(e){
-        console.error('Nem sikerült betölteni a térkép adatait', e);
+        console.error('Térkép betöltési hiba:', e);
         mapEl.innerHTML = '<p class="text-center text-white">Hiba történt a térkép adatok betöltésekor.</p>';
         return;
       }
 
-      // Kiemelendő megyék a locations alapján
-      const highlightedSet = new Set();
-      const completedCount = {}; // { "Veszprém": 6, ... }
+      if (!geojson?.type || !Array.isArray(geojson?.features)) {
+        console.error('Hibás GeoJSON szerkezet:', geojson);
+        mapEl.innerHTML = '<p class="text-center text-white">Hibás GeoJSON (features hiányzik).</p>';
+        return;
+      }
 
+      const highlightedSet = new Set();
+      const completedCount = {};
       const addCompleted = (countyName) => {
         if(!countyName) return;
         highlightedSet.add(countyName);
@@ -549,85 +539,43 @@
       if (Array.isArray(loc?.counties)) {
         loc.counties.forEach(co => {
           const cname = co.county_name || co.name || co.megye || co.megye_nev;
-          if (Array.isArray(co.cities)) {
-            co.cities.forEach(c => {
-              if (c?.completed) addCompleted(cname);
-            });
-          }
+          (co.cities || []).forEach(c => { if (c?.completed) addCompleted(cname); });
         });
       } else if (Array.isArray(loc)) {
         loc.forEach(row => {
           const cname = row.county_name || row.county || row.megye;
           if (row?.completed) addCompleted(cname);
         });
+      } else {
+        console.warn('locations.json nem várt struktúra:', loc);
       }
 
-      // Stílusok
-      const baseStyle = {
-        fillColor: '#e5e7eb', // gray-200
-        weight: 1,
-        color: '#ffffff',
-        opacity: 1,
-        fillOpacity: 0.5,
-        className: 'county-outline'
-      };
-      const hotStyle = {
-        fillColor: '#16a34a', // green-600
-        weight: 2,
-        color: '#15803d',     // outline
-        opacity: 1,
-        fillOpacity: 0.6,
-        className: 'county-outline'
-      };
+      const baseStyle = { fillColor:'#e5e7eb', weight:1, color:'#ffffff', opacity:1, fillOpacity:0.5, className:'county-outline' };
+      const hotStyle  = { fillColor:'#16a34a', weight:2, color:'#15803d', opacity:1, fillOpacity:0.6, className:'county-outline' };
 
       const layer = L.geoJSON(geojson, {
-        style: feature => {
-          const name = feature?.properties?.name;
-          return highlightedSet.has(name) ? hotStyle : baseStyle;
-        },
+        style: f => highlightedSet.has(f?.properties?.name) ? hotStyle : baseStyle,
         onEachFeature: (feature, lyr) => {
           const name = feature?.properties?.name || 'Ismeretlen megye';
           const count = completedCount[name] || 0;
 
-          // Tooltip középre
-          lyr.bindTooltip(name, {
-            permanent: true,
-            direction: 'center',
-            className: 'county-label'
-          }).openTooltip();
+          lyr.bindTooltip(name, { permanent:true, direction:'center', className:'county-label' }).openTooltip();
 
-          // Hover effektek
-          lyr.on('mouseover', () => {
-            if (highlightedSet.has(name)) {
-              lyr.setStyle({ fillColor: '#15803d' }); // green-700
-            } else {
-              lyr.setStyle({ fillOpacity: 0.65 });
-            }
-          });
-          lyr.on('mouseout', () => {
-            if (highlightedSet.has(name)) {
-              lyr.setStyle({ fillColor: '#16a34a' });
-            } else {
-              lyr.setStyle({ fillOpacity: 0.5 });
-            }
-          });
+          lyr.on('mouseover', () => highlightedSet.has(name) ? lyr.setStyle({ fillColor:'#15803d' }) : lyr.setStyle({ fillOpacity:0.65 }));
+          lyr.on('mouseout',  () => highlightedSet.has(name) ? lyr.setStyle({ fillColor:'#16a34a' }) : lyr.setStyle({ fillOpacity:0.5  }));
 
-          // Click – zoom + popup
           lyr.on('click', () => {
             const b = lyr.getBounds();
-            map.fitBounds(b, { padding: [20,20] });
+            map.fitBounds(b, { padding:[20,20] });
             const msg = highlightedSet.has(name)
               ? `<b>${name}</b><br>Jelölt települések száma: <b>${count}</b>`
               : `<b>${name}</b><br>Még nincs jelölt munka.`;
             L.popup({ closeButton:true, autoClose:true })
-              .setLatLng(b.getCenter())
-              .setContent(msg)
-              .openOn(map);
+              .setLatLng(b.getCenter()).setContent(msg).openOn(map);
           });
         }
       }).addTo(map);
 
-      // Auto-fit
       try { map.fitBounds(layer.getBounds(), { padding:[10,10] }); } catch {}
     };
 
