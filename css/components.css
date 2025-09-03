@@ -168,3 +168,36 @@ html.no-scroll, body.no-scroll{ height:100%; overflow:hidden; touch-action:none;
   100%{ left:120%; opacity:0 }
 }
 
+/* ===== Testimonials – alsó sáv, kártyák + háttér csúszka ===== */
+#ugyfel-velemenyek{ position:relative; }
+#testimonials-bg{
+  position:absolute; inset:0; overflow:hidden; pointer-events:none; opacity:.22;
+}
+.ghost-lane{
+  position:absolute; left:0; right:0;
+  display:flex; gap:16px; white-space:nowrap;
+  top:22%; animation:bgmarquee 45s linear infinite;
+}
+.ghost-lane.delay{
+  top:auto; bottom:16%; animation-duration:55s;
+}
+.ghost-pill{
+  display:inline-block; padding:6px 10px; border-radius:9999px;
+  border:1px solid rgba(0,0,0,.08); background:#fff;
+  box-shadow:0 8px 16px rgba(0,0,0,.10);
+  font:600 13px/1.1 Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  color:#0b1f2a;
+}
+@keyframes bgmarquee{ from{ transform:translateX(0) } to{ transform:translateX(-50%) } }
+
+.t-grid{ position:relative; z-index:1; }
+.t-card{
+  background:#fff; border:1px solid #e5e7eb; border-radius:16px; padding:18px;
+  box-shadow:0 10px 24px rgba(2,6,23,.08);
+  transform:translateY(24px); filter:blur(4px); opacity:0;
+  transition:transform .6s ease, filter .6s ease, opacity .6s ease;
+}
+.t-card.show{ transform:translateY(0); filter:none; opacity:1; }
+.t-card .who{ font-weight:800; color:#0f172a; margin-bottom:6px; }
+.t-card .city{ color:#334155; font-weight:600; font-size:13px; }
+.t-card .text{ color:#111827; }
