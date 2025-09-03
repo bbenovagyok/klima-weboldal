@@ -1,0 +1,9 @@
+[
+  { "name": "Siófok",         "lat": 46.905, "lng": 18.059 },
+  { "name": "Kaposvár",       "lat": 46.359, "lng": 17.796 },
+  { "name": "Veszprém",       "lat": 47.093, "lng": 17.911 },
+  { "name": "Székesfehérvár", "lat": 47.186, "lng": 18.422 },
+  { "name": "Dunaújváros",    "lat": 46.964, "lng": 18.935 },
+  { "name": "Szekszárd",      "lat": 46.352, "lng": 18.706 },
+  { "name": "Paks",           "lat": 46.624, "lng": 18.859 }
+]
