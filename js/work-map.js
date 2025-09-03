@@ -12,7 +12,7 @@
     `/data/${file}`,
     new URL(`data/${file}`, document.baseURI).href
   ];
-  const parseJsonSafe = (t) => (t.charCodeAt(0) === 0xFEFF ? JSON.parse(t.slice(1)) : JSON.parse(t));
+  const parseJsonSafe = (t) => (t && t.charCodeAt && t.charCodeAt(0) === 0xFEFF ? JSON.parse(t.slice(1)) : JSON.parse(t));
   const fetchFirstOk = async (cands) => {
     let last;
     for (const u of cands) {
@@ -43,7 +43,7 @@
 
   L.tileLayer("https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png", {
     attribution: "&copy; OpenStreetMap & CARTO",
-    maxZoom: 22                 // kell, hogy ránagyíthassunk
+    maxZoom: 22
   }).addTo(map);
 
   map.fitBounds(HU_TMP, { padding: [0, 0] });
@@ -54,7 +54,6 @@
     map.touchZoom[f](); map.boxZoom[f](); map.keyboard[f]();
   }
   function unlockView() {
-    // elengedjük az előző korlátokat, hogy szabadon zoomolhasson a fit/fly
     map.setMinZoom(0);
     map.setMaxZoom(22);
     map.setMaxBounds(null);
@@ -83,22 +82,23 @@
       infoBadge.className = "map-hint hidden";
       mapEl.appendChild(infoBadge);
     }
+    // ESC = vissza
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !backBtn.classList.contains("hidden")) showOverview();
+    });
   }
 
   // ===== nézetek
   function showOverview() {
     selectedCountyKey = null;
-
-    // felszedjük a város-réteget
     if (cityLayer) { map.removeLayer(cityLayer); cityLayer = null; }
 
-    // minden megye eredeti stílus + látszódjon a réteg
     if (countyLayer) {
       countyLayer.eachLayer(l => countyLayer.resetStyle(l));
       countyLayer.addTo(map);
 
-      // országkeret + fixálás (statikus nézet)
       unlockView();
+      map.invalidateSize();
       const b = countyLayer.getBounds();
       map.fitBounds(b, { padding: [2, 2] });
       map.setMinZoom(map.getZoom());
@@ -115,7 +115,6 @@
     selectedCountyKey = countyKey;
     if (!countyLayer) return;
 
-    // engedjük el a korlátokat, különben nem tud ránagyítani
     unlockView();
 
     // megkeressük a kiválasztott megyét
@@ -124,29 +123,36 @@
     if (!target) return;
     const b = target.getBounds();
 
-    // "cover" zoom: számolunk egy illeszkedő zoomot, majd rátolunk, hogy kitöltse a #work-map-et
-    const fitZoom    = map.getBoundsZoom(b, true);
-// kisebb ráemelés (mobil / desktop)
-const bump       = mapEl.clientWidth < 640 ? -0.15: 0.01;
-const targetZoom = Math.min(22, fitZoom + bump);
-map.flyTo(b.getCenter(), targetZoom, { duration: 0.50, easeLinearity: 0.15 });
+    // Töltse ki szinte teljesen a dobozt: minimális padding px-ben
+    const pad = Math.max(6, mapEl.clientWidth < 640 ? 8 : 12);
 
-    // amikor odaért, fagyasszuk le (ne lehessen elmozgatni/zoomolni)
-    setTimeout(() => {
-      map.setMinZoom(map.getZoom());
-      map.setMaxZoom(map.getZoom());
-      map.setMaxBounds(b.pad(0.001));  // gyakorlatilag teljesen fix
+    // finom animáció a megyére, "cover" hatás
+    map.invalidateSize();
+    map.flyToBounds(b, {
+      paddingTopLeft:     [pad, pad],
+      paddingBottomRight: [pad, pad],
+      duration: 0.65,
+      easeLinearity: 0.25
+    });
+
+    // a mozgás végén "lefagyasztjuk" a nézetet
+    const freeze = () => {
+      map.off("moveend", freeze);
+      const nowZ = map.getZoom();
+      map.setMinZoom(nowZ);
+      map.setMaxZoom(nowZ);
+      map.setMaxBounds(b.pad(0.0015));
       setInteractions(false);
-    }, 900);
+    };
+    map.on("moveend", freeze);
 
-    // város-pöttyök kirajzolása
+    // város-pöttyök
     if (cityLayer) { map.removeLayer(cityLayer); cityLayer = null; }
     cityLayer = L.layerGroup().addTo(map);
 
-    const dataArr = Array.isArray(loc?.counties) ? loc.counties : (Array.isArray(loc) ? loc : []);
+    const dataArr   = Array.isArray(loc?.counties) ? loc.counties : (Array.isArray(loc) ? loc : []);
     const countyRow = dataArr.find(c => keyOf(c.county_name || c.megye || c.name) === countyKey);
-
-    const cities = (countyRow?.cities || []).filter(c => c?.completed && c?.lat && c?.lng);
+    const cities    = (countyRow?.cities || []).filter(c => c?.completed && c?.lat && c?.lng);
 
     cities.forEach(c => {
       const marker = L.circleMarker([c.lat, c.lng], {
@@ -168,6 +174,7 @@ map.flyTo(b.getCenter(), targetZoom, { duration: 0.50, easeLinearity: 0.15 });
     infoBadge.textContent = cities.length
       ? `Megjelölt városok: ${cities.length}`
       : "Ebben a megyében még nincs megjelölt város.";
+
     backBtn.classList.remove("hidden");
     infoBadge.classList.remove("hidden");
   }
@@ -181,7 +188,6 @@ map.flyTo(b.getCenter(), targetZoom, { duration: 0.50, easeLinearity: 0.15 });
 
     // megye kulcsok + megjelenített nevek
     const highlighted = new Set();
-    const displayByKey = new Map();
 
     (geo.features || []).forEach(f => {
       const p = f.properties || {};
@@ -189,10 +195,8 @@ map.flyTo(b.getCenter(), targetZoom, { duration: 0.50, easeLinearity: 0.15 });
         p.name || p.NAME || p.NAME_1 || p.megye || p.megye_nev || p.megyeNev ||
         p.county || p.County || p.COUNTY || p.MEGYE || p.NEV || p.Név || p.nev ||
         p.NUTS_NAME || p.NUTS_NAME_HU || p.TER_NEV || p.TERNEV || p.megye_name || "";
-      const k = keyOf(raw);
       f.__display = String(raw).trim();
-      f.__key = k;
-      displayByKey.set(k, f.__display);
+      f.__key = keyOf(raw);
     });
 
     const arr = Array.isArray(loc?.counties) ? loc.counties : (Array.isArray(loc) ? loc : []);
@@ -215,20 +219,15 @@ map.flyTo(b.getCenter(), targetZoom, { duration: 0.50, easeLinearity: 0.15 });
     countyLayer = L.geoJSON(geo, {
       style: f => highlighted.has(f.__key) ? hotStyle : baseStyle,
       onEachFeature: (feature, layer) => {
-        // a kulcsot elmentjük a layerre
         layer.feature.__key = feature.__key;
 
-        // felirat ország-nézetben
         layer.bindTooltip(feature.__display, {
           permanent: true,
           direction: "center",
           className: "county-label"
         }).openTooltip();
 
-        // kattintás: belépés megye-nézetbe
         layer.on("click", () => showCounty(feature.__key));
-
-        // hover effekt csak a kijelölt (zöld) megyékre
         layer.on("mouseover", () => highlighted.has(feature.__key) && layer.setStyle({ fillColor: "#15803d" }));
         layer.on("mouseout",  () => highlighted.has(feature.__key) && layer.setStyle({ fillColor: "#16a34a" }));
       }
