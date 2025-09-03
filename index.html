@@ -26,7 +26,7 @@
     crossorigin=""
   ></script>
 
-  <!-- Saját komponens-stílusok (lightbox + térkép) -->
+  <!-- Saját komponens-stílusok (lightbox + térkép + galéria) -->
   <link rel="stylesheet" href="css/components.css">
 
   <!-- Külső saját JS-ek -->
@@ -177,8 +177,9 @@
         <h2 class="text-4xl md:text-5xl font-black text-center mb-4 text-white reveal-on-scroll">Aktuális Munkáink</h2>
         <p class="text-center text-lg text-cyan-100 mb-12 max-w-2xl mx-auto reveal-on-scroll" style="--delay:150ms">Minden klímánk mögött egy elégedett ügyfél áll!</p>
 
-       <div id="gallery-container"></div>
-          <p class="text-center col-span-full">Galéria betöltése...</p>
+        <!-- Galéria (loader a tartóban) -->
+        <div id="gallery-container">
+          <p class="gallery-loading text-center col-span-full">Galéria betöltése...</p>
         </div>
 
         <!-- Térkép blokk -->
@@ -247,7 +248,7 @@
         <div class="inline-block bg-white/90 text-cyan-800 rounded-xl p-8 shadow-2xl reveal-on-scroll" style="--delay:300ms">
           <p class="text-lg mb-2">Időpontegyeztetés telefonon:</p>
           <a href="tel:+36709304841" class="text-4xl font-bold hover:text-cyan-600 transition-colors duration-300 flex items-center justify-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.518.759a1.156 1.156 0 00-.43 1.659l4.592 4.592a1 1 0 001.659-.43l.759-1.518a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.518.759a1 1 0 00-.43 1.659l4.592 4.592a1 1 0 001.659-.43l.759-1.518a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
             +36 70 930 4841
           </a>
           <p class="mt-4 text-sm text-gray-600">Hívható hétköznap 8:00 és 18:00 között.</p>
@@ -411,7 +412,7 @@
             data.images.forEach((item, i) => {
               const title = item.title || item.cim || '';
               const desc  = item.description || item.leiras || '';
-             galleryContainer.innerHTML += `
+              galleryContainer.innerHTML += `
   <div
     class="gallery-item group relative overflow-hidden rounded-lg shadow-lg cursor-pointer reveal-on-scroll"
     data-src="${safe(item.image)}"
@@ -431,7 +432,7 @@
   </div>`;
             });
 
-            // Lightbox kattintás összedrótozása (külső js/lightbox.js kezeli a megnyitást)
+            // Lightbox kattintás
             document.querySelectorAll('.gallery-item').forEach(card=>{
               card.addEventListener('click',()=>{
                 const src = card.getAttribute('data-src');
@@ -501,5 +502,3 @@
   <!-- /Cookie sáv vége -->
 </body>
 </html>
-
-
