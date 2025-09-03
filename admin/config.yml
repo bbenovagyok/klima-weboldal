@@ -32,12 +32,28 @@ collections:
             name: "counties"
             widget: "list"
             fields:
-              - { label: "Megye neve", name: "county_name", widget: "string" }
-
+              - { label: "Megye neve", name: "county_name", widget: "string", hint: "Pl. Somogy, Veszprém, Fejér" }
+              - { label: "Megye kijelölve?", name: "completed", widget: "boolean", default: false }
               - label: "Városok"
                 name: "cities"
                 widget: "list"
+                collapsed: true
                 fields:
-                  - { label: "Város neve", name: "city_name", widget: "string" }
+                  - { label: "Város neve", name: "city_name", widget: "string", hint: "Pl. Siófok" }
                   - { label: "Már dolgoztunk itt?", name: "completed", widget: "boolean", default: false }
-
+                  - label: "Szélesség (lat)"
+                    name: "lat"
+                    widget: "number"
+                    value_type: "float"
+                    min: -90
+                    max: 90
+                    step: 0.0001
+                    required: false
+                  - label: "Hosszúság (lng)"
+                    name: "lng"
+                    widget: "number"
+                    value_type: "float"
+                    min: -180
+                    max: 180
+                    step: 0.0001
+                    required: false
