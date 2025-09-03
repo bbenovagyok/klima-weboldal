@@ -89,75 +89,63 @@
   //     ÚJ: erős rázúzás megyére + utána plusz zoom
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   function showCounty(countyKey) {
-    selectedCountyKey = countyKey;
-    if (!countyLayer) return;
+  selectedCountyKey = countyKey;
+  if (!countyLayer) return;
 
-    // a kiválasztott megye geometriája és bounds
-    let target;
-    countyLayer.eachLayer(l => {
-      const k = l.feature.__key;
-      if (k === countyKey) target = l;
-    });
-    if (!target) return;
+  // kiválasztott megye layer + bounds
+  let target = null;
+  countyLayer.eachLayer(l => { if (l.feature.__key === countyKey) target = l; });
+  if (!target) return;
 
-    // interakciók tiltva maradnak
-    setInteractions(false);
+  const b = target.getBounds();
+  setInteractions(false);
 
-    // 1) Rárepülünk nagyon kicsi paddal, hogy a megye szinte kitöltse a keretet
-    const b = target.getBounds();
-    const PADDING = 4;      // ha még jobban rá akarod húzni, csökkentsd 4-re
-    const ZOOM_BOOST = 1.4; // utólagos +zoom mértéke
+  // "cover" zoom: a megye töltse ki a konténert
+  const EXTRA = 0.6; // ha még nagyobbra szeretnéd, emeld (pl. 0.8)
+  const coverZoom = Math.min(
+    (typeof map.getMaxZoom === "function" ? map.getMaxZoom() : 19),
+    map.getBoundsZoom(b, /*inside?*/ false) + EXTRA
+  );
 
-    map.flyToBounds(b, { padding: [PADDING, PADDING], duration: 0.8, easeLinearity: 0.25 });
+  // rászállunk a megye közepére ezzel a zoommal
+  map.flyTo(b.getCenter(), coverZoom, { duration: 0.8, easeLinearity: 0.25 });
 
-    // 2) amikor beállt a bounds, még egy kicsit rázúzunk
-    const once = () => {
-      map.off("moveend", once);
-      const targetZoom = Math.min(
-        (typeof map.getMaxZoom === "function" ? map.getMaxZoom() : 19),
-        map.getZoom() + ZOOM_BOOST
-      );
-      setTimeout(() => {
-        map.setZoom(targetZoom, { animate: true });
+  // fagyasszuk a nézetet (ne lehessen zoomolni/húzni)
+  setTimeout(() => {
+    map.setMinZoom(map.getZoom());
+    map.setMaxZoom(map.getZoom());
+    map.setMaxBounds(b.pad(0.001)); // minimális mozgástér, gyakorlatilag fix
+  }, 850);
 
-        // fagyasszuk be ezt a zoomot/boundst – ne lehessen mászni
-        map.setMinZoom(map.getZoom());
-        map.setMaxZoom(map.getZoom());
-        map.setMaxBounds(b.pad(0.002));
-      }, 80);
-    };
-    map.on("moveend", once);
+  // város-pöttyök
+  if (cityLayer) { map.removeLayer(cityLayer); cityLayer = null; }
+  cityLayer = L.layerGroup().addTo(map);
 
-    // város pöttyök kirajzolása (csak completed + lat/lng)
-    if (cityLayer) { map.removeLayer(cityLayer); cityLayer = null; }
-    cityLayer = L.layerGroup().addTo(map);
+  const countyRow =
+    (Array.isArray(loc?.counties) ? loc.counties : loc)
+      ?.find(c => keyOf(c.county_name || c.megye || c.name) === countyKey);
 
-    const countyRow =
-      (Array.isArray(loc?.counties) ? loc.counties : loc)?.find(c => keyOf(c.county_name || c.megye || c.name) === countyKey);
+  const cities = (countyRow?.cities || []).filter(c => c?.completed && c?.lat && c?.lng);
 
-    const cities = (countyRow?.cities || []).filter(c => c?.completed && c?.lat && c?.lng);
+  cities.forEach(c => {
+    const p = L.circleMarker([c.lat, c.lng], {
+      radius: 6, weight: 2, color: "#b91c1c", fillColor: "#ef4444", fillOpacity: 0.9
+    }).addTo(cityLayer);
 
-    cities.forEach(c => {
-      const p = L.circleMarker([c.lat, c.lng], {
-        radius: 6, weight: 2,
-        color: "#b91c1c", fillColor: "#ef4444", fillOpacity: 0.9
-      }).addTo(cityLayer);
+    p.bindTooltip(String(c.city_name || c.name), {
+      permanent: true, direction: "right", offset: [8, 0], className: "city-label"
+    }).openTooltip();
+  });
 
-      // városnév címke
-      p.bindTooltip(String(c.city_name || c.name), {
-        permanent: true, direction: "right", offset: [8, 0], className: "city-label"
-      }).openTooltip();
-    });
-
-    // infó badge
-    if (!cities.length) {
-      infoBadge.textContent = "Ebben a megyében még nincs megjelölt város.";
-    } else {
-      infoBadge.textContent = `Megjelölt városok: ${cities.length}`;
-    }
-    backBtn.classList.remove("hidden");
-    infoBadge.classList.remove("hidden");
+  // infó badge
+  if (!cities.length) {
+    infoBadge.textContent = "Ebben a megyében még nincs megjelölt város.";
+  } else {
+    infoBadge.textContent = `Megjelölt városok: ${cities.length}`;
   }
+  backBtn.classList.remove("hidden");
+  infoBadge.classList.remove("hidden");
+}
   // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
   // ===== betöltés + rétegépítés
