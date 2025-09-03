@@ -85,6 +85,9 @@
     infoBadge?.classList.add("hidden");
   }
 
+  // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+  //     ÚJ: erős rázúzás megyére + utána plusz zoom
+  // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   function showCounty(countyKey) {
     selectedCountyKey = countyKey;
     if (!countyLayer) return;
@@ -97,19 +100,38 @@
     });
     if (!target) return;
 
-    // csak ránagyítunk – interakció off
-    const b = target.getBounds();
-    map.fitBounds(b, { padding: [20, 20] });
-    map.setMinZoom(map.getZoom());
-    map.setMaxZoom(map.getZoom());
-    map.setMaxBounds(b.pad(0.002));
+    // interakciók tiltva maradnak
     setInteractions(false);
 
-    // város pöttyök kirajzolása
+    // 1) Rárepülünk nagyon kicsi paddal, hogy a megye szinte kitöltse a keretet
+    const b = target.getBounds();
+    const PADDING = 6;      // ha még jobban rá akarod húzni, csökkentsd 4-re
+    const ZOOM_BOOST = 1.25; // utólagos +zoom mértéke
+
+    map.flyToBounds(b, { padding: [PADDING, PADDING], duration: 0.8, easeLinearity: 0.25 });
+
+    // 2) amikor beállt a bounds, még egy kicsit rázúzunk
+    const once = () => {
+      map.off("moveend", once);
+      const targetZoom = Math.min(
+        (typeof map.getMaxZoom === "function" ? map.getMaxZoom() : 19),
+        map.getZoom() + ZOOM_BOOST
+      );
+      setTimeout(() => {
+        map.setZoom(targetZoom, { animate: true });
+
+        // fagyasszuk be ezt a zoomot/boundst – ne lehessen mászni
+        map.setMinZoom(map.getZoom());
+        map.setMaxZoom(map.getZoom());
+        map.setMaxBounds(b.pad(0.002));
+      }, 80);
+    };
+    map.on("moveend", once);
+
+    // város pöttyök kirajzolása (csak completed + lat/lng)
     if (cityLayer) { map.removeLayer(cityLayer); cityLayer = null; }
     cityLayer = L.layerGroup().addTo(map);
 
-    // cities list az adott megyéhez (completed true + lat/lng kell a pöttyhöz)
     const countyRow =
       (Array.isArray(loc?.counties) ? loc.counties : loc)?.find(c => keyOf(c.county_name || c.megye || c.name) === countyKey);
 
@@ -136,6 +158,7 @@
     backBtn.classList.remove("hidden");
     infoBadge.classList.remove("hidden");
   }
+  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
   // ===== betöltés + rétegépítés
   (async () => {
@@ -178,8 +201,9 @@
         // felirat az ország nézetben
         layer.bindTooltip(feature.__display, { permanent: true, direction: "center", className: "county-label" }).openTooltip();
 
-        // katt: belépés megye-nézetbe
+        // katt: belépés megye-nézetbe (ÚJ zoom logikával)
         layer.on("click", () => showCounty(feature.__key));
+
         // kis hover effekt csak a „zöld” megyékre
         layer.on("mouseover", () => highlighted.has(feature.__key) && layer.setStyle({ fillColor: "#15803d" }));
         layer.on("mouseout",  () => highlighted.has(feature.__key) && layer.setStyle({ fillColor: "#16a34a" }));
