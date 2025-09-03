@@ -187,10 +187,13 @@
             <p class="text-gray-600 leading-relaxed">Modern, energiahatékony klímák szakszerű telepítése – kiválasztás, kivitelezés, garanciával.</p>
           </div>
 
-          <!-- 2. kártya – Kiemelt piros szöveg (IKON CSERÉLVE) -->
+          <!-- 2. kártya – Kiemelt piros szöveg (IKON NAGYOBBRA VÉVE) -->
           <div class="service-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200 reveal-on-scroll" style="--delay:150ms">
             <div class="bg-cyan-100 rounded-full w-16 h-16 flex items-center justify-center mb-6">
-              <img src="https://i.postimg.cc/VvjqLm5k/check.png" alt="Tisztítás ikon" class="w-8 h-8 object-contain" loading="lazy" referrerpolicy="no-referrer">
+              <!-- Itt nagyítottam fel: 56×56px + kicsi skálázás, hogy a kör széléig érjen -->
+              <img src="https://i.postimg.cc/VvjqLm5k/check.png" alt="Tisztítás ikon"
+                   class="w-14 h-14 object-contain scale-[1.06] pointer-events-none select-none"
+                   loading="lazy" referrerpolicy="no-referrer">
             </div>
             <h3 class="text-xl md:text-2xl font-bold mb-2">Tisztítás és Karbantartás</h3>
             <p class="text-gray-800 font-extrabold mb-2">Hogy miért fontos?</p>
@@ -245,7 +248,7 @@
           </div>
           <div class="md:w-1/2 reveal-on-scroll" style="--delay:200ms">
             <h2 class="text-4xl md:text-5xl font-black mb-6 text-cyan-800 text-center">Rólunk</h2>
-            <div class="bg-white p-6 rounded-xl shadow-lg">
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
               <div class="space-y-4 text-gray-700 text-base md:text-lg leading-relaxed">
                 <p>Az Eszes Tiszta Klíma Kft. egy családi vállalkozás, ahol a tiszta és megbízható klímákért dolgozunk.</p>
                 <p>A rendszeres tisztítás és karbantartás növeli az élettartamot, csökkenti a fogyasztást, és egészségesebb beltéri levegőt ad.</p>
@@ -328,7 +331,7 @@
 
   <footer class="bg-gray-800 text-white py-10">
     <div class="container mx-auto px-6 text-center">
-     <p class="text-xl font-bold text-white mb-2">Eszes Tiszta Klíma Kft.</p>
+      <p class="text-xl font-bold text-white mb-2">Eszes Tiszta Klíma Kft.</p>
       <p class="text-gray-400">&copy; 2025 Minden jog fenntartva.</p>
       <p class="text-sm text-gray-500 mt-4">Powered by: Berceli Bence</p>
     </div>
