@@ -148,7 +148,7 @@
     let b = (overviewBoundsActive || overviewBoundsAll || countyLayer.getBounds());
     const isMobile = window.matchMedia("(max-width: 640px)").matches;
     // Desktopon ~6% tágítás, mobilon ~12% (hogy a szomszéd megyenevek is beférjenek)
-    return b.pad(isMobile ? 0.16 : 0.03);
+    return b.pad(isMobile ? 0.20 : 0.03);
   }
 
   // ===== nézetek
