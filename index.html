@@ -411,19 +411,24 @@
             data.images.forEach((item, i) => {
               const title = item.title || item.cim || '';
               const desc  = item.description || item.leiras || '';
-              galleryContainer.innerHTML += `
-                <div class="gallery-item group relative aspect-square overflow-hidden rounded-lg shadow-lg cursor-pointer reveal-on-scroll"
-                     data-src="${safe(item.image)}" data-title="${safe(title)}" data-description="${safe(desc)}"
-                     style="--delay:${i * 100}ms">
-                  <img src="${safe(item.image)}" alt="${safe(title)}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                  <div class="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors duration-300"></div>
-                  <div class="absolute inset-x-0 bottom-0 p-3">
-                    <div class="backdrop-blur-md bg-black/40 text-white rounded-md px-3 py-2 shadow-md opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
-                      <h4 class="text-sm font-semibold truncate">${safe(title)}</h4>
-                      <p class="hidden sm:block text-xs text-white/85 mt-0.5">${safe(desc)}</p>
-                    </div>
-                  </div>
-                </div>`;
+             galleryContainer.innerHTML += `
+  <div
+    class="gallery-item group relative overflow-hidden rounded-lg shadow-lg cursor-pointer reveal-on-scroll"
+    data-src="${safe(item.image)}"
+    data-title="${safe(title)}"
+    data-description="${safe(desc)}"
+    style="--delay:${i * 80}ms"
+  >
+    <img src="${safe(item.image)}" alt="${safe(title)}"
+         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors duration-300"></div>
+    <div class="absolute inset-x-0 bottom-0 p-2">
+      <div class="backdrop-blur-md bg-black/40 text-white rounded px-2 py-1 shadow opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
+        <h4 class="text-xs font-semibold truncate">${safe(title)}</h4>
+        <p class="hidden sm:block text-[11px] text-white/85 mt-0.5">${safe(desc)}</p>
+      </div>
+    </div>
+  </div>`;
             });
 
             // Lightbox kattintás összedrótozása (külső js/lightbox.js kezeli a megnyitást)
@@ -496,4 +501,5 @@
   <!-- /Cookie sáv vége -->
 </body>
 </html>
+
 
