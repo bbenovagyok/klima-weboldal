@@ -1,4 +1,4 @@
-/* interaktív megye -> város nézet, csak „Vissza” gombbal */
+/* interaktív megye -> város nézet | koord. és "completed" automatikus */
 (() => {
   const mapEl = document.getElementById("work-map");
   if (!mapEl) return;
@@ -6,6 +6,7 @@
   // ===== segédek
   const strip = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   const keyOf  = s => strip(s).replace(/\bmegye\b/gi, "").replace(/\s+/g, " ").trim().toLowerCase();
+  const trimStr = s => String(s || "").trim();
 
   const tryUrls = (file) => [
     `data/${file}`,
@@ -25,42 +26,30 @@
     throw last || new Error("Betöltési hiba");
   };
 
-  // ===== belső padding + pan segédek (hogy a címkék ne lógjanak ki)
-  function _innerPad(map) {
-    const s = map.getSize();
-    // kb. 8% szélesség, 24–120 px közé szorítva
-    const p = Math.round(Math.min(120, Math.max(24, s.x * 0.08)));
-    return [p, p];
-  }
-  function fitBoundsWithPad(map, bounds, opts = {}) {
-    const [px, py] = _innerPad(map);
-    map.fitBounds(bounds, {
-      paddingTopLeft: [px, py],
-      paddingBottomRight: [px, py],
-      ...opts
+  // nagyon kicsi beépített névtár végső fallbacknek (ha nincs hu-cities.json és a geokódolás sem megy)
+  const tinyGazetteer = [
+    { name:"Siófok",        lat:46.905, lng:18.059 },
+    { name:"Kaposvár",      lat:46.359, lng:17.796 },
+    { name:"Veszprém",      lat:47.093, lng:17.911 },
+    { name:"Székesfehérvár",lat:47.186, lng:18.422 },
+    { name:"Dunaújváros",   lat:46.964, lng:18.935 },
+    { name:"Pécs",          lat:46.072, lng:18.233 },
+    { name:"Szekszárd",     lat:46.352, lng:18.706 },
+    { name:"Paks",          lat:46.624, lng:18.859 }
+  ];
+
+  const gazetteerIndex = new Map(); // "kulcs" -> {lat,lng,name}
+
+  function indexGazetteer(list) {
+    (list || []).forEach(row => {
+      const nm = trimStr(row.name || row.city || row.city_name);
+      if (!nm || typeof row.lat !== "number" || typeof row.lng !== "number") return;
+      gazetteerIndex.set(keyOf(nm), { name:nm, lat:row.lat, lng:row.lng });
     });
-  }
-  // pan egy pontot belülre hoz paddinggal (fallback, ha a natív panInside hiányzik)
-  function panCityInside(map, latlng) {
-    const [px, py] = _innerPad(map);
-    const size = map.getSize();
-    const pt = map.latLngToContainerPoint(latlng);
-    const minX = px, maxX = size.x - px;
-    const minY = py,  maxY = size.y - py;
-
-    let dx = 0, dy = 0;
-    if (pt.x < minX) dx = minX - pt.x;
-    else if (pt.x > maxX) dx = maxX - pt.x;
-    if (pt.y < minY) dy = minY - pt.y;
-    else if (pt.y > maxY) dy = maxY - pt.y;
-
-    if (dx !== 0 || dy !== 0) {
-      map.panBy([dx, dy], { animate: true, duration: 0.5 });
-    }
   }
 
   // ===== Leaflet alap
-  const HU_TMP = L.latLngBounds([45.6, 16.0], [48.7, 22.95]);
+  const HU_BOUNDS = L.latLngBounds([45.6, 16.0], [48.7, 22.95]);
 
   const map = L.map("work-map", {
     zoomControl: false,
@@ -80,7 +69,7 @@
     maxZoom: 22
   }).addTo(map);
 
-  fitBoundsWithPad(map, HU_TMP);
+  map.fitBounds(HU_BOUNDS, { padding: [0, 0] });
 
   function setInteractions(on) {
     const f = on ? "enable" : "disable";
@@ -95,14 +84,9 @@
 
   // ===== állapot + UI elemek
   let geo, loc;
-  let countyLayer = null;          // ország szintű megye poligonok
-  let cityLayer   = null;          // kiválasztott megye város-pöttyök
+  let countyLayer = null;   // ország szintű megye poligonok
+  let cityLayer   = null;   // kiválasztott megye város-pöttyök
   let selectedCountyKey = null;
-  let selectedCountyBounds = null;
-
-  // áttekintő nézet határai
-  let overviewBoundsAll = null;    // összes megye
-  let overviewBoundsActive = null; // csak a kiemelt megyék (locations.json szerint)
 
   let backBtn = null;
   let infoBadge = null;
@@ -125,36 +109,69 @@
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && !backBtn.classList.contains("hidden")) showOverview();
     });
-
-    // Átméretezéskor igazítsuk újra az éppen látható nézetet
-    map.on("resize", () => {
-      if (selectedCountyKey && selectedCountyBounds) {
-        fitBoundsWithPad(map, selectedCountyBounds);
-        const z = map.getZoom();
-        map.setMinZoom(z); map.setMaxZoom(z);
-        map.setMaxBounds(selectedCountyBounds.pad(0.0015));
-      } else if (countyLayer) {
-        const b = getOverviewTargetBounds();
-        fitBoundsWithPad(map, b);
-        const z = map.getZoom();
-        map.setMinZoom(z); map.setMaxZoom(z);
-        map.setMaxBounds(b.pad(0.005));
-      }
-    });
   }
 
-  // <<< ÚJ segédfüggvény: áttekintő célbounds (mobilon kicsit tágabb)
-  function getOverviewTargetBounds() {
-    let b = (overviewBoundsActive || overviewBoundsAll || countyLayer.getBounds());
-    const isMobile = window.matchMedia("(max-width: 640px)").matches;
-    // Desktopon ~6% tágítás, mobilon ~12% (hogy a szomszéd megyenevek is beférjenek)
-    return b.pad(isMobile ? 0.20 : 0.03);
+  // ===== adatok normalizálása admin felülethez
+  function normalizeCities(rawCities) {
+    if (!Array.isArray(rawCities)) return [];
+    return rawCities.map(c => {
+      if (typeof c === "string") {
+        return { city_name: trimStr(c), completed: true };
+      }
+      const name = trimStr(c.city_name || c.name || c.varos);
+      const done = (c.completed === undefined ? true : !!c.completed);
+      let lat = c.lat, lng = c.lng;
+      if (!lat && !lng && typeof c.coords === "string") {
+        const m = c.coords.split(",").map(s => parseFloat(s));
+        if (m.length === 2 && m.every(n => !Number.isNaN(n))) { lat = m[0]; lng = m[1]; }
+      }
+      return { city_name: name, completed: done, lat, lng };
+    }).filter(x => x.city_name);
+  }
+
+  // ===== koord. megszerzése (gazetteer / geokódolás)
+  const GKEY = "hu-city-geo-";
+  async function geocodeCityIfNeeded(name, countyDisplay) {
+    const key = GKEY + keyOf(`${name}|${countyDisplay}`);
+    try {
+      const cached = localStorage.getItem(key);
+      if (cached) {
+        const p = JSON.parse(cached);
+        if (typeof p.lat === "number" && typeof p.lng === "number") return p;
+      }
+    } catch {}
+    // Nominatim – óvatosan, egy lekérés városonként, cache-elve
+    try {
+      const url = new URL("https://nominatim.openstreetmap.org/search");
+      url.searchParams.set("format","json");
+      url.searchParams.set("countrycodes","HU");
+      url.searchParams.set("city", name);
+      if (countyDisplay) url.searchParams.set("county", countyDisplay);
+      url.searchParams.set("limit","1");
+
+      const r = await fetch(url.toString(), {
+        headers: { "Accept": "application/json", "User-Agent": "klima-site/1.0 (map)" }
+      });
+      const arr = await r.json();
+      if (Array.isArray(arr) && arr[0] && arr[0].lat && arr[0].lon) {
+        const p = { lat: parseFloat(arr[0].lat), lng: parseFloat(arr[0].lon) };
+        if (!Number.isNaN(p.lat) && !Number.isNaN(p.lng)) {
+          try { localStorage.setItem(key, JSON.stringify(p)); } catch {}
+          return p;
+        }
+      }
+    } catch {}
+    return null;
+  }
+
+  function coordsFromGazetteer(name) {
+    const hit = gazetteerIndex.get(keyOf(name));
+    return hit ? { lat: hit.lat, lng: hit.lng } : null;
   }
 
   // ===== nézetek
   function showOverview() {
     selectedCountyKey = null;
-    selectedCountyBounds = null;
     if (cityLayer) { map.removeLayer(cityLayer); cityLayer = null; }
 
     if (countyLayer) {
@@ -163,9 +180,8 @@
 
       unlockView();
       map.invalidateSize();
-
-      const b = getOverviewTargetBounds();
-      fitBoundsWithPad(map, b);
+      const b = countyLayer.getBounds();
+      map.fitBounds(b, { padding: [2, 2] });
       map.setMinZoom(map.getZoom());
       map.setMaxZoom(map.getZoom());
       map.setMaxBounds(b.pad(0.005));
@@ -187,14 +203,15 @@
     countyLayer.eachLayer(l => { if (l.feature.__key === countyKey) target = l; });
     if (!target) return;
     const b = target.getBounds();
-    selectedCountyBounds = b;
 
-    // finom animáció a megyére, dinamikus paddinggal
+    // Töltse ki szinte teljesen a dobozt: minimális padding px-ben
+    const pad = Math.max(6, mapEl.clientWidth < 640 ? 8 : 12);
+
+    // finom animáció a megyére, "cover" hatás
     map.invalidateSize();
-    const [px, py] = _innerPad(map);
     map.flyToBounds(b, {
-      paddingTopLeft:     [px, py],
-      paddingBottomRight: [px, py],
+      paddingTopLeft:     [pad, pad],
+      paddingBottomRight: [pad, pad],
       duration: 0.65,
       easeLinearity: 0.25
     });
@@ -216,44 +233,72 @@
 
     const dataArr   = Array.isArray(loc?.counties) ? loc.counties : (Array.isArray(loc) ? loc : []);
     const countyRow = dataArr.find(c => keyOf(c.county_name || c.megye || c.name) === countyKey);
-    const cities    = (countyRow?.cities || []).filter(c => c?.completed && c?.lat && c?.lng);
+    const countyDisplay = String(countyRow?.county_name || countyRow?.megye || countyRow?.name || "").trim();
 
-    cities.forEach(c => {
-      const marker = L.circleMarker([c.lat, c.lng], {
-        radius: 6,
-        weight: 2,
-        color: "#b91c1c",
-        fillColor: "#ef4444",
-        fillOpacity: 0.9
-      }).addTo(cityLayer);
+    const cities = normalizeCities(countyRow?.cities);
 
-      marker.bindTooltip(String(c.city_name || c.name), {
-        permanent: true,
-        direction: "auto",
-        offset: [8, 0],
-        className: "city-label"
-      }).openTooltip();
+    let shown = 0;
 
-      // interakció esetén biztosan belülre hozzuk
-      marker.on("click", () => panCityInside(map, marker.getLatLng()));
-      marker.on("mouseover", () => panCityInside(map, marker.getLatLng()));
-    });
+    (async () => {
+      for (const c of cities) {
+        if (!c.completed) continue; // ha valaki direkt hamisra állítja
+        const name = c.city_name;
 
-    infoBadge.textContent = cities.length
-      ? `Megjelölt városok: ${cities.length}`
-      : "Ebben a megyében még nincs megjelölt város.";
+        // 1) explicit lat/lng
+        let pt = (typeof c.lat === "number" && typeof c.lng === "number")
+          ? { lat:c.lat, lng:c.lng }
+          : null;
 
-    backBtn.classList.remove("hidden");
-    infoBadge.classList.remove("hidden");
+        // 2) helyi névtár
+        if (!pt) pt = coordsFromGazetteer(name);
+
+        // 3) geokódolás + cache
+        if (!pt) pt = await geocodeCityIfNeeded(name, countyDisplay);
+
+        // 4) ha semmi, akkor kihagyjuk (nem dobunk hibát)
+        if (!pt) continue;
+
+        const marker = L.circleMarker([pt.lat, pt.lng], {
+          radius: 6,
+          weight: 2,
+          color: "#b91c1c",
+          fillColor: "#ef4444",
+          fillOpacity: 0.9
+        }).addTo(cityLayer);
+
+        marker.bindTooltip(String(name), {
+          permanent: true,
+          direction: "auto",
+          offset: [8, 0],
+          className: "city-label"
+        }).openTooltip();
+
+        shown++;
+      }
+
+      infoBadge.textContent = shown
+        ? `Megjelölt városok: ${shown}`
+        : "Ebben a megyében még nincs megjelölt város.";
+
+      backBtn.classList.remove("hidden");
+      infoBadge.classList.remove("hidden");
+    })();
   }
 
   // ===== betöltés + megye-réteg
   (async () => {
-    const [geoData, locData] = await Promise.all([
+    // hu-cities.json (opcionális, de erősen ajánlott)
+    try {
+      const gaz = await fetchFirstOk(tryUrls("hu-cities.json")).catch(() => null);
+      if (gaz) indexGazetteer(gaz);
+    } catch {}
+    // beépített mini fallback
+    indexGazetteer(tinyGazetteer);
+
+    [geo, loc] = await Promise.all([
       fetchFirstOk(tryUrls("hungary-counties.json")),
       fetchFirstOk(tryUrls("locations.json"))
     ]);
-    geo = geoData; loc = locData;
 
     // megye kulcsok + megjelenített nevek
     const highlighted = new Set();
@@ -301,19 +346,6 @@
         layer.on("mouseout",  () => highlighted.has(feature.__key) && layer.setStyle({ fillColor: "#16a34a" }));
       }
     }).addTo(map);
-
-    // áttekintő határok kiszámolása
-    overviewBoundsAll = countyLayer.getBounds(); // minden megye
-    countyLayer.eachLayer(l => {
-      if (highlighted.has(l.feature.__key)) {
-        const lb = l.getBounds();
-        if (overviewBoundsActive) {
-          overviewBoundsActive.extend(lb);
-        } else {
-          overviewBoundsActive = L.latLngBounds(lb.getSouthWest(), lb.getNorthEast());
-        }
-      }
-    });
 
     ensureUi();
     showOverview();
