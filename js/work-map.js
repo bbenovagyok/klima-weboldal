@@ -100,7 +100,7 @@
   let selectedCountyKey = null;
   let selectedCountyBounds = null;
 
-  // ÚJ: áttekintő nézet határai
+  // áttekintő nézet határai
   let overviewBoundsAll = null;    // összes megye
   let overviewBoundsActive = null; // csak a kiemelt megyék (locations.json szerint)
 
@@ -134,13 +134,21 @@
         map.setMinZoom(z); map.setMaxZoom(z);
         map.setMaxBounds(selectedCountyBounds.pad(0.0015));
       } else if (countyLayer) {
-        const b = overviewBoundsActive || overviewBoundsAll || countyLayer.getBounds();
+        const b = getOverviewTargetBounds();
         fitBoundsWithPad(map, b);
         const z = map.getZoom();
         map.setMinZoom(z); map.setMaxZoom(z);
         map.setMaxBounds(b.pad(0.005));
       }
     });
+  }
+
+  // <<< ÚJ segédfüggvény: áttekintő célbounds (mobilon kicsit tágabb)
+  function getOverviewTargetBounds() {
+    let b = (overviewBoundsActive || overviewBoundsAll || countyLayer.getBounds());
+    const isMobile = window.matchMedia("(max-width: 640px)").matches;
+    // Desktopon ~6% tágítás, mobilon ~12% (hogy a szomszéd megyenevek is beférjenek)
+    return b.pad(isMobile ? 0.12 : 0.06);
   }
 
   // ===== nézetek
@@ -155,8 +163,8 @@
 
       unlockView();
       map.invalidateSize();
-      // <<< ÚJ: csak a kiemelt megyékre igazít, ha elérhető
-      const b = overviewBoundsActive || overviewBoundsAll || countyLayer.getBounds();
+
+      const b = getOverviewTargetBounds();
       fitBoundsWithPad(map, b);
       map.setMinZoom(map.getZoom());
       map.setMaxZoom(map.getZoom());
@@ -221,7 +229,7 @@
 
       marker.bindTooltip(String(c.city_name || c.name), {
         permanent: true,
-        direction: "auto",       // automatikus irány, hogy kevésbé lógjon ki
+        direction: "auto",
         offset: [8, 0],
         className: "city-label"
       }).openTooltip();
@@ -241,10 +249,11 @@
 
   // ===== betöltés + megye-réteg
   (async () => {
-    [geo, loc] = await Promise.all([
+    const [geoData, locData] = await Promise.all([
       fetchFirstOk(tryUrls("hungary-counties.json")),
       fetchFirstOk(tryUrls("locations.json"))
     ]);
+    geo = geoData; loc = locData;
 
     // megye kulcsok + megjelenített nevek
     const highlighted = new Set();
@@ -293,10 +302,8 @@
       }
     }).addTo(map);
 
-    // === ÚJ: áttekintő határok kiszámolása
+    // áttekintő határok kiszámolása
     overviewBoundsAll = countyLayer.getBounds(); // minden megye
-
-    // csak a kiemelt megyék összevont határa
     countyLayer.eachLayer(l => {
       if (highlighted.has(l.feature.__key)) {
         const lb = l.getBounds();
