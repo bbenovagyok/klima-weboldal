@@ -59,7 +59,7 @@ html.no-scroll, body.no-scroll{ height:100%; overflow:hidden; touch-action:none;
   margin-left: auto;
   margin-right: auto;
 }
-.gallery-item { height: 120px; }              /* volt 150px */
+.gallery-item { height: 150px; }              /* volt 150px */
 @media (min-width: 640px){ .gallery-item { height: 150px; } }   /* volt 180px */
 @media (min-width: 1024px){
   #gallery-container { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
