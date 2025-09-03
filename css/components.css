@@ -53,20 +53,17 @@ html.no-scroll, body.no-scroll{ height:100%; overflow:hidden; touch-action:none;
 /* Galéria – kisebb kártyák, auto-tördelés */
 #gallery-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* volt 150px */
   gap: 12px;
-  max-width: 1200px;   /* szűkebb teljes szélesség */
+  max-width: 960px; /* volt 1200px */
   margin-left: auto;
   margin-right: auto;
 }
-.gallery-item {
-  height: 150px;       /* alap magasság kisebb */
-}
-@media (min-width: 640px){
-  .gallery-item { height: 180px; }
-}
+.gallery-item { height: 120px; }              /* volt 150px */
+@media (min-width: 640px){ .gallery-item { height: 150px; } }   /* volt 180px */
 @media (min-width: 1024px){
-  .gallery-item { height: 200px; }
+  #gallery-container { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+  .gallery-item { height: 170px; }            /* volt 200px */
 }
 
 /* --- Map overlay UI --- */
