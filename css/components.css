@@ -67,4 +67,44 @@ html.no-scroll, body.no-scroll{ height:100%; overflow:hidden; touch-action:none;
 @media (min-width: 1024px){
   .gallery-item { height: 200px; }
 }
+/* --- Map overlay UI --- */
+#work-map { position: relative; } /* hogy a gombot ide tudjuk pozicionálni */
+
+.map-back-btn{
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2000;                /* Leaflet kontrollok fölé */
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 9999px;
+  border: 1px solid rgba(0,0,0,.08);
+  background: rgba(255,255,255,.9);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #0c4a6e;               /* cyan-900 */
+  font-weight: 700;
+  box-shadow: 0 6px 20px rgba(0,0,0,.15);
+  cursor: pointer;
+}
+.map-back-btn:hover{ background: rgba(255,255,255,1); }
+.map-back-btn.hidden{ display: none; }
+
+.map-hint{
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 2000;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.92);
+  border: 1px solid rgba(0,0,0,.08);
+  font-size: 13px;
+  color: #0b1f2a;
+  box-shadow: 0 6px 20px rgba(0,0,0,.12);
+}
+.map-hint.hidden{ display:none; }
+
 
