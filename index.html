@@ -32,6 +32,8 @@
   <!-- Külső saját JS-ek -->
   <script src="js/lightbox.js" defer></script>
   <script src="js/work-map.js" defer></script>
+  <!-- Firebase + vélemény logika külön fájlokban -->
+  <script type="module" src="js/reviews-firebase.js" defer></script>
 
   <style>
     /* Alap tipó + hero + header animáció + reviews sáv „kerete” */
@@ -82,72 +84,39 @@
     @media (hover:hover){ .marquee:hover{ animation-play-state: paused; } }
     @keyframes marquee{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
 
-    /* ---- Fénycsík animáció a szolgáltatás kártyákon ---- */
+    /* Fénycsík animáció a szolgáltatás kártyákon */
     .service-card{ position:relative; overflow:hidden; }
     .service-card::after{
-      content:"";
-      position:absolute; top:0; left:-30%;
-      width:30%; height:4px;
+      content:""; position:absolute; top:0; left:-30%;
+      width:30%; height:4px; border-radius:9999px;
       background: linear-gradient(90deg, transparent, rgba(255,255,255,.85), transparent);
-      border-radius:9999px;
-      pointer-events:none;
-      opacity:0;
-      transform: translateX(0);
+      pointer-events:none; opacity:0; transform: translateX(0);
     }
-    @media (hover:hover){
-      .service-card:hover::after{ opacity:1; animation: cardSweep 1.2s ease both; }
-    }
-    @media (hover:none){
-      .service-card::after{ opacity:1; animation: cardSweep 2.2s linear infinite; }
-    }
+    @media (hover:hover){ .service-card:hover::after{ opacity:1; animation: cardSweep 1.2s ease both; } }
+    @media (hover:none){ .service-card::after{ opacity:1; animation: cardSweep 2.2s linear infinite; } }
     @keyframes cardSweep{ 0%{transform:translateX(-160%);} 100%{transform:translateX(520%);} }
     @media (prefers-reduced-motion: reduce){
       .service-card::after{ animation:none !important; opacity:.4; }
       @media (hover:hover){ .service-card:hover::after{ animation:none !important; } }
     }
 
-    /* ---- VERTIKÁLIS, KÁRTYÁS háttér-vélemények a vélemény űrlap mögé ---- */
-    .reviews-bg-vertical{
-      position:absolute; inset:0; padding:24px 16px;
-      display:grid; grid-template-columns: 1fr; gap:16px;
-      pointer-events:none; opacity:.30; filter: blur(1px);
-    }
-    @media (min-width:640px){ .reviews-bg-vertical{ grid-template-columns: repeat(2,1fr); } }
-    @media (min-width:1024px){ .reviews-bg-vertical{ grid-template-columns: repeat(3,1fr); } }
-
+    /* VERTIKÁLIS, KÁRTYÁS háttér-vélemények a vélemény űrlap mögé */
+    .reviews-bg-vertical{ position:absolute; inset:0; padding:24px 16px; display:grid; grid-template-columns:1fr; gap:16px; pointer-events:none; opacity:.30; filter:blur(1px);}
+    @media (min-width:640px){ .reviews-bg-vertical{ grid-template-columns:repeat(2,1fr);} }
+    @media (min-width:1024px){ .reviews-bg-vertical{ grid-template-columns:repeat(3,1fr);} }
     .reviews-col{ position:relative; overflow:hidden; }
-    .reviews-col::before, .reviews-col::after{
-      content:""; position:absolute; left:0; right:0; height:56px; z-index:2; pointer-events:none;
-    }
-    /* a szekció bg-je: #e5e7eb (tailwind gray-200) */
+    .reviews-col::before,.reviews-col::after{ content:""; position:absolute; left:0; right:0; height:56px; z-index:2; pointer-events:none; }
     .reviews-col::before{ top:0; background:linear-gradient(to bottom, rgba(229,231,235,1), rgba(229,231,235,0)); }
     .reviews-col::after{ bottom:0; background:linear-gradient(to top, rgba(229,231,235,1), rgba(229,231,235,0)); }
-
-    .reviews-track{
-      display:flex; flex-direction:column; gap:12px;
-      animation: scrollUp var(--dur, 22s) linear infinite;
-    }
+    .reviews-track{ display:flex; flex-direction:column; gap:12px; animation: scrollUp var(--dur, 22s) linear infinite; }
     .reviews-set{ display:flex; flex-direction:column; gap:12px; }
-
-    .review-bg-card{
-      background: rgba(255,255,255,.96);
-      border: 1px solid rgba(0,0,0,.06);
-      border-radius: 14px;
-      box-shadow: 0 10px 28px rgba(2,6,23,.10);
-      padding: 12px 14px;
-    }
+    .review-bg-card{ background:rgba(255,255,255,.96); border:1px solid rgba(0,0,0,.06); border-radius:14px; box-shadow:0 10px 28px rgba(2,6,23,.10); padding:12px 14px; }
     .review-bg-card p{ margin:0; font-size:14px; line-height:1.35; color:#1f2937; }
     .review-bg-card .meta{ margin-top:6px; font-weight:700; font-size:12px; color:#334155; }
+    @keyframes scrollUp{ 0%{transform:translateY(0);} 100%{transform:translateY(-50%);} }
+    @media (prefers-reduced-motion: reduce){ .reviews-track{ animation:none !important; } }
 
-    @keyframes scrollUp{
-      0%   { transform: translateY(0); }
-      100% { transform: translateY(-50%); }
-    }
-    @media (prefers-reduced-motion: reduce){
-      .reviews-track{ animation:none !important; }
-    }
-
-    /* Cookie sáv – itt hagyjuk inline */
+    /* Cookie sáv */
     #cookie-consent {transform: translateY(100%);opacity: 0;transition: transform .5s cubic-bezier(.22,.61,.36,1), opacity .5s ease;pointer-events: none;}
     #cookie-consent.show {transform: translateY(0);opacity: 1;pointer-events: auto;}
     @media (prefers-reduced-motion: reduce) {#cookie-consent { transition: none; }}
@@ -196,7 +165,7 @@
           <a href="#kapcsolat" class="bg-yellow-400 text-gray-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition duration-300 shadow-xl inline-block">Ingyenes ajánlat</a>
         </div>
       </div>
-      <!-- Reviews strip (TETEJÉN) -->
+      <!-- Reviews strip -->
       <div class="reviews-strip absolute bottom-0 left-0 right-0 py-4">
         <div class="w-full flex">
           <div id="reviews-container" class="marquee items-center"></div>
@@ -242,12 +211,10 @@
         <h2 class="text-4xl md:text-5xl font-black text-center mb-4 text-white reveal-on-scroll">Aktuális Munkáink</h2>
         <p class="text-center text-lg text-cyan-100 mb-12 max-w-2xl mx-auto reveal-on-scroll" style="--delay:150ms">Minden klímánk mögött egy elégedett ügyfél áll!</p>
 
-        <!-- Galéria (loader a tartóban) -->
         <div id="gallery-container">
           <p class="gallery-loading text-center col-span-full">Galéria betöltése...</p>
         </div>
 
-        <!-- Térkép blokk -->
         <div class="mt-8 sm:mt-16 reveal-on-scroll" style="--delay:300ms;">
           <h3 class="text-2xl font-bold text-center text-white mb-6">Ahol már dolgoztunk:</h3>
           <div id="work-map" class="mx-auto max-w-5xl"></div>
@@ -277,9 +244,9 @@
       </div>
     </section>
 
-    <!-- Vélemények – BEKÜLDŐ ŰRLAP (SÖTÉTEBB SZÜRKE HÁTTÉR + VERTIKÁLIS, KÁRTYÁS FUTÁS) -->
+    <!-- Vélemények – űrlap + sötét(ebb) szürke háttér, kártyák futnak mögötte -->
     <section id="velemenyek" class="py-20 bg-gray-200 relative overflow-hidden">
-      <!-- háttérben futó VERTIKÁLIS kártyák -->
+      <!-- háttérben futó oszlopok -->
       <div class="reviews-bg-vertical" aria-hidden="true">
         <div class="reviews-col" id="rev-col-1"></div>
         <div class="reviews-col" id="rev-col-2"></div>
@@ -356,125 +323,6 @@
   <a href="#" id="to-top-button" class="fixed bottom-5 right-5 z-50 w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg hover:bg-yellow-500 transition-all duration-300 opacity-0 translate-y-5">
     <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
   </a>
-
-  <!-- Firebase + Reviews (felső sáv + háttér oszlopok) -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, Timestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyB0yin_VnilXLpth-qzNsJqpIwyalirI6M",
-      authDomain: "klima-weboldal.firebaseapp.com",
-      projectId: "klima-weboldal",
-      storageBucket: "klima-weboldal.appspot.com",
-      messagingSenderId: "31440003199",
-      appId: "1:31440003199:web:13ec2fcd1601861eec5f4a"
-    };
-
-    let app, db, auth;
-    try { app = initializeApp(firebaseConfig); db = getFirestore(app); auth = getAuth(app); }
-    catch(e){ console.error("Firebase init fail", e); }
-
-    const reviewForm = document.getElementById('reviewForm');
-    const reviewsContainer = document.getElementById('reviews-container'); // felső vízszintes sáv
-
-    const buildReview = (text, name, city) => `
-      <div class="review-card">
-        <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white/20">
-          <i class="fa-solid fa-quote-left text-xs"></i>
-        </span>
-        <span class="font-bold tracking-tight">"${text}"</span>
-        <span class="opacity-90 font-semibold">– ${name}, ${city}</span>
-      </div>
-    `;
-
-    const buildReviewBgCard = (r) => `
-      <div class="review-bg-card">
-        <p>"${r.text}"</p>
-        <div class="meta">– ${r.name}, ${r.city}</div>
-      </div>
-    `;
-
-    function renderVerticalBgColumns(list){
-      const safeList = list && list.length ? list : [];
-      const colsData = [[],[],[]];
-      safeList.forEach((r,i)=> colsData[i%3].push(r));
-
-      const colIds = ['rev-col-1','rev-col-2','rev-col-3'];
-      colIds.forEach((id, idx) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        const cards = colsData[idx].map(buildReviewBgCard).join('') || buildReviewBgCard({text:'Gyors, tiszta, profi munka!',name:'Mintapélda',city:'Siófok'});
-        const set = `<div class="reviews-set">${cards}</div>`;
-        const duration = 20 + idx*4; // oszloponként kicsit más tempó
-        el.innerHTML = `<div class="reviews-track" style="--dur:${duration}s">${set}${set}</div>`;
-      });
-    }
-
-    const escapeHtml = s => String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-
-    const loadDefaultReviews = () => {
-      const def = [
-        {name:"Nagy Család",city:"Siófok",text:"Gyorsak, profik és nagyon tisztán dolgoztak. Végre hűvös van a nappaliban!"},
-        {name:"Kiss Péter",city:"Székesfehérvár",text:"Minden a megbeszéltek szerint történt, a klíma tökéletesen működik. Csak ajánlani tudom!"},
-        {name:"Horváth Éva",city:"Veszprém",text:"A régi, zajos klímánkat cserélték le egy újra. Hatalmas a különbség, köszönjük!"}
-      ];
-      let lane=''; def.forEach(r=> lane += buildReview(escapeHtml(r.text), escapeHtml(r.name), escapeHtml(r.city)));
-      if (reviewsContainer) reviewsContainer.innerHTML = lane + lane;
-      renderVerticalBgColumns(def);
-    };
-
-    async function loadReviews(){
-      if (reviewsContainer) reviewsContainer.innerHTML='';
-      try{
-        const snap = await getDocs(query(collection(db,'reviews'),orderBy('createdAt','desc')));
-        if (snap.empty){ loadDefaultReviews(); return; }
-        let lane=''; const arr=[];
-        snap.forEach(doc=>{
-          const r=doc.data();
-          const safe={ text:escapeHtml(r.text), name:escapeHtml(r.name), city:escapeHtml(r.city) };
-          arr.push(safe);
-          lane += buildReview(safe.text, safe.name, safe.city);
-        });
-        if (reviewsContainer) reviewsContainer.innerHTML = lane + lane;
-        renderVerticalBgColumns(arr);
-      }catch{
-        loadDefaultReviews();
-      }
-    }
-
-    if (auth){
-      onAuthStateChanged(auth,(user)=>{
-        if(user) loadReviews();
-        else signInAnonymously(auth).then(loadReviews).catch(()=>loadDefaultReviews());
-      });
-    } else { loadDefaultReviews(); }
-
-    reviewForm?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      if (!db) { alert("A véleményküldés funkció jelenleg nem elérhető."); return; }
-      const btn = document.getElementById('submitReviewBtn');
-      btn.disabled = true; btn.textContent = 'Küldés...';
-
-      const name = document.getElementById('reviewerName')?.value?.trim();
-      const city = document.getElementById('reviewerCity')?.value?.trim();
-      const text = document.getElementById('reviewText')?.value?.trim();
-      if (!name || !text || !city) { alert('Töltsön ki minden mezőt!'); btn.disabled=false; btn.textContent='Vélemény elküldése'; return; }
-
-      try {
-        await addDoc(collection(db, 'reviews'), { name, city, text, createdAt: Timestamp.now() });
-        reviewForm.reset();
-        alert('Köszönjük a véleményét!');
-        await loadReviews();
-      } catch (err) {
-        console.error('Hiba a mentéskor:', err);
-        alert('Hiba történt a vélemény mentése során.');
-      } finally {
-        btn.disabled=false; btn.textContent='Vélemény elküldése';
-      }
-    });
-  </script>
 
   <!-- UI + Galéria (kisebb kódok) -->
   <script>
@@ -601,6 +449,5 @@
     });
   })();
   </script>
-  <!-- /Cookie sáv vége -->
 </body>
 </html>
