@@ -242,7 +242,7 @@
   <!-- Lightbox -->
   <div id="lightbox" class="fixed inset-0 z-[110] flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm hidden transition-opacity duration-300">
     <div id="lightbox-content" class="relative max-w-4xl max-h-[90vh] w-full p-4">
-      <button id="close-lightbox" class="absolute -top-2 -right-2 md:top-0 md:-right-10 text-white text-5xl font-bold">&times;</button>
+     <button id="close-lightbox" aria-label="Bezárás">&times;</button>
       <img id="lightbox-image" src="" alt="" class="max-w-full max-h-[75vh] mx-auto rounded-lg shadow-2xl">
       <div id="lightbox-caption" class="text-center text-white mt-4">
         <h4 id="lightbox-title" class="text-xl font-bold"></h4>
@@ -365,11 +365,28 @@
     const lightboxTitle=document.getElementById('lightbox-title');
     const lightboxDescription=document.getElementById('lightbox-description');
     const closeLightboxButton=document.getElementById('close-lightbox');
-    function openLightbox(src,t,d){ lightboxImage.src=src; lightboxTitle.textContent=t; lightboxDescription.textContent=d; lightbox.classList.remove('hidden'); }
-    function closeLightbox(){ lightbox.classList.add('hidden'); }
-    galleryContainer?.addEventListener('click',e=>{ const el=e.target.closest('.gallery-item'); if(el) openLightbox(el.dataset.src,el.dataset.title,el.dataset.description);});
-    closeLightboxButton?.addEventListener('click',closeLightbox);
-    lightbox?.addEventListener('click',e=>{ if(e.target===lightbox) closeLightbox(); });
+   function openLightbox(src, t, d){
+  lightboxImage.src = src;
+  lightboxTitle.textContent = t || '';
+  lightboxDescription.textContent = d || '';
+  lightbox.classList.remove('hidden');
+
+  // háttér görgetés tiltása
+  document.documentElement.classList.add('no-scroll');
+  document.body.classList.add('no-scroll');
+}
+
+function closeLightbox(){
+  lightbox.classList.add('hidden');
+
+  // görgetés vissza
+  document.documentElement.classList.remove('no-scroll');
+  document.body.classList.remove('no-scroll');
+}
+// ESC-re zárás
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !lightbox.classList.contains('hidden')) closeLightbox();
+});
 
     // Scroll animáció
     function initializeScrollAnimation(){
@@ -605,6 +622,37 @@
   @media (prefers-reduced-motion: reduce) {
     #cookie-consent { transition: none; }
   }
+
+/* ===== Lightbox – mobil fixek ===== */
+#lightbox{
+  height: 100vh;            /* fallback */
+  height: 100dvh;           /* helyes mobil magasság */
+  overscroll-behavior: contain;
+}
+html.no-scroll, body.no-scroll{
+  height: 100%;
+  overflow: hidden;         /* háttér nem görgethető */
+  touch-action: none;
+}
+#close-lightbox{
+  position: fixed;          /* ne csússzon el a tartalommal */
+  top: calc(env(safe-area-inset-top, 0px) + 12px);
+  right: calc(env(safe-area-inset-right, 0px) + 12px);
+  z-index: 9999;
+  width: 44px; height: 44px; border-radius: 9999px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  color: #fff; font-size: 28px; line-height: 1;
+}
+#close-lightbox:focus{ outline: 2px solid #fff; outline-offset: 2px; }
+
+/* a kép ne lógjon ki – maradjon látható a bezáró alatt */
+#lightbox-image{
+  max-height: calc(100dvh - 120px);
+  object-fit: contain;
+}
 </style>
 
 <div id="cookie-consent" class="fixed left-0 right-0 bottom-0 z-[200]">
@@ -669,4 +717,5 @@
 
 </body>
 </html>
+
 
