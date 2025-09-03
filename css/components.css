@@ -201,3 +201,43 @@ html.no-scroll, body.no-scroll{ height:100%; overflow:hidden; touch-action:none;
 .t-card .who{ font-weight:800; color:#0f172a; margin-bottom:6px; }
 .t-card .city{ color:#334155; font-weight:600; font-size:13px; }
 .t-card .text{ color:#111827; }
+
+/* ===== Szolgáltatás kártya – felső fénycsík ===== */
+.service-card{ position:relative; overflow:hidden; }
+.service-card::after{
+  content:"";
+  position:absolute;
+  top:0; left:0;
+  height:4px;                 /* a csík vastagsága */
+  width:45%;                  /* a csík hossza (szabadon állítható) */
+  pointer-events:none;
+  z-index:2;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.95), transparent);
+  filter: blur(.3px);
+  opacity:0;                  /* alapból rejtve (desktopon csak hoverre fusson) */
+  transform: translateX(-140%);
+  will-change: transform, opacity;
+}
+@keyframes cardTopSweep{
+  to { transform: translateX(140%); }
+}
+
+/* Desktop: hoverkor egyszer fusson végig */
+.service-card:hover::after{
+  opacity:1;
+  animation: cardTopSweep 1.6s cubic-bezier(.35,.85,.35,1) forwards;
+}
+
+/* Mobil/touch: a csík folyamatos, végtelenített legyen */
+@media (hover:none), (pointer:coarse) {
+  .service-card::after{
+    opacity:.9;
+    animation: cardTopSweep 2.2s linear infinite;
+  }
+}
+
+/* Akik csökkentett animációt kérnek, ott kapcsoljuk ki */
+@media (prefers-reduced-motion: reduce){
+  .service-card::after{ animation:none !important; opacity:0 !important; }
+}
+
