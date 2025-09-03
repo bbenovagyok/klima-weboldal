@@ -49,3 +49,22 @@ html.no-scroll, body.no-scroll{ height:100%; overflow:hidden; touch-action:none;
   .leaflet-tooltip.county-label{ font-size:10px; transform:translateY(-2px); }
   .city-marker{ font-size:11px; padding:3px 7px; }
 }
+/* Galéria – kisebb kártyák, auto-tördelés */
+#gallery-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  max-width: 1200px;   /* szűkebb teljes szélesség */
+  margin-left: auto;
+  margin-right: auto;
+}
+.gallery-item {
+  height: 150px;       /* alap magasság kisebb */
+}
+@media (min-width: 640px){
+  .gallery-item { height: 180px; }
+}
+@media (min-width: 1024px){
+  .gallery-item { height: 200px; }
+}
+
