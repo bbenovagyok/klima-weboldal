@@ -125,11 +125,11 @@
     const b = target.getBounds();
 
     // "cover" zoom: számolunk egy illeszkedő zoomot, majd rátolunk, hogy kitöltse a #work-map-et
-    const fitZoom    = map.getBoundsZoom(b, true);                   // ami még pont befér
-    const bump       = mapEl.clientWidth < 640 ? 1.0 : 1.25;         // mobilon kicsit kisebb ráemelés
-    const targetZoom = Math.min(22, fitZoom + bump);
-
-    map.flyTo(b.getCenter(), targetZoom, { duration: 0.85, easeLinearity: 0.25 });
+    const fitZoom    = map.getBoundsZoom(b, true);
+// kisebb ráemelés (mobil / desktop)
+const bump       = mapEl.clientWidth < 640 ? 0.35 : 0.55;
+const targetZoom = Math.min(22, fitZoom + bump);
+map.flyTo(b.getCenter(), targetZoom, { duration: 0.75, easeLinearity: 0.25 });
 
     // amikor odaért, fagyasszuk le (ne lehessen elmozgatni/zoomolni)
     setTimeout(() => {
