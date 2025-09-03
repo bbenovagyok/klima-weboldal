@@ -127,7 +127,7 @@
     // "cover" zoom: számolunk egy illeszkedő zoomot, majd rátolunk, hogy kitöltse a #work-map-et
     const fitZoom    = map.getBoundsZoom(b, true);
 // kisebb ráemelés (mobil / desktop)
-const bump       = mapEl.clientWidth < 640 ? 0.08 : 0.08;
+const bump       = mapEl.clientWidth < 640 ? 0.01: 0.01;
 const targetZoom = Math.min(22, fitZoom + bump);
 map.flyTo(b.getCenter(), targetZoom, { duration: 0.75, easeLinearity: 0.25 });
 
