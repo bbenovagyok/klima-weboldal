@@ -129,7 +129,7 @@
 // kisebb ráemelés (mobil / desktop)
 const bump       = mapEl.clientWidth < 640 ? 0.01: 0.01;
 const targetZoom = Math.min(22, fitZoom + bump);
-map.flyTo(b.getCenter(), targetZoom, { duration: 0.75, easeLinearity: 0.25 });
+map.flyTo(b.getCenter(), targetZoom, { duration: 0.50, easeLinearity: 0.15 });
 
     // amikor odaért, fagyasszuk le (ne lehessen elmozgatni/zoomolni)
     setTimeout(() => {
