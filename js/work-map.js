@@ -105,7 +105,7 @@
 
     // 1) Rárepülünk nagyon kicsi paddal, hogy a megye szinte kitöltse a keretet
     const b = target.getBounds();
-    const PADDING = 6;      // ha még jobban rá akarod húzni, csökkentsd 4-re
+    const PADDING = 4;      // ha még jobban rá akarod húzni, csökkentsd 4-re
     const ZOOM_BOOST = 1.25; // utólagos +zoom mértéke
 
     map.flyToBounds(b, { padding: [PADDING, PADDING], duration: 0.8, easeLinearity: 0.25 });
