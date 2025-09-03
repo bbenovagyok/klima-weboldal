@@ -94,50 +94,63 @@
       opacity:0;
       transform: translateX(0);
     }
-    /* Asztali: hoverre fusson végig egyszer */
     @media (hover:hover){
-      .service-card:hover::after{
-        opacity:1;
-        animation: cardSweep 1.2s ease both;
-      }
+      .service-card:hover::after{ opacity:1; animation: cardSweep 1.2s ease both; }
     }
-    /* Mobil/tablet: folyamatosan fusson */
     @media (hover:none){
-      .service-card::after{
-        opacity:1;
-        animation: cardSweep 2.2s linear infinite;
-      }
+      .service-card::after{ opacity:1; animation: cardSweep 2.2s linear infinite; }
     }
-    @keyframes cardSweep{
-      0%   { transform: translateX(-160%); }
-      100% { transform: translateX(520%); }
-    }
+    @keyframes cardSweep{ 0%{transform:translateX(-160%);} 100%{transform:translateX(520%);} }
     @media (prefers-reduced-motion: reduce){
-      .service-card::after{ animation: none !important; opacity:.4; }
-      @media (hover:hover){
-        .service-card:hover::after{ animation:none !important; }
-      }
+      .service-card::after{ animation:none !important; opacity:.4; }
+      @media (hover:hover){ .service-card:hover::after{ animation:none !important; } }
     }
 
-    /* ---- Háttérben futó vélemények a vélemény űrlap szekcióhoz ---- */
-    .reviews-bg{
-      position:absolute; inset:0; overflow:hidden; pointer-events:none;
-      opacity:.35;
+    /* ---- VERTIKÁLIS, KÁRTYÁS háttér-vélemények a vélemény űrlap mögé ---- */
+    .reviews-bg-vertical{
+      position:absolute; inset:0; padding:24px 16px;
+      display:grid; grid-template-columns: 1fr; gap:16px;
+      pointer-events:none; opacity:.30; filter: blur(1px);
     }
-    .reviews-bg::before,
-    .reviews-bg::after{
-      content:""; position:absolute; left:0; right:0; height:72px; z-index:2; pointer-events:none;
+    @media (min-width:640px){ .reviews-bg-vertical{ grid-template-columns: repeat(2,1fr); } }
+    @media (min-width:1024px){ .reviews-bg-vertical{ grid-template-columns: repeat(3,1fr); } }
+
+    .reviews-col{ position:relative; overflow:hidden; }
+    .reviews-col::before, .reviews-col::after{
+      content:""; position:absolute; left:0; right:0; height:56px; z-index:2; pointer-events:none;
     }
-    .reviews-bg::before{ top:0; background: linear-gradient(to bottom, rgba(243,244,246,1), rgba(243,244,246,0)); }
-    .reviews-bg::after{ bottom:0; background: linear-gradient(to top, rgba(243,244,246,1), rgba(243,244,246,0)); }
-    #reviews-bg-container{
-      display:inline-flex; gap:.75rem; align-items:center; padding-inline:1rem; white-space:nowrap;
-      filter: blur(1px);
+    /* a szekció bg-je: #e5e7eb (tailwind gray-200) */
+    .reviews-col::before{ top:0; background:linear-gradient(to bottom, rgba(229,231,235,1), rgba(229,231,235,0)); }
+    .reviews-col::after{ bottom:0; background:linear-gradient(to top, rgba(229,231,235,1), rgba(229,231,235,0)); }
+
+    .reviews-track{
+      display:flex; flex-direction:column; gap:12px;
+      animation: scrollUp var(--dur, 22s) linear infinite;
     }
-    .reviews-bg .review-card{
-      background: linear-gradient(to bottom, rgba(255,255,255,.12), rgba(255,255,255,.08));
-      border-color: rgba(255,255,255,.35);
+    .reviews-set{ display:flex; flex-direction:column; gap:12px; }
+
+    .review-bg-card{
+      background: rgba(255,255,255,.96);
+      border: 1px solid rgba(0,0,0,.06);
+      border-radius: 14px;
+      box-shadow: 0 10px 28px rgba(2,6,23,.10);
+      padding: 12px 14px;
     }
+    .review-bg-card p{ margin:0; font-size:14px; line-height:1.35; color:#1f2937; }
+    .review-bg-card .meta{ margin-top:6px; font-weight:700; font-size:12px; color:#334155; }
+
+    @keyframes scrollUp{
+      0%   { transform: translateY(0); }
+      100% { transform: translateY(-50%); }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .reviews-track{ animation:none !important; }
+    }
+
+    /* Cookie sáv – itt hagyjuk inline */
+    #cookie-consent {transform: translateY(100%);opacity: 0;transition: transform .5s cubic-bezier(.22,.61,.36,1), opacity .5s ease;pointer-events: none;}
+    #cookie-consent.show {transform: translateY(0);opacity: 1;pointer-events: auto;}
+    @media (prefers-reduced-motion: reduce) {#cookie-consent { transition: none; }}
   </style>
 </head>
 
@@ -206,7 +219,7 @@
 
           <div class="service-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200 reveal-on-scroll" style="--delay:150ms">
             <div class="bg-cyan-100 text-cyan-700 rounded-full w-16 h-16 flex items-center justify-center mb-6">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 002 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
             </div>
             <h3 class="text-xl md:text-2xl font-bold mb-3">Tisztítás és Karbantartás</h3>
             <p class="text-gray-600 leading-relaxed">Tiszta, egészséges levegő – kisebb fogyasztás és hosszabb élettartam rendszeres karbantartással.</p>
@@ -264,13 +277,13 @@
       </div>
     </section>
 
-    <!-- Vélemények – BEKÜLDŐ ŰRLAP (SÖTÉTEBB SZÜRKE HÁTTÉR + MOZGÓ VÉLEMÉNYEK A HÁTTÉRBEN) -->
+    <!-- Vélemények – BEKÜLDŐ ŰRLAP (SÖTÉTEBB SZÜRKE HÁTTÉR + VERTIKÁLIS, KÁRTYÁS FUTÁS) -->
     <section id="velemenyek" class="py-20 bg-gray-200 relative overflow-hidden">
-      <!-- háttérben futó vélemény-lane -->
-      <div class="reviews-bg flex items-center">
-        <div class="w-full flex">
-          <div id="reviews-bg-container" class="marquee items-center"></div>
-        </div>
+      <!-- háttérben futó VERTIKÁLIS kártyák -->
+      <div class="reviews-bg-vertical" aria-hidden="true">
+        <div class="reviews-col" id="rev-col-1"></div>
+        <div class="reviews-col" id="rev-col-2"></div>
+        <div class="reviews-col" id="rev-col-3"></div>
       </div>
 
       <div class="container mx-auto px-6 max-w-3xl relative">
@@ -344,7 +357,7 @@
     <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
   </a>
 
-  <!-- Firebase + Reviews (marquee + űrlap működés) -->
+  <!-- Firebase + Reviews (felső sáv + háttér oszlopok) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -364,8 +377,7 @@
     catch(e){ console.error("Firebase init fail", e); }
 
     const reviewForm = document.getElementById('reviewForm');
-    const reviewsContainer = document.getElementById('reviews-container');        // felső sáv
-    const reviewsBgContainer = document.getElementById('reviews-bg-container');  // háttér a űrlap mögött
+    const reviewsContainer = document.getElementById('reviews-container'); // felső vízszintes sáv
 
     const buildReview = (text, name, city) => `
       <div class="review-card">
@@ -377,33 +389,56 @@
       </div>
     `;
 
-    const loadDefaultReviews = () => {
-      const def = [
-        {name:"Nagy Család",city:"Siófok",review:"Gyorsak, profik és nagyon tisztán dolgoztak. Végre hűvös van a nappaliban!"},
-        {name:"Kiss Péter",city:"Székesfehérvár",review:"Minden a megbeszéltek szerint történt, a klíma tökéletesen működik. Csak ajánlani tudom!"},
-        {name:"Horváth Éva",city:"Veszprém",review:"A régi, zajos klímánkat cserélték le egy újra. Hatalmas a különbség, köszönjük!"}
-      ];
-      let lane=''; def.forEach(r=> lane += buildReview(r.review, r.name, r.city));
-      if (reviewsContainer) reviewsContainer.innerHTML = lane + lane;
-      if (reviewsBgContainer) reviewsBgContainer.innerHTML = lane + lane;
-    };
+    const buildReviewBgCard = (r) => `
+      <div class="review-bg-card">
+        <p>"${r.text}"</p>
+        <div class="meta">– ${r.name}, ${r.city}</div>
+      </div>
+    `;
+
+    function renderVerticalBgColumns(list){
+      const safeList = list && list.length ? list : [];
+      const colsData = [[],[],[]];
+      safeList.forEach((r,i)=> colsData[i%3].push(r));
+
+      const colIds = ['rev-col-1','rev-col-2','rev-col-3'];
+      colIds.forEach((id, idx) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const cards = colsData[idx].map(buildReviewBgCard).join('') || buildReviewBgCard({text:'Gyors, tiszta, profi munka!',name:'Mintapélda',city:'Siófok'});
+        const set = `<div class="reviews-set">${cards}</div>`;
+        const duration = 20 + idx*4; // oszloponként kicsit más tempó
+        el.innerHTML = `<div class="reviews-track" style="--dur:${duration}s">${set}${set}</div>`;
+      });
+    }
 
     const escapeHtml = s => String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
+    const loadDefaultReviews = () => {
+      const def = [
+        {name:"Nagy Család",city:"Siófok",text:"Gyorsak, profik és nagyon tisztán dolgoztak. Végre hűvös van a nappaliban!"},
+        {name:"Kiss Péter",city:"Székesfehérvár",text:"Minden a megbeszéltek szerint történt, a klíma tökéletesen működik. Csak ajánlani tudom!"},
+        {name:"Horváth Éva",city:"Veszprém",text:"A régi, zajos klímánkat cserélték le egy újra. Hatalmas a különbség, köszönjük!"}
+      ];
+      let lane=''; def.forEach(r=> lane += buildReview(escapeHtml(r.text), escapeHtml(r.name), escapeHtml(r.city)));
+      if (reviewsContainer) reviewsContainer.innerHTML = lane + lane;
+      renderVerticalBgColumns(def);
+    };
+
     async function loadReviews(){
       if (reviewsContainer) reviewsContainer.innerHTML='';
-      if (reviewsBgContainer) reviewsBgContainer.innerHTML='';
       try{
         const snap = await getDocs(query(collection(db,'reviews'),orderBy('createdAt','desc')));
         if (snap.empty){ loadDefaultReviews(); return; }
-        let lane='';
+        let lane=''; const arr=[];
         snap.forEach(doc=>{
           const r=doc.data();
-          const safe = {text:escapeHtml(r.text), name:escapeHtml(r.name), city:escapeHtml(r.city)};
+          const safe={ text:escapeHtml(r.text), name:escapeHtml(r.name), city:escapeHtml(r.city) };
+          arr.push(safe);
           lane += buildReview(safe.text, safe.name, safe.city);
         });
         if (reviewsContainer) reviewsContainer.innerHTML = lane + lane;
-        if (reviewsBgContainer) reviewsBgContainer.innerHTML = lane + lane;
+        renderVerticalBgColumns(arr);
       }catch{
         loadDefaultReviews();
       }
