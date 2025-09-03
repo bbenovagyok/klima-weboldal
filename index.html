@@ -86,6 +86,44 @@
     @media (hover:hover){ .marquee:hover{ animation-play-state: paused; } }
     @keyframes marquee{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
 
+    /* ---- Fénycsík animáció a szolgáltatás kártyákon ---- */
+    .service-card{ position:relative; overflow:hidden; }
+    .service-card::after{
+      content:"";
+      position:absolute; top:0; left:-30%;
+      width:30%; height:4px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.85), transparent);
+      border-radius:9999px;
+      pointer-events:none;
+      opacity:0;
+      transform: translateX(0);
+    }
+    /* Asztali: hoverre fusson végig egyszer */
+    @media (hover:hover){
+      .service-card:hover::after{
+        opacity:1;
+        animation: cardSweep 1.2s ease both;
+      }
+    }
+    /* Mobil/tablet: folyamatosan fusson */
+    @media (hover:none){
+      .service-card::after{
+        opacity:1;
+        animation: cardSweep 2.2s linear infinite;
+      }
+    }
+    @keyframes cardSweep{
+      0%   { transform: translateX(-160%); }
+      100% { transform: translateX(520%); }
+    }
+    /* Akik kérik a kevesebb mozgást */
+    @media (prefers-reduced-motion: reduce){
+      .service-card::after{ animation: none !important; opacity:.4; }
+      @media (hover:hover){
+        .service-card:hover::after{ animation:none !important; }
+      }
+    }
+
     /* Cookie sáv – itt hagyjuk inline */
     #cookie-consent {transform: translateY(100%);opacity: 0;transition: transform .5s cubic-bezier(.22,.61,.36,1), opacity .5s ease;pointer-events: none;}
     #cookie-consent.show {transform: translateY(0);opacity: 1;pointer-events: auto;}
