@@ -2,34 +2,20 @@
   "counties": [
     {
       "county_name": "Somogy",
+      "completed": true,
       "cities": [
-        {
-          "city_name": "Siófok",
-          "completed": true
-        }
-      ],
-      "completed": true
+        { "city_name": "Siófok", "lat": 46.909, "lng": 18.1046, "completed": true }
+      ]
     },
     {
       "county_name": "Veszprém",
+      "completed": true,
       "cities": [
-        {
-          "city_name": "Veszprém",
-          "completed": true
-        },
-        {
-          "city_name": "Balatonfüred",
-          "completed": true
-        }
-      ],
-      "completed": true
+        { "city_name": "Veszprém",      "lat": 47.093,  "lng": 17.911,  "completed": true },
+        { "city_name": "Balatonfüred",  "lat": 46.961,  "lng": 17.871,  "completed": true }
+      ]
     },
-    {
-      "county_name": "Fejér",
-      "completed": true
-    },
-    {
-      "county_name": "tolna"
-    }
+    { "county_name": "Fejér", "completed": true, "cities": [] },
+    { "county_name": "Tolna", "completed": false, "cities": [] }
   ]
 }
