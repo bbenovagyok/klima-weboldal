@@ -69,15 +69,12 @@
     }
     .reviews-strip::before{ left:0; background: linear-gradient(to right, rgba(0,32,48,.85), rgba(0,32,48,0)); }
     .reviews-strip::after{ right:0; background: linear-gradient(to left, rgba(0,32,48,.85), rgba(0,32,48,0)); }
-    #reviews-container{
-      display:inline-flex; gap:1rem; align-items:center; padding-inline:1rem; white-space:nowrap;
-    }
+    #reviews-container{ display:inline-flex; gap:1rem; align-items:center; padding-inline:1rem; white-space:nowrap; }
     .review-card{
       display:inline-flex; align-items:center; gap:.6rem; color:#fff;
       background: linear-gradient(to bottom, rgba(255,255,255,.10), rgba(255,255,255,.06));
       border:1px solid rgba(255,255,255,.50);
-      border-radius:9999px;
-      box-shadow: 0 8px 18px rgba(0,0,0,.35);
+      border-radius:9999px; box-shadow: 0 8px 18px rgba(0,0,0,.35);
       padding:.55rem .9rem; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
     }
     .marquee{ animation: marquee 40s linear infinite; will-change: transform; }
@@ -178,19 +175,20 @@
       <div class="container mx-auto px-6">
         <h2 class="text-4xl md:text-5xl font-black text-center mb-12 text-cyan-800 reveal-on-scroll">Szolgáltatásaink</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <!-- 1. kártya -->
+          <!-- 1. kártya – Ikon csere, nagy méret -->
           <div class="service-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200 reveal-on-scroll">
-            <div class="bg-cyan-100 text-cyan-700 rounded-full w-16 h-16 flex items-center justify-center mb-6">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            <div class="bg-cyan-100 rounded-full w-16 h-16 flex items-center justify-center mb-6">
+              <img src="https://i.postimg.cc/3RrjrPmX/air-conditioner.png" alt="Klíma telepítés ikon"
+                   class="w-14 h-14 object-contain scale-[1.06] pointer-events-none select-none"
+                   loading="lazy" referrerpolicy="no-referrer">
             </div>
             <h3 class="text-xl md:text-2xl font-bold mb-3">Klíma Telepítés</h3>
             <p class="text-gray-600 leading-relaxed">Modern, energiahatékony klímák szakszerű telepítése – kiválasztás, kivitelezés, garanciával.</p>
           </div>
 
-          <!-- 2. kártya – Kiemelt piros szöveg (IKON NAGYOBBRA VÉVE) -->
+          <!-- 2. kártya – Kiemelt piros szöveg -->
           <div class="service-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200 reveal-on-scroll" style="--delay:150ms">
             <div class="bg-cyan-100 rounded-full w-16 h-16 flex items-center justify-center mb-6">
-              <!-- Itt nagyítottam fel: 56×56px + kicsi skálázás, hogy a kör széléig érjen -->
               <img src="https://i.postimg.cc/VvjqLm5k/check.png" alt="Tisztítás ikon"
                    class="w-14 h-14 object-contain scale-[1.06] pointer-events-none select-none"
                    loading="lazy" referrerpolicy="no-referrer">
@@ -210,10 +208,12 @@
             </p>
           </div>
 
-          <!-- 3. kártya -->
+          <!-- 3. kártya – Ikon csere, nagy méret -->
           <div class="service-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200 reveal-on-scroll" style="--delay:300ms">
-            <div class="bg-cyan-100 text-cyan-700 rounded-full w-16 h-16 flex items-center justify-center mb-6">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
+            <div class="bg-cyan-100 rounded-full w-16 h-16 flex items-center justify-center mb-6">
+              <img src="https://i.postimg.cc/DyGj848B/air-condition.png" alt="Javítás ikon"
+                   class="w-14 h-14 object-contain scale-[1.06] pointer-events-none select-none"
+                   loading="lazy" referrerpolicy="no-referrer">
             </div>
             <h3 class="text-xl md:text-2xl font-bold mb-3">Javítás és Hibaelhárítás</h3>
             <p class="text-gray-600 leading-relaxed">Márkafüggetlen gyorsszerviz Siófokon és környékén – hívjon bizalommal!</p>
