@@ -50,20 +50,40 @@ html.no-scroll, body.no-scroll{ height:100%; overflow:hidden; touch-action:none;
   .city-marker{ font-size:11px; padding:3px 7px; }
 }
 
-/* Galéria – kisebb kártyák, auto-tördelés */
-#gallery-container {
+/* ===== Galéria – kis NÉGYZET kártyák, manuális méretállítás ===== */
+:root{
+  /* Itt állítod a kártyák alap méretét */
+  --tile: 170px;         /* pl. 150–220 közé állítsd ízlés szerint */
+}
+
+#gallery-container{
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* volt 150px */
-  gap: 12px;
-  max-width: 960px; /* volt 1200px */
+  grid-template-columns: repeat(auto-fill, minmax(var(--tile), 1fr));
+  gap: 14px;
+  max-width: 1100px;     /* ha szélesebb rács kell, növeld */
   margin-left: auto;
   margin-right: auto;
 }
-.gallery-item { height: 150px; }              /* volt 150px */
-@media (min-width: 640px){ .gallery-item { height: 150px; } }   /* volt 180px */
+
+/* mindig négyzet alak */
+.gallery-item{
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0,0,0,.15);
+}
+
+/* a kép kitölti a kártyát, nem nyúlik el */
+.gallery-item img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* opcionális: nagyobb kártyák desktopon */
 @media (min-width: 1024px){
-  #gallery-container { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
-  .gallery-item { height: 170px; }            /* volt 200px */
+  :root{ --tile: 200px; }    /* desktop méret */
 }
 
 /* --- Map overlay UI --- */
