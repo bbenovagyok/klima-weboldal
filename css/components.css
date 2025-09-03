@@ -241,3 +241,18 @@ html.no-scroll, body.no-scroll{ height:100%; overflow:hidden; touch-action:none;
   .service-card::after{ animation:none !important; opacity:0 !important; }
 }
 
+/* Városfelirat (Leaflet tooltip) – ne vágjuk el, pill alak, erősebb kontraszt */
+.leaflet-tooltip.city-label{
+  max-width: none;            /* ne korlátozzuk a szélességet */
+  white-space: nowrap;        /* egy sorban maradjon */
+  overflow: visible;          /* semmit ne rejtsen el */
+  background: rgba(255,255,255,.96);
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 9999px;
+  padding: 6px 10px;
+  box-shadow: 0 8px 18px rgba(0,0,0,.12);
+  color: #0b1f2a;
+  font: 800 12px/1 Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+
