@@ -587,7 +587,86 @@
 
     window.addEventListener('DOMContentLoaded', initWorkMap);
   </script>
+
+
+<!-- Cookie (Süti) sáv – illeszd be a </body> elé -->
+<style>
+  #cookie-consent {
+    transform: translateY(100%);
+    opacity: 0;
+    transition: transform .5s cubic-bezier(.22,.61,.36,1), opacity .5s ease;
+    pointer-events: none;
+  }
+  #cookie-consent.show {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #cookie-consent { transition: none; }
+  }
+</style>
+
+<div id="cookie-consent" class="fixed left-0 right-0 bottom-0 z-[200]">
+  <div class="mx-auto max-w-3xl mb-4 px-4">
+    <div class="bg-white/95 backdrop-blur-md border border-cyan-700/20 rounded-2xl shadow-xl p-4 md:p-5 flex flex-col md:flex-row items-start md:items-center gap-4">
+      <div class="hidden sm:block shrink-0">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M21 12a9 9 0 1 1-9-9 4 4 0 0 0 4 4 4 4 0 0 0 4 4 1 1 0 0 0 1 1Z" stroke="#0e7490" stroke-width="1.5" fill="#cffafe"/>
+        </svg>
+      </div>
+      <p class="text-sm text-gray-700 leading-relaxed">
+        Ez a weboldal sütiket használ a működéshez és a látogatottság méréséhez. Az
+        <span class="font-semibold">„Elfogadom”</span> gombbal hozzájárulsz ezek használatához.
+        <a href="/adatkezeles" class="underline text-cyan-700 hover:text-cyan-800">Részletek</a>
+      </p>
+      <div class="flex items-center gap-2 md:ml-auto">
+        <button id="cookie-decline"
+          class="px-3 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm">
+          Csak szükséges
+        </button>
+        <button id="cookie-accept"
+          class="px-3 py-2 rounded-lg bg-cyan-600 text-white hover:bg-cyan-700 text-sm font-semibold">
+          Elfogadom
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const KEY = 'cookieConsent-v1';
+  const saved = localStorage.getItem(KEY);
+  const bar = document.getElementById('cookie-consent');
+
+  // ha még nincs döntés, mutatjuk a sávot
+  if (!saved) {
+    requestAnimationFrame(() => bar.classList.add('show'));
+  } else {
+    // opcionális jelző más kódnak
+    try { window.COOKIE_CONSENT = JSON.parse(saved).accepted; } catch{}
+  }
+
+  const hide = () => {
+    bar.classList.remove('show');
+    setTimeout(() => bar.remove(), 600);
+  };
+
+  document.getElementById('cookie-accept')?.addEventListener('click', () => {
+    localStorage.setItem(KEY, JSON.stringify({ accepted: true, date: new Date().toISOString() }));
+    window.COOKIE_CONSENT = true;
+    hide();
+  });
+
+  document.getElementById('cookie-decline')?.addEventListener('click', () => {
+    localStorage.setItem(KEY, JSON.stringify({ accepted: false, date: new Date().toISOString() }));
+    window.COOKIE_CONSENT = false;
+    hide();
+  });
+})();
+</script>
+<!-- /Cookie sáv vége -->
+
 </body>
 </html>
-
-
