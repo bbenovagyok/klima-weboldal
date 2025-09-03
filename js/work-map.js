@@ -46,7 +46,7 @@
     const size = map.getSize();
     const pt = map.latLngToContainerPoint(latlng);
     const minX = px, maxX = size.x - px;
-    const minY = py, maxY = size.y - py;
+    const minY = py,  maxY = size.y - py;
 
     let dx = 0, dy = 0;
     if (pt.x < minX) dx = minX - pt.x;
@@ -95,10 +95,14 @@
 
   // ===== állapot + UI elemek
   let geo, loc;
-  let countyLayer = null;   // ország szintű megye poligonok
-  let cityLayer   = null;   // kiválasztott megye város-pöttyök
+  let countyLayer = null;          // ország szintű megye poligonok
+  let cityLayer   = null;          // kiválasztott megye város-pöttyök
   let selectedCountyKey = null;
   let selectedCountyBounds = null;
+
+  // ÚJ: áttekintő nézet határai
+  let overviewBoundsAll = null;    // összes megye
+  let overviewBoundsActive = null; // csak a kiemelt megyék (locations.json szerint)
 
   let backBtn = null;
   let infoBadge = null;
@@ -126,15 +130,15 @@
     map.on("resize", () => {
       if (selectedCountyKey && selectedCountyBounds) {
         fitBoundsWithPad(map, selectedCountyBounds);
-        // fagyasszuk újra
         const z = map.getZoom();
         map.setMinZoom(z); map.setMaxZoom(z);
         map.setMaxBounds(selectedCountyBounds.pad(0.0015));
       } else if (countyLayer) {
-        fitBoundsWithPad(map, countyLayer.getBounds());
+        const b = overviewBoundsActive || overviewBoundsAll || countyLayer.getBounds();
+        fitBoundsWithPad(map, b);
         const z = map.getZoom();
         map.setMinZoom(z); map.setMaxZoom(z);
-        map.setMaxBounds(countyLayer.getBounds().pad(0.005));
+        map.setMaxBounds(b.pad(0.005));
       }
     });
   }
@@ -151,7 +155,8 @@
 
       unlockView();
       map.invalidateSize();
-      const b = countyLayer.getBounds();
+      // <<< ÚJ: csak a kiemelt megyékre igazít, ha elérhető
+      const b = overviewBoundsActive || overviewBoundsAll || countyLayer.getBounds();
       fitBoundsWithPad(map, b);
       map.setMinZoom(map.getZoom());
       map.setMaxZoom(map.getZoom());
@@ -287,6 +292,21 @@
         layer.on("mouseout",  () => highlighted.has(feature.__key) && layer.setStyle({ fillColor: "#16a34a" }));
       }
     }).addTo(map);
+
+    // === ÚJ: áttekintő határok kiszámolása
+    overviewBoundsAll = countyLayer.getBounds(); // minden megye
+
+    // csak a kiemelt megyék összevont határa
+    countyLayer.eachLayer(l => {
+      if (highlighted.has(l.feature.__key)) {
+        const lb = l.getBounds();
+        if (overviewBoundsActive) {
+          overviewBoundsActive.extend(lb);
+        } else {
+          overviewBoundsActive = L.latLngBounds(lb.getSouthWest(), lb.getNorthEast());
+        }
+      }
+    });
 
     ensureUi();
     showOverview();
