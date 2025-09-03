@@ -1,13 +1,14 @@
 backend:
   name: git-gateway
-  branch: main  # vagy 'master', ha az a fő ág
+  branch: main
 
-media_folder: "img/uploads"     # Ide menti a feltöltött képeket
-public_folder: "/img/uploads"   # Ezen az úton éri el a site
+media_folder: "img/uploads"
+public_folder: "/img/uploads"
 
 collections:
   - name: "gallery"
     label: "Galéria"
+    editor: { preview: false }   # opcionális: JSON-hoz felesleges előnézet
     files:
       - label: "Munkáink Galéria"
         name: "munkaink"
@@ -16,6 +17,7 @@ collections:
           - label: "Galéria Képek"
             name: "images"
             widget: "list"
+            summary: "{{fields.title}}"   # opcionális: sor összefoglaló
             fields:
               - { label: "Kép", name: "image", widget: "image" }
               - { label: "Cím", name: "title", widget: "string" }
@@ -23,6 +25,7 @@ collections:
 
   - name: "locations"
     label: "Munkaterületek"
+    editor: { preview: false }   # opcionális
     files:
       - label: "Helyszínek"
         name: "locations"
@@ -31,6 +34,7 @@ collections:
           - label: "Megyék"
             name: "counties"
             widget: "list"
+            summary: "{{fields.county_name}} — városok: {{fields.cities.length | default(0)}}"
             fields:
               - { label: "Megye neve", name: "county_name", widget: "string", hint: "Pl. Somogy, Veszprém, Fejér" }
               - { label: "Megye kijelölve?", name: "completed", widget: "boolean", default: false }
@@ -38,6 +42,7 @@ collections:
                 name: "cities"
                 widget: "list"
                 collapsed: true
+                summary: "{{fields.city_name}} {{fields.completed | ternary('✓','')}}"
                 fields:
                   - { label: "Város neve", name: "city_name", widget: "string", hint: "Pl. Siófok" }
                   - { label: "Már dolgoztunk itt?", name: "completed", widget: "boolean", default: false }
