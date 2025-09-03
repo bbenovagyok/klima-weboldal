@@ -7,7 +7,15 @@
   const stripDiacritics = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   const clean = s => stripDiacritics(s).replace(/\bmegye\b/gi,'').replace(/\s+/g,' ').trim().toLowerCase();
   const escapeHtml = s => String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const num = v => (v===null||v===undefined) ? NaN : Number(v);
   const isMobile = window.matchMedia('(max-width: 640px)').matches;
+
+  // Kis fallback koordináta-szótár (bővíthető)
+  const CITY_FALLBACKS = {
+    "siófok":       { lat: 46.909, lng: 18.1046 },
+    "veszprém":     { lat: 47.093, lng: 17.911  },
+    "balatonfüred": { lat: 46.961, lng: 17.871  }
+  };
 
   const tryUrls = (file) => [ `data/${file}`, `/data/${file}`, new URL(`data/${file}`, document.baseURI).href ];
   const parseJsonSafe = (txt) => { const noBom = txt.charCodeAt(0)===0xFEFF ? txt.slice(1) : txt; return JSON.parse(noBom); };
@@ -38,7 +46,7 @@
     this.update();
     return this._div;
   };
-  info.update = (html='') => { info._div.innerHTML = html; };
+  info.update = (html='') => { this._div.innerHTML = html; };
   info.addTo(map);
 
   // vissza gomb
@@ -78,10 +86,14 @@
     };
     const getCountyName = f => { const raw=getCountyNameRaw(f); return { display:String(raw).trim(), key:clean(raw) }; };
 
+    // normalize locations
     let countyRows = Array.isArray(locRaw?.counties) ? locRaw.counties : Array.isArray(locRaw) ? locRaw : [];
     countyRows = countyRows.map(r => ({ ...r, _key: clean(r.county_name || r.name || r.megye || r.megye_nev || '') }));
 
-    const highlightedKeys = new Set(countyRows.map(r => r._key).filter(Boolean));
+    const highlightedKeys = new Set(
+      countyRows.filter(r => r.completed === true || r.completed === 'true' || (Array.isArray(r.cities) && r.cities.some(c=>c.completed===true||c.completed==='true')))
+                .map(r => r._key)
+    );
 
     const baseStyle = { fillColor:'#e5e7eb', fillOpacity:0,   color:'#cbd5e1', weight:1, opacity:1, className:'county-outline' };
     const hotStyle  = { fillColor:'#16a34a', fillOpacity:0.55,color:'#15803d', weight:2, opacity:1, className:'county-outline' };
@@ -112,21 +124,40 @@
       citiesLayer.clearLayers();
 
       const row = countyRows.find(r => r._key === key);
-      const cities = (row?.cities || []).filter(c => c && (c.completed === true || c.completed === 'true'));
+      const rawCities = Array.isArray(row?.cities) ? row.cities : [];
+      const cities = rawCities.filter(c => c && (c.completed === true || c.completed === 'true'));
 
-      const pts = [];
-      cities.forEach(c => {
-        const lat = Number(c.lat ?? c.latitude), lng = Number(c.lng ?? c.lon ?? c.longitude);
-        if (Number.isFinite(lat) && Number.isFinite(lng)) {
-          L.marker([lat,lng], { icon: makeCityIcon(c.name || c.varos || '') })
-            .addTo(citiesLayer)
-            .bindPopup(`<b>${escapeHtml(c.name || c.varos || '')}</b><br>${escapeHtml(displayName)} megye`);
-          pts.push([lat,lng]);
+      // ha nincs koordináta: próbáld a szótárból, különben a megye közepe köré szórjuk
+      const base = bounds.getCenter();
+      const n = Math.max(1, cities.length);
+
+      cities.forEach((c, i) => {
+        const name = (c.name || c.city_name || c.varos || '').toString().trim();
+        const keyName = clean(name);
+        let lat = num(c.lat ?? c.latitude);
+        let lng = num(c.lng ?? c.lon ?? c.longitude);
+
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+          const fb = CITY_FALLBACKS[keyName];
+          if (fb) { lat = fb.lat; lng = fb.lng; }
         }
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+          const angle = (i / n) * 2 * Math.PI;
+          const r = 0.06 + (i % 3) * 0.01; // ~pár km szórás
+          lat = base.lat + r * Math.cos(angle);
+          lng = base.lng + r * Math.sin(angle);
+          console.warn(`Koordináta hiányzik: "${name}" – ideiglenesen megye-közép közelébe rakva.`);
+        }
+
+        L.marker([lat,lng], { icon: makeCityIcon(name) })
+          .addTo(citiesLayer)
+          .bindPopup(`<b>${escapeHtml(name)}</b><br>${escapeHtml(displayName)} megye`);
       });
 
       let b = bounds;
+      const pts = citiesLayer.getLayers().map(m => m.getLatLng());
       if (pts.length) b = L.latLngBounds(pts).extend(bounds);
+
       map.fitBounds(b, { padding: isMobile ? [20,20] : [30,30], maxZoom: isMobile ? 11.5 : 12.5 });
 
       if (!map.hasLayer(backCtrl)) backCtrl.addTo(map);
@@ -140,7 +171,6 @@
       info.update('');
     }
 
-    // ha később kell külsőből
     window.__resetWorkMapToCountry = resetToCountry;
   }).catch(err=>{
     console.error(err);
