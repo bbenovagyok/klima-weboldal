@@ -28,14 +28,10 @@
 
   <!-- Saját komponens-stílusok (lightbox + térkép + galéria) -->
   <link rel="stylesheet" href="css/components.css" />
-  <!-- Vélemény-fal külön stílus (külön fájlban kérted) -->
-  <link rel="stylesheet" href="css/reviews-wall.css" />
 
   <!-- Külső saját JS-ek -->
   <script src="js/lightbox.js" defer></script>
   <script src="js/work-map.js" defer></script>
-  <!-- Vélemény-fal JS (külön fájl) -->
-  <script src="js/reviews-wall.js" defer></script>
 
   <style>
     /* Alap tipó + hero + header animáció + reviews sáv „kerete” */
@@ -116,7 +112,6 @@
       0%   { transform: translateX(-160%); }
       100% { transform: translateX(520%); }
     }
-    /* Akik kérik a kevesebb mozgást */
     @media (prefers-reduced-motion: reduce){
       .service-card::after{ animation: none !important; opacity:.4; }
       @media (hover:hover){
@@ -124,10 +119,25 @@
       }
     }
 
-    /* Cookie sáv – itt hagyjuk inline */
-    #cookie-consent {transform: translateY(100%);opacity: 0;transition: transform .5s cubic-bezier(.22,.61,.36,1), opacity .5s ease;pointer-events: none;}
-    #cookie-consent.show {transform: translateY(0);opacity: 1;pointer-events: auto;}
-    @media (prefers-reduced-motion: reduce) {#cookie-consent { transition: none; }}
+    /* ---- Háttérben futó vélemények a vélemény űrlap szekcióhoz ---- */
+    .reviews-bg{
+      position:absolute; inset:0; overflow:hidden; pointer-events:none;
+      opacity:.35;
+    }
+    .reviews-bg::before,
+    .reviews-bg::after{
+      content:""; position:absolute; left:0; right:0; height:72px; z-index:2; pointer-events:none;
+    }
+    .reviews-bg::before{ top:0; background: linear-gradient(to bottom, rgba(243,244,246,1), rgba(243,244,246,0)); }
+    .reviews-bg::after{ bottom:0; background: linear-gradient(to top, rgba(243,244,246,1), rgba(243,244,246,0)); }
+    #reviews-bg-container{
+      display:inline-flex; gap:.75rem; align-items:center; padding-inline:1rem; white-space:nowrap;
+      filter: blur(1px);
+    }
+    .reviews-bg .review-card{
+      background: linear-gradient(to bottom, rgba(255,255,255,.12), rgba(255,255,255,.08));
+      border-color: rgba(255,255,255,.35);
+    }
   </style>
 </head>
 
@@ -173,7 +183,7 @@
           <a href="#kapcsolat" class="bg-yellow-400 text-gray-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition duration-300 shadow-xl inline-block">Ingyenes ajánlat</a>
         </div>
       </div>
-      <!-- Reviews strip -->
+      <!-- Reviews strip (TETEJÉN) -->
       <div class="reviews-strip absolute bottom-0 left-0 right-0 py-4">
         <div class="w-full flex">
           <div id="reviews-container" class="marquee items-center"></div>
@@ -186,7 +196,6 @@
       <div class="container mx-auto px-6">
         <h2 class="text-4xl md:text-5xl font-black text-center mb-12 text-cyan-800 reveal-on-scroll">Szolgáltatásaink</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <!-- HOZZÁADVA: service-card osztály a betöltő-csík animációhoz -->
           <div class="service-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200 reveal-on-scroll">
             <div class="bg-cyan-100 text-cyan-700 rounded-full w-16 h-16 flex items-center justify-center mb-6">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
@@ -197,7 +206,7 @@
 
           <div class="service-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200 reveal-on-scroll" style="--delay:150ms">
             <div class="bg-cyan-100 text-cyan-700 rounded-full w-16 h-16 flex items-center justify-center mb-6">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 002 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
             </div>
             <h3 class="text-xl md:text-2xl font-bold mb-3">Tisztítás és Karbantartás</h3>
             <p class="text-gray-600 leading-relaxed">Tiszta, egészséges levegő – kisebb fogyasztás és hosszabb élettartam rendszeres karbantartással.</p>
@@ -255,9 +264,16 @@
       </div>
     </section>
 
-    <!-- Vélemények – BEKÜLDŐ ŰRLAP -->
-    <section id="velemenyek" class="py-20">
-      <div class="container mx-auto px-6 max-w-3xl">
+    <!-- Vélemények – BEKÜLDŐ ŰRLAP (SÖTÉTEBB SZÜRKE HÁTTÉR + MOZGÓ VÉLEMÉNYEK A HÁTTÉRBEN) -->
+    <section id="velemenyek" class="py-20 bg-gray-200 relative overflow-hidden">
+      <!-- háttérben futó vélemény-lane -->
+      <div class="reviews-bg flex items-center">
+        <div class="w-full flex">
+          <div id="reviews-bg-container" class="marquee items-center"></div>
+        </div>
+      </div>
+
+      <div class="container mx-auto px-6 max-w-3xl relative">
         <h2 class="text-4xl md:text-5xl font-black text-center mb-6 text-cyan-800">Vélemény írása</h2>
         <p class="text-center text-gray-600 mb-8">Írd meg röviden a tapasztalatod – köszönjük!</p>
 
@@ -280,16 +296,6 @@
             <button type="submit" id="submitReviewBtn" class="px-5 py-2 rounded-lg bg-cyan-600 text-white font-semibold hover:bg-cyan-700">Vélemény elküldése</button>
           </div>
         </form>
-      </div>
-    </section>
-
-    <!-- ÚJ: Vélemény-fal – sötétebb szürke sáv, kártyák animációval (külön JS tölti be) -->
-    <section id="velemeny-fal" class="py-20 bg-gray-200">
-      <div class="container mx-auto px-6">
-        <h2 class="text-4xl md:text-5xl font-black text-center mb-10 text-cyan-800">Mit mondanak rólunk?</h2>
-        <div id="reviews-wall" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          <div class="col-span-full text-center text-gray-600 reviews-wall-loading">Vélemények betöltése…</div>
-        </div>
       </div>
     </section>
 
@@ -358,7 +364,8 @@
     catch(e){ console.error("Firebase init fail", e); }
 
     const reviewForm = document.getElementById('reviewForm');
-    const reviewsContainer = document.getElementById('reviews-container');
+    const reviewsContainer = document.getElementById('reviews-container');        // felső sáv
+    const reviewsBgContainer = document.getElementById('reviews-bg-container');  // háttér a űrlap mögött
 
     const buildReview = (text, name, city) => `
       <div class="review-card">
@@ -377,27 +384,29 @@
         {name:"Horváth Éva",city:"Veszprém",review:"A régi, zajos klímánkat cserélték le egy újra. Hatalmas a különbség, köszönjük!"}
       ];
       let lane=''; def.forEach(r=> lane += buildReview(r.review, r.name, r.city));
-      reviewsContainer.innerHTML = lane + lane;
-      window.DEFAULT_REVIEWS = def; // a vélemény-fal is fel tudja használni
+      if (reviewsContainer) reviewsContainer.innerHTML = lane + lane;
+      if (reviewsBgContainer) reviewsBgContainer.innerHTML = lane + lane;
     };
 
     const escapeHtml = s => String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
     async function loadReviews(){
-      reviewsContainer.innerHTML='';
+      if (reviewsContainer) reviewsContainer.innerHTML='';
+      if (reviewsBgContainer) reviewsBgContainer.innerHTML='';
       try{
         const snap = await getDocs(query(collection(db,'reviews'),orderBy('createdAt','desc')));
         if (snap.empty){ loadDefaultReviews(); return; }
-        let lane=''; const arr=[];
+        let lane='';
         snap.forEach(doc=>{
           const r=doc.data();
           const safe = {text:escapeHtml(r.text), name:escapeHtml(r.name), city:escapeHtml(r.city)};
-          arr.push(safe);
           lane += buildReview(safe.text, safe.name, safe.city);
         });
-        reviewsContainer.innerHTML = lane + lane;
-        window.LIVE_REVIEWS = arr; // a vélemény-fal JS ebből is tud dolgozni
-      }catch{ loadDefaultReviews(); }
+        if (reviewsContainer) reviewsContainer.innerHTML = lane + lane;
+        if (reviewsBgContainer) reviewsBgContainer.innerHTML = lane + lane;
+      }catch{
+        loadDefaultReviews();
+      }
     }
 
     if (auth){
