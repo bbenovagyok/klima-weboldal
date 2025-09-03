@@ -151,3 +151,20 @@ html.no-scroll, body.no-scroll{ height:100%; overflow:hidden; touch-action:none;
     padding: 14px 18px;
   }
 }
+/* ===== Service cards – felső „betöltő csík” hoverre ===== */
+.service-card{ position:relative; overflow:hidden; }
+.service-card::before{
+  content:""; position:absolute; top:0; left:-40%;
+  height:4px; width:40%;
+  background:linear-gradient(90deg,transparent,rgba(6,182,212,.95),transparent);
+  transform:skewX(-25deg); opacity:0;
+}
+.service-card:hover::before{ animation:sweep 1.2s ease-out forwards; }
+
+@keyframes sweep{
+  0%{ left:-40%; opacity:0 }
+  15%{ opacity:1 }
+  80%{ left:110%; opacity:1 }
+  100%{ left:120%; opacity:0 }
+}
+
