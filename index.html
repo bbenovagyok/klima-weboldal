@@ -14,18 +14,13 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 
   <!-- Leaflet -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-    crossorigin=""
-  />
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin=""
-  ></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
+  <!-- KÜLSŐ KOMPONENS CSS-ek (lightbox+térkép) -->
+  <link rel="stylesheet" href="css/components.css"/>
+
+  <!-- Saját rövid stílusok -->
   <style>
     body{font-family:'Inter',sans-serif}
     .hero-bg{position:relative;background-image:url('https://i.postimg.cc/3J1W66pj/fdsffsf.jpg');background-size:cover;background-position:center}
@@ -34,10 +29,8 @@
     .text-shadow{ text-shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06)}
     .text-shadow-md{ text-shadow:0 2px 4px rgba(0,0,0,.2)}
     .text-shadow-strong{ text-shadow:0px 1px 4px rgba(0,0,0,.8)}
-
     .reveal-on-scroll{opacity:0;transform:translateY(30px);transition:opacity .8s ease-out,transform .8s ease-out;transition-delay:var(--delay,0ms)}
     .reveal-on-scroll.is-visible{opacity:1;transform:translateY(0)}
-
     #header-container,#header-logo,#header-company-name,#main-nav,#mobile-menu-button{transition:all .5s cubic-bezier(.65,0,.35,1)}
     #header-container{justify-content:space-between}
     #main-header .max-w-6xl{text-align:center}
@@ -47,52 +40,22 @@
     .header-scrolled #header-company-name{font-size:1.125rem}
 
     /* Reviews sáv */
-    .reviews-strip{
-      position: relative;
-      background: linear-gradient(to bottom, rgba(0,32,48,.92), rgba(0,32,48,.96));
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      overflow: hidden;
-    }
-    .reviews-strip::before,
-    .reviews-strip::after{
-      content:"";
-      position:absolute; top:0; bottom:0; width:72px; z-index:2; pointer-events:none;
-    }
-    .reviews-strip::before{ left:0; background: linear-gradient(to right, rgba(0,32,48,.85), rgba(0,32,48,0)); }
-    .reviews-strip::after{ right:0; background: linear-gradient(to left, rgba(0,32,48,.85), rgba(0,32,48,0)); }
-    #reviews-container{
-      display:inline-flex; gap:1rem; align-items:center; padding-inline:1rem; white-space:nowrap;
-    }
-    .review-card{
-      display:inline-flex; align-items:center; gap:.6rem; color:#fff;
-      background: linear-gradient(to bottom, rgba(255,255,255,.10), rgba(255,255,255,.06));
-      border:1px solid rgba(255,255,255,.50);
-      border-radius:9999px;
-      box-shadow: 0 8px 18px rgba(0,0,0,.35);
-      padding:.55rem .9rem; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-    }
-    .review-quote{ width:26px;height:26px;border-radius:9999px; display:inline-flex;align-items:center;justify-content:center; background: rgba(255,255,255,.18); }
-    .review-text{ font-weight:700; letter-spacing:.1px; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
-    .review-meta{ opacity:1; font-weight:600; }
-    .marquee{ animation: marquee 40s linear infinite; will-change: transform; }
-    @media (hover:hover){ .marquee:hover{ animation-play-state: paused; } }
-    @keyframes marquee{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
-
-    /* Térkép */
-    #work-map{ width:100%; height:520px; border-radius:16px; box-shadow:0 20px 45px rgba(0,0,0,.25); overflow:hidden; }
-    @media (max-width:640px){ 
-      /* 2) CSS – mobil magasság + felirat kisebb */
-      #work-map{ height:58vh; min-height:320px; max-height:440px; }
-      .leaflet-tooltip.county-label{ background:transparent; border:none; box-shadow:none; color:#0b1f2a; font-weight:800; letter-spacing:.2px; text-shadow:0 1px 2px rgba(255,255,255,.8); font-size:10px; padding:0; transform:translateY(-2px); }
-    }
-    .leaflet-tooltip.county-label{
-      background:transparent; border:none; box-shadow:none;
-      color:#0b1f2a; font-weight:800; letter-spacing:.2px; text-shadow:0 1px 2px rgba(255,255,255,.8);
-    }
-    .leaflet-container .leaflet-control-attribution{ display:none; }
-    .county-outline{ filter: drop-shadow(0 2px 8px rgba(0,0,0,.35)); }
+    .reviews-strip{position:relative;background:linear-gradient(to bottom,rgba(0,32,48,.92),rgba(0,32,48,.96));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);overflow:hidden}
+    .reviews-strip::before,.reviews-strip::after{content:"";position:absolute;top:0;bottom:0;width:72px;z-index:2;pointer-events:none}
+    .reviews-strip::before{left:0;background:linear-gradient(to right,rgba(0,32,48,.85),rgba(0,32,48,0))}
+    .reviews-strip::after{right:0;background:linear-gradient(to left,rgba(0,32,48,.85),rgba(0,32,48,0))}
+    #reviews-container{display:inline-flex;gap:1rem;align-items:center;padding-inline:1rem;white-space:nowrap}
+    .review-card{display:inline-flex;align-items:center;gap:.6rem;color:#fff;background:linear-gradient(to bottom,rgba(255,255,255,.10),rgba(255,255,255,.06));border:1px solid rgba(255,255,255,.50);border-radius:9999px;box-shadow:0 8px 18px rgba(0,0,0,.35);padding:.55rem .9rem;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+    .review-quote{width:26px;height:26px;border-radius:9999px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.18)}
+    .review-text{font-weight:700;letter-spacing:.1px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+    .review-meta{opacity:1;font-weight:600}
+    .marquee{animation:marquee 40s linear infinite;will-change:transform}
+    @media (hover:hover){.marquee:hover{animation-play-state:paused}}
+    @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
   </style>
+
+  <!-- KÜLSŐ LIGHTBOX JS -->
+  <script src="js/lightbox.js" defer></script>
 </head>
 
 <body class="bg-gray-100 text-gray-800">
@@ -190,7 +153,6 @@
         <!-- Térkép blokk -->
         <div class="mt-8 sm:mt-16 reveal-on-scroll" style="--delay:300ms;">
           <h3 class="text-2xl font-bold text-center text-white mb-6">Ahol már dolgoztunk:</h3>
-
           <div id="work-map" class="mx-auto max-w-5xl"></div>
         </div>
       </div>
@@ -242,7 +204,7 @@
   <!-- Lightbox -->
   <div id="lightbox" class="fixed inset-0 z-[110] flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm hidden transition-opacity duration-300">
     <div id="lightbox-content" class="relative max-w-4xl max-h-[90vh] w-full p-4">
-     <button id="close-lightbox" aria-label="Bezárás">&times;</button>
+      <button id="close-lightbox" aria-label="Bezárás">&times;</button>
       <img id="lightbox-image" src="" alt="" class="max-w-full max-h-[75vh] mx-auto rounded-lg shadow-2xl">
       <div id="lightbox-caption" class="text-center text-white mt-4">
         <h4 id="lightbox-title" class="text-xl font-bold"></h4>
@@ -350,43 +312,13 @@
     });
   </script>
 
-  <!-- UI + Galéria -->
+  <!-- UI + Galéria (lightbox nélkül, mert az külön JS fájl kezeli) -->
   <script>
     // Mobil menü
     const mobileMenuButton=document.getElementById('mobile-menu-button');
     const mobileMenu=document.getElementById('mobile-menu');
     mobileMenuButton?.addEventListener('click',()=>mobileMenu.classList.toggle('hidden'));
     mobileMenu?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>mobileMenu.classList.add('hidden')));
-
-    // Lightbox
-    const galleryContainer=document.getElementById('gallery-container');
-    const lightbox=document.getElementById('lightbox');
-    const lightboxImage=document.getElementById('lightbox-image');
-    const lightboxTitle=document.getElementById('lightbox-title');
-    const lightboxDescription=document.getElementById('lightbox-description');
-    const closeLightboxButton=document.getElementById('close-lightbox');
-   function openLightbox(src, t, d){
-  lightboxImage.src = src;
-  lightboxTitle.textContent = t || '';
-  lightboxDescription.textContent = d || '';
-  lightbox.classList.remove('hidden');
-
-  // háttér görgetés tiltása
-  document.documentElement.classList.add('no-scroll');
-  document.body.classList.add('no-scroll');
-}
-
-function closeLightbox(){
-  lightbox.classList.add('hidden');
-
-  // görgetés vissza
-  document.documentElement.classList.remove('no-scroll');
-  document.body.classList.remove('no-scroll');
-}
-// ESC-re zárás
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && !lightbox.classList.contains('hidden')) closeLightbox();
-});
 
     // Scroll animáció
     function initializeScrollAnimation(){
@@ -397,6 +329,7 @@ document.addEventListener('keydown', (e) => {
     }
     initializeScrollAnimation();
 
+    // Vissza a tetejére + fejléc zsugorítás
     const toTopButton=document.getElementById('to-top-button');
     const header=document.getElementById('main-header');
     window.addEventListener('scroll',()=>{
@@ -405,11 +338,12 @@ document.addEventListener('keydown', (e) => {
       else { toTopButton.classList.add('opacity-0','translate-y-5'); }
     });
 
-    // Galéria betöltése
+    // Galéria betöltése (a lightbox.js kattintással nyit)
     window.addEventListener('DOMContentLoaded', () => {
       fetch('data/gallery.json')
         .then(r => r.json())
         .then(data => {
+          const galleryContainer=document.getElementById('gallery-container');
           galleryContainer.innerHTML = '';
           if (data.images?.length) {
             const safe = s => String(s ?? '').replace(/"/g, '&quot;');
@@ -436,285 +370,62 @@ document.addEventListener('keydown', (e) => {
           }
         })
         .catch(() => {
-          galleryContainer.innerHTML = '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben.</p>';
+          document.getElementById('gallery-container').innerHTML =
+            '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben.</p>';
         });
     });
   </script>
 
-  <!-- TÉRKÉP – HU-ra rászabva, mobil declutter + „Városok száma” -->
-  <script>
-    const initWorkMap = async () => {
-      const mapEl = document.getElementById('work-map');
-      if (!mapEl) return;
+  <!-- TÉRKÉP külön fájlban -->
+  <script src="js/work-map.js" defer></script>
 
-      const isMobile = window.matchMedia('(max-width: 640px)').matches;
+  <!-- Cookie (Süti) sáv -->
+  <style>
+    #cookie-consent{transform:translateY(100%);opacity:0;transition:transform .5s cubic-bezier(.22,.61,.36,1),opacity .5s ease;pointer-events:none}
+    #cookie-consent.show{transform:translateY(0);opacity:1;pointer-events:auto}
+    @media (prefers-reduced-motion:reduce){#cookie-consent{transition:none}}
+  </style>
 
-      // ideiglenes HU keret, amíg a réteg be nem jön
-      const HU_BOUNDS_TMP = L.latLngBounds([45.6, 16.0], [48.7, 22.95]);
-
-      const map = L.map('work-map', {
-        zoomControl: false,
-        dragging: false,
-        scrollWheelZoom: false,
-        doubleClickZoom: false,
-        touchZoom: false,
-        boxZoom: false,
-        keyboard: false,
-        attributionControl: false,
-        zoomSnap: 0,
-        zoomDelta: 0.1
-      });
-
-      // Feliratmentes csempe – így a külföldi város/megye nevek nem zavarják
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap & CARTO'
-      }).addTo(map);
-
-      map.fitBounds(HU_BOUNDS_TMP, { padding: [0,0] });
-
-      // ---- fetch helper-ek ----
-      const tryUrls = (file) => [ `data/${file}`, `/data/${file}`, new URL(`data/${file}`, document.baseURI).href ];
-      const parseJsonSafe = (txt) => { const noBom = txt.charCodeAt(0)===0xFEFF ? txt.slice(1) : txt; return JSON.parse(noBom); };
-      const fetchFirstOk = async (cands) => {
-        let lastErr; for (const u of cands) {
-          try { const r = await fetch(u, { cache:'no-store' }); if(!r.ok) throw new Error(`HTTP ${r.status}`); return parseJsonSafe(await r.text()); }
-          catch(e){ lastErr=e; }
-        }
-        throw lastErr || new Error('Betöltési hiba');
-      };
-
-      // ---- adatok ----
-      let geojson, loc;
-      try {
-        [geojson, loc] = await Promise.all([
-          fetchFirstOk(tryUrls('hungary-counties.json')),
-          fetchFirstOk(tryUrls('locations.json'))
-        ]);
-      } catch (e) {
-        console.error('Térkép betöltési hiba:', e);
-        mapEl.innerHTML = '<p class="text-center text-white">Hiba történt a térkép adatok betöltésekor.</p>';
-        return;
-      }
-      if (!geojson?.type || !Array.isArray(geojson?.features)) {
-        console.error('Hibás GeoJSON:', geojson);
-        mapEl.innerHTML = '<p class="text-center text-white">Hibás GeoJSON (features hiányzik).</p>';
-        return;
-      }
-
-      // ---- név normalizálás ----
-      const stripDiacritics = (s) => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-      const clean = (s) => stripDiacritics(s).replace(/\bmegye\b/gi,'').replace(/\s+/g,' ').trim().toLowerCase();
-      const getCountyNameRaw = (f) => {
-        const p=f?.properties||{};
-        return p.name || p.NAME || p.NAME_1 || p.megye || p.megye_nev || p.megyeNev ||
-               p.county || p.County || p.COUNTY || p.MEGYE || p.NEV || p.Név || p.nev ||
-               p.NUTS_NAME || p.NUTS_NAME_HU || p.TER_NEV || p.TERNEV || p.megye_name || '';
-      };
-      const getCountyName = (f) => { const raw=getCountyNameRaw(f); return { display:String(raw).trim(), key:clean(raw) }; };
-
-      // ---- jelölések + megjelenítendő nevek ----
-      const highlightedKeys = new Set();
-      const cityCompletedCount = {};    // Városok száma (completed true) megyénként
-      const geoDisplayByKey = new Map();
-
-      geojson.features.forEach(f => {
-        const { display, key } = getCountyName(f);
-        if (key) geoDisplayByKey.set(key, display);
-      });
-
-      const ensureCountEntry = (key) => { if (!(key in cityCompletedCount)) cityCompletedCount[key]=0; };
-
-      if (Array.isArray(loc?.counties)) {
-        loc.counties.forEach(co => {
-          const cName = co.county_name || co.name || co.megye || co.megye_nev || '';
-          const key = clean(cName||'');
-          if (!key) return;
-          highlightedKeys.add(key);
-          ensureCountEntry(key);
-          (co.cities || []).forEach(c => { if (c?.completed) cityCompletedCount[key] += 1; });
-        });
-      } else if (Array.isArray(loc)) {
-        // Alternatív struktúra támogatása
-        loc.forEach(row => {
-          const cName = row.county_name || row.county || row.megye || '';
-          const key = clean(cName||'');
-          if (!key) return;
-          highlightedKeys.add(key);
-          ensureCountEntry(key);
-          if (row?.cities?.length) row.cities.forEach(c => { if (c?.completed) cityCompletedCount[key] += 1; });
-          else if (row?.completed) cityCompletedCount[key] += 1; // ha county-szintű completed van
-        });
-      }
-
-      // ---- stílusok ----
-      const baseStyle = { fillColor:'#e5e7eb', fillOpacity:0.0, color:'#cbd5e1', weight:1, opacity:1, className:'county-outline' };
-      const hotStyle  = { fillColor:'#16a34a', fillOpacity:0.6, color:'#15803d', weight:2, opacity:1, className:'county-outline' };
-
-      // ---- réteg ----
-      const layer = L.geoJSON(geojson, {
-        style: f => highlightedKeys.has(getCountyName(f).key) ? hotStyle : baseStyle,
-        onEachFeature: (feature, lyr) => {
-          const { key } = getCountyName(feature);
-          const displayName = geoDisplayByKey.get(key) || 'Ismeretlen megye';
-          const isHot = highlightedKeys.has(key);
-          const count = cityCompletedCount[key] || 0;
-
-          // 3) Mobilon csak a zöld megyék felirata
-          if (!isMobile || isHot) {
-            lyr.bindTooltip(displayName, { permanent:true, direction:'center', className:'county-label' }).openTooltip();
-          }
-
-          // Hover finomság
-          lyr.on('mouseover', () => isHot ? lyr.setStyle({ fillColor:'#15803d' }) : null);
-          lyr.on('mouseout',  () => isHot ? lyr.setStyle({ fillColor:'#16a34a' }) : null);
-
-          // Popup
-          lyr.on('click', () => {
-            const b = lyr.getBounds();
-            const msg = isHot
-              ? `<b>${displayName}</b><br>Városok száma: <b>${count}</b>`
-              : `<b>${displayName}</b><br>Még nincs jelölt munka.`;
-            L.popup({ closeButton:true, autoClose:true })
-              .setLatLng(b.getCenter()).setContent(msg).openOn(map);
-          });
-        }
-      }).addTo(map);
-
-      // HU keretre feszítés szűk peremmel; mobilon még rázoom
-      const b = layer.getBounds();
-      map.fitBounds(b, { padding: [2,2] });
-      let z = map.getZoom();
-      if (isMobile) {
-        map.setView(b.getCenter(), z + 0.4); // kicsit közelebb
-        z = map.getZoom();
-      }
-      map.setMinZoom(z);
-      map.setMaxZoom(z);
-      map.setMaxBounds(b.pad(0.005));
-
-      // teljesen statikus nézet
-      map.dragging.disable();
-      map.scrollWheelZoom.disable();
-      map.doubleClickZoom.disable();
-      map.touchZoom.disable();
-      map.boxZoom.disable();
-      map.keyboard.disable();
-      if (map.tap) map.tap.disable();
-    };
-
-    window.addEventListener('DOMContentLoaded', initWorkMap);
-  </script>
-
-
-<!-- Cookie (Süti) sáv – illeszd be a </body> elé -->
-<style>
-  #cookie-consent {
-    transform: translateY(100%);
-    opacity: 0;
-    transition: transform .5s cubic-bezier(.22,.61,.36,1), opacity .5s ease;
-    pointer-events: none;
-  }
-  #cookie-consent.show {
-    transform: translateY(0);
-    opacity: 1;
-    pointer-events: auto;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    #cookie-consent { transition: none; }
-  }
-
-/* ===== Lightbox – mobil fixek ===== */
-#lightbox{
-  height: 100vh;            /* fallback */
-  height: 100dvh;           /* helyes mobil magasság */
-  overscroll-behavior: contain;
-}
-html.no-scroll, body.no-scroll{
-  height: 100%;
-  overflow: hidden;         /* háttér nem görgethető */
-  touch-action: none;
-}
-#close-lightbox{
-  position: fixed;          /* ne csússzon el a tartalommal */
-  top: calc(env(safe-area-inset-top, 0px) + 12px);
-  right: calc(env(safe-area-inset-right, 0px) + 12px);
-  z-index: 9999;
-  width: 44px; height: 44px; border-radius: 9999px;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(0,0,0,.55);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-  color: #fff; font-size: 28px; line-height: 1;
-}
-#close-lightbox:focus{ outline: 2px solid #fff; outline-offset: 2px; }
-
-/* a kép ne lógjon ki – maradjon látható a bezáró alatt */
-#lightbox-image{
-  max-height: calc(100dvh - 120px);
-  object-fit: contain;
-}
-</style>
-
-<div id="cookie-consent" class="fixed left-0 right-0 bottom-0 z-[200]">
-  <div class="mx-auto max-w-3xl mb-4 px-4">
-    <div class="bg-white/95 backdrop-blur-md border border-cyan-700/20 rounded-2xl shadow-xl p-4 md:p-5 flex flex-col md:flex-row items-start md:items-center gap-4">
-      <div class="hidden sm:block shrink-0">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M21 12a9 9 0 1 1-9-9 4 4 0 0 0 4 4 4 4 0 0 0 4 4 1 1 0 0 0 1 1Z" stroke="#0e7490" stroke-width="1.5" fill="#cffafe"/>
-        </svg>
-      </div>
-      <p class="text-sm text-gray-700 leading-relaxed">
-        Ez a weboldal sütiket használ a működéshez és a látogatottság méréséhez. Az
-        <span class="font-semibold">„Elfogadom”</span> gombbal hozzájárulsz ezek használatához.
-      </p>
-      <div class="flex items-center gap-2 md:ml-auto">
-        <button id="cookie-decline"
-          class="px-3 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm">
-          Csak szükséges
-        </button>
-        <button id="cookie-accept"
-          class="px-3 py-2 rounded-lg bg-cyan-600 text-white hover:bg-cyan-700 text-sm font-semibold">
-          Elfogadom
-        </button>
+  <div id="cookie-consent" class="fixed left-0 right-0 bottom-0 z-[200]">
+    <div class="mx-auto max-w-3xl mb-4 px-4">
+      <div class="bg-white/95 backdrop-blur-md border border-cyan-700/20 rounded-2xl shadow-xl p-4 md:p-5 flex flex-col md:flex-row items-start md:items-center gap-4">
+        <div class="hidden sm:block shrink-0">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M21 12a9 9 0 1 1-9-9 4 4 0 0 0 4 4 4 4 0 0 0 4 4 1 1 0 0 0 1 1Z" stroke="#0e7490" stroke-width="1.5" fill="#cffafe"/>
+          </svg>
+        </div>
+        <p class="text-sm text-gray-700 leading-relaxed">
+          Ez a weboldal sütiket használ a működéshez és a látogatottság méréséhez.
+          Az <span class="font-semibold">„Elfogadom”</span> gombbal hozzájárulsz ezek használatához.
+        </p>
+        <div class="flex items-center gap-2 md:ml-auto">
+          <button id="cookie-decline" class="px-3 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm">Csak szükséges</button>
+          <button id="cookie-accept" class="px-3 py-2 rounded-lg bg-cyan-600 text-white hover:bg-cyan-700 text-sm font-semibold">Elfogadom</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<script>
-(() => {
-  const KEY = 'cookieConsent-v1';
-  const saved = localStorage.getItem(KEY);
-  const bar = document.getElementById('cookie-consent');
+  <script>
+  (() => {
+    const KEY = 'cookieConsent-v1';
+    const saved = localStorage.getItem(KEY);
+    const bar = document.getElementById('cookie-consent');
+    if (!saved) { requestAnimationFrame(() => bar.classList.add('show')); }
+    else { try{ window.COOKIE_CONSENT = JSON.parse(saved).accepted; }catch{} }
 
-  // ha még nincs döntés, mutatjuk a sávot
-  if (!saved) {
-    requestAnimationFrame(() => bar.classList.add('show'));
-  } else {
-    // opcionális jelző más kódnak
-    try { window.COOKIE_CONSENT = JSON.parse(saved).accepted; } catch{}
-  }
+    const hide = () => { bar.classList.remove('show'); setTimeout(() => bar.remove(), 600); };
 
-  const hide = () => {
-    bar.classList.remove('show');
-    setTimeout(() => bar.remove(), 600);
-  };
-
-  document.getElementById('cookie-accept')?.addEventListener('click', () => {
-    localStorage.setItem(KEY, JSON.stringify({ accepted: true, date: new Date().toISOString() }));
-    window.COOKIE_CONSENT = true;
-    hide();
-  });
-
-  document.getElementById('cookie-decline')?.addEventListener('click', () => {
-    localStorage.setItem(KEY, JSON.stringify({ accepted: false, date: new Date().toISOString() }));
-    window.COOKIE_CONSENT = false;
-    hide();
-  });
-})();
-</script>
-<!-- /Cookie sáv vége -->
-
+    document.getElementById('cookie-accept')?.addEventListener('click', () => {
+      localStorage.setItem(KEY, JSON.stringify({ accepted: true, date: new Date().toISOString() }));
+      window.COOKIE_CONSENT = true; hide();
+    });
+    document.getElementById('cookie-decline')?.addEventListener('click', () => {
+      localStorage.setItem(KEY, JSON.stringify({ accepted: false, date: new Date().toISOString() }));
+      window.COOKIE_CONSENT = false; hide();
+    });
+  })();
+  </script>
+  <!-- /Cookie sáv vége -->
 </body>
 </html>
-
