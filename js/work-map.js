@@ -25,6 +25,40 @@
     throw last || new Error("Betöltési hiba");
   };
 
+  // ===== belső padding + pan segédek (hogy a címkék ne lógjanak ki)
+  function _innerPad(map) {
+    const s = map.getSize();
+    // kb. 8% szélesség, 24–120 px közé szorítva
+    const p = Math.round(Math.min(120, Math.max(24, s.x * 0.08)));
+    return [p, p];
+  }
+  function fitBoundsWithPad(map, bounds, opts = {}) {
+    const [px, py] = _innerPad(map);
+    map.fitBounds(bounds, {
+      paddingTopLeft: [px, py],
+      paddingBottomRight: [px, py],
+      ...opts
+    });
+  }
+  // pan egy pontot belülre hoz paddinggal (fallback, ha a natív panInside hiányzik)
+  function panCityInside(map, latlng) {
+    const [px, py] = _innerPad(map);
+    const size = map.getSize();
+    const pt = map.latLngToContainerPoint(latlng);
+    const minX = px, maxX = size.x - px;
+    const minY = py, maxY = size.y - py;
+
+    let dx = 0, dy = 0;
+    if (pt.x < minX) dx = minX - pt.x;
+    else if (pt.x > maxX) dx = maxX - pt.x;
+    if (pt.y < minY) dy = minY - pt.y;
+    else if (pt.y > maxY) dy = maxY - pt.y;
+
+    if (dx !== 0 || dy !== 0) {
+      map.panBy([dx, dy], { animate: true, duration: 0.5 });
+    }
+  }
+
   // ===== Leaflet alap
   const HU_TMP = L.latLngBounds([45.6, 16.0], [48.7, 22.95]);
 
@@ -46,7 +80,7 @@
     maxZoom: 22
   }).addTo(map);
 
-  map.fitBounds(HU_TMP, { padding: [0, 0] });
+  fitBoundsWithPad(map, HU_TMP);
 
   function setInteractions(on) {
     const f = on ? "enable" : "disable";
@@ -64,6 +98,7 @@
   let countyLayer = null;   // ország szintű megye poligonok
   let cityLayer   = null;   // kiválasztott megye város-pöttyök
   let selectedCountyKey = null;
+  let selectedCountyBounds = null;
 
   let backBtn = null;
   let infoBadge = null;
@@ -86,11 +121,28 @@
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && !backBtn.classList.contains("hidden")) showOverview();
     });
+
+    // Átméretezéskor igazítsuk újra az éppen látható nézetet
+    map.on("resize", () => {
+      if (selectedCountyKey && selectedCountyBounds) {
+        fitBoundsWithPad(map, selectedCountyBounds);
+        // fagyasszuk újra
+        const z = map.getZoom();
+        map.setMinZoom(z); map.setMaxZoom(z);
+        map.setMaxBounds(selectedCountyBounds.pad(0.0015));
+      } else if (countyLayer) {
+        fitBoundsWithPad(map, countyLayer.getBounds());
+        const z = map.getZoom();
+        map.setMinZoom(z); map.setMaxZoom(z);
+        map.setMaxBounds(countyLayer.getBounds().pad(0.005));
+      }
+    });
   }
 
   // ===== nézetek
   function showOverview() {
     selectedCountyKey = null;
+    selectedCountyBounds = null;
     if (cityLayer) { map.removeLayer(cityLayer); cityLayer = null; }
 
     if (countyLayer) {
@@ -100,7 +152,7 @@
       unlockView();
       map.invalidateSize();
       const b = countyLayer.getBounds();
-      map.fitBounds(b, { padding: [2, 2] });
+      fitBoundsWithPad(map, b);
       map.setMinZoom(map.getZoom());
       map.setMaxZoom(map.getZoom());
       map.setMaxBounds(b.pad(0.005));
@@ -122,15 +174,14 @@
     countyLayer.eachLayer(l => { if (l.feature.__key === countyKey) target = l; });
     if (!target) return;
     const b = target.getBounds();
+    selectedCountyBounds = b;
 
-    // Töltse ki szinte teljesen a dobozt: minimális padding px-ben
-    const pad = Math.max(6, mapEl.clientWidth < 640 ? 8 : 12);
-
-    // finom animáció a megyére, "cover" hatás
+    // finom animáció a megyére, dinamikus paddinggal
     map.invalidateSize();
+    const [px, py] = _innerPad(map);
     map.flyToBounds(b, {
-      paddingTopLeft:     [pad, pad],
-      paddingBottomRight: [pad, pad],
+      paddingTopLeft:     [px, py],
+      paddingBottomRight: [px, py],
       duration: 0.65,
       easeLinearity: 0.25
     });
@@ -165,10 +216,14 @@
 
       marker.bindTooltip(String(c.city_name || c.name), {
         permanent: true,
-        direction: "right",
+        direction: "auto",       // automatikus irány, hogy kevésbé lógjon ki
         offset: [8, 0],
         className: "city-label"
       }).openTooltip();
+
+      // interakció esetén biztosan belülre hozzuk
+      marker.on("click", () => panCityInside(map, marker.getLatLng()));
+      marker.on("mouseover", () => panCityInside(map, marker.getLatLng()));
     });
 
     infoBadge.textContent = cities.length
