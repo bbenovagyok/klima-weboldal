@@ -172,6 +172,9 @@
   let backBtn = null;
   let infoBadge = null;
 
+  /* <<< ÚJ: kiemelt megyék halmaza az overview-hez >>> */
+  let highlightedSet = null;
+
   function ensureUi() {
     if (!backBtn) {
       backBtn = document.createElement("button");
@@ -204,6 +207,20 @@
     return targetZoom;
   }
 
+  // <<< ÚJ: csak a kiemelt megyék egyesített határára illeszkedünk >>>
+  function getHighlightedBounds() {
+    if (!countyLayer || !highlightedSet || !highlightedSet.size) return null;
+    let merged = null;
+    countyLayer.eachLayer(l => {
+      const k = l.feature?.__key;
+      if (highlightedSet.has(k)) {
+        const lb = l.getBounds();
+        merged = merged ? merged.extend(lb) : lb;
+      }
+    });
+    return merged;
+  }
+
   function showOverview() {
     selectedCountyKey = null;
     if (cityLayer) { map.removeLayer(cityLayer); cityLayer = null; }
@@ -215,15 +232,15 @@
       unlockView();
       map.invalidateSize();
 
-      const b = countyLayer.getBounds();
-      const z = applyFitZoomWithBump(b);
+      const bounds = getHighlightedBounds() || countyLayer.getBounds();
+      const z = applyFitZoomWithBump(bounds);
 
       // Mozgás végén „fagyasszuk be”
       const freeze = () => {
         map.off("moveend", freeze);
         map.setMinZoom(z);
         map.setMaxZoom(z);
-        map.setMaxBounds(b.pad(0.005));
+        map.setMaxBounds(bounds.pad(0.005));
       };
       map.on("moveend", freeze);
     }
@@ -318,7 +335,7 @@
     ]);
 
     // megye kulcsok + feliratok
-    const highlighted = new Set();
+    highlightedSet = new Set();
 
     (geo.features || []).forEach(f => {
       const p = f.properties || {};
@@ -333,7 +350,7 @@
     const arr = Array.isArray(loc?.counties) ? loc.counties : (Array.isArray(loc) ? loc : []);
     arr.forEach(c => {
       const k = keyOf(c.county_name || c.megye || c.name || "");
-      if (k) highlighted.add(k);
+      if (k) highlightedSet.add(k);
     });
 
     const baseStyle = {
@@ -348,7 +365,7 @@
     };
 
     countyLayer = L.geoJSON(geo, {
-      style: f => highlighted.has(f.__key) ? hotStyle : baseStyle,
+      style: f => highlightedSet.has(f.__key) ? hotStyle : baseStyle,
       onEachFeature: (feature, layer) => {
         layer.feature.__key = feature.__key;
 
@@ -359,8 +376,8 @@
         }).openTooltip();
 
         layer.on("click", () => showCounty(feature.__key));
-        layer.on("mouseover", () => highlighted.has(feature.__key) && layer.setStyle({ fillColor: "#15803d" }));
-        layer.on("mouseout",  () => highlighted.has(feature.__key) && layer.setStyle({ fillColor: "#16a34a" }));
+        layer.on("mouseover", () => highlightedSet.has(feature.__key) && layer.setStyle({ fillColor: "#15803d" }));
+        layer.on("mouseout",  () => highlightedSet.has(feature.__key) && layer.setStyle({ fillColor: "#16a34a" }));
       }
     }).addTo(map);
 
