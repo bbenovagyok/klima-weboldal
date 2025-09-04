@@ -50,7 +50,10 @@
       "county_name": "Vas",
       "cities": [
         {
-          "city_name": "szombathely"
+          "city_name": "Szombathely"
+        },
+        {
+          "city_name": "Sárvár"
         }
       ]
     }
