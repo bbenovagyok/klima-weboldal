@@ -185,22 +185,24 @@
 
   /* ===================== Zoom helper (stabil) ===================== */
   function applyFitZoomWithBump(bounds) {
-    // illeszkedő zoom kis korrigálással
-    const fitZoom    = map.getBoundsZoom(bounds, true);
-    const bump       = mapEl.clientWidth < 640 ? 0.20 : 0.05; // mobil kicsit kijjebb
-    const targetZoom = Math.min(22, fitZoom + bump);
+  const fitZoom    = map.getBoundsZoom(bounds, true);
+  const bump       = mapEl.clientWidth < 640 ? -0.55 : -0.60;
+  const targetZoom = Math.min(22, fitZoom + bump);
 
-    const padPx = mapEl.clientWidth < 640 ? 8 : 12;
-    // flyToBounds: biztosan „be is veszi” a határokat – szélső megyéknél (Vas) ez a stabil
-    map.flyToBounds(bounds, {
-      maxZoom: targetZoom,
-      paddingTopLeft: [padPx, padPx],
-      paddingBottomRight: [padPx, padPx],
-      duration: 0.50,
-      easeLinearity: 0.15
-    });
-    return targetZoom;
-  }
+  // Aszimmetrikus padding – NAGYOBB JOBB OLDAL
+  const PAD = mapEl.clientWidth < 640
+    ? { L: 10, T: 8,  R: 140, B: 16 }   // mobil
+    : { L: 16, T: 12, R: 240, B: 20 };  // desktop
+
+  map.flyToBounds(bounds, {
+    maxZoom: targetZoom,
+    paddingTopLeft:     [PAD.L, PAD.T],
+    paddingBottomRight: [PAD.R, PAD.B],
+    duration: 0.50,
+    easeLinearity: 0.15
+  });
+  return targetZoom;
+}
 
   /* ===================== Nézetek ===================== */
   function showOverview() {
