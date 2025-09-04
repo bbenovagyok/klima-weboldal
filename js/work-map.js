@@ -197,7 +197,7 @@
     // "cover" zoom: számolunk egy illeszkedő zoomot, majd finoman állítunk rajta
     const fitZoom   = map.getBoundsZoom(bounds, true);
     // kisebb ráemelés (mobil / desktop) – mobilon picit kijjebb, desktopon épphogy beljebb
-    const bump      = mapEl.clientWidth < 640 ? -0.30 : -0.40;
+    const bump      = mapEl.clientWidth < 640 ? -0.55 : -0.40;
     const targetZoom = Math.min(22, fitZoom + bump);
 
     map.flyTo(bounds.getCenter(), targetZoom, { duration: 0.50, easeLinearity: 0.15 });
