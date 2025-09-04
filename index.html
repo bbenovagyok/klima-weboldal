@@ -295,6 +295,32 @@
         </form>
       </div>
     </section>
+
+    <!-- KAPCSOLAT – CTA blokk visszarakva -->
+    <section id="kapcsolat" class="py-20 bg-cyan-700 text-white">
+      <div class="container mx-auto px-6 text-center">
+        <h2 class="text-4xl md:text-5xl font-black mb-4 reveal-on-scroll">Készen áll a tökéletes klímára?</h2>
+        <p class="text-xl mb-8 text-cyan-100 reveal-on-scroll" style="--delay:150ms">
+          Hívjon minket bizalommal időpontért vagy egyedi ajánlatért!
+        </p>
+
+        <div class="inline-block bg-white/90 text-cyan-800 rounded-xl p-8 shadow-2xl reveal-on-scroll" style="--delay:300ms">
+          <p class="text-lg mb-2">Időpontegyeztetés telefonon:</p>
+          <a href="tel:+36709304841" class="text-4xl font-bold hover:text-cyan-600 transition-colors duration-300 flex items-center justify-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.518.759a1 1 0 00-.43 1.659l4.592 4.592a1 1 0 001.659-.43l.759-1.518a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+            +36 70 930 4841
+          </a>
+          <p class="mt-4 text-sm text-gray-600">Hívható hétköznap 8:00 és 18:00 között.</p>
+        </div>
+
+        <div class="mt-6 reveal-on-scroll" style="--delay:400ms">
+          <p class="text-cyan-200">Vagy írjon e-mailt:</p>
+          <a href="mailto:sandor.szanto@gmail.com" class="text-cyan-100 hover:text-white font-semibold transition-colors duration-300">
+            sandor.szanto@gmail.com
+          </a>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- Lightbox -->
@@ -415,7 +441,7 @@
               function applyMobileClamp() {
                 if (isMobile.matches) {
                   items.slice(4).forEach(el => el.classList.toggle('mobile-hidden', !expanded));
-                  toggleWrap.classList.remove('hidden'); // gomb látszik mobilon
+                  toggleWrap.classList.remove('hidden'); // gomb mobilon látszik
                 } else {
                   items.forEach(el => el.classList.remove('mobile-hidden')); // desktop: mind látszik
                   expanded = true;
