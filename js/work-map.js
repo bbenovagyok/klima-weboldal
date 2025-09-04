@@ -3,11 +3,26 @@
   const mapEl = document.getElementById("work-map");
   if (!mapEl) return;
 
+  /* ===================== ÁLLÍTHATÓ PARAMÉTEREK ===================== */
+  // Ha az alap térképet még balrább szeretnéd: növeld a RIGHT paddinget (R),
+  // ha közelebb/távolabb: állíts a bump értéken (negatív = kicsit kijjebb).
+  const ZOOMCFG = {
+    overview: {
+      mobile:  { bump: -0.25, pad: { T:  8, L: 12, R: 170, B: 18 }, duration: 0.50 },
+      desktop: { bump: -0.20, pad: { T: 10, L: 14, R: 220, B: 20 }, duration: 0.50 }
+    },
+    county: {
+      // hogy ne legyen túl közeli a megye nézet (városok jól látszanak)
+      mobile:  { bump: -0.35, pad: { T:  8, L: 12, R: 12,  B: 14 }, duration: 0.55 },
+      desktop: { bump: -0.30, pad: { T: 10, L: 14, R: 14,  B: 16 }, duration: 0.55 }
+    }
+  };
+
   /* ===================== Segédek ===================== */
   const strip = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   const keyOf  = s => strip(s).replace(/\bmegye\b/gi, "").replace(/\s+/g, " ").trim().toLowerCase();
   const sleep  = (ms) => new Promise(r => setTimeout(r, ms));
-  const round5 = n => Math.round(Number(n) * 1e5) / 1e5;  // determinisztikus kerekítés
+  const round5 = n => Math.round(Number(n) * 1e-5) / 1e-5;
 
   const tryUrls = (file) => [
     `data/${file}`,
@@ -27,7 +42,7 @@
     throw last || new Error("Betöltési hiba");
   };
 
-  /* ===== Geokód cache (verzió bump) ===== */
+  /* ===== Geokód cache (új verzió – a régi elcsúszások ne maradjanak) ===== */
   const CACHE_KEY = "geoCache-v3";
   let geoCache = {};
   try { geoCache = JSON.parse(localStorage.getItem(CACHE_KEY) || "{}"); } catch {}
@@ -38,8 +53,8 @@
     try { localStorage.setItem(CACHE_KEY, JSON.stringify(geoCache)); } catch {}
   };
 
-  /* ===== Opcionális offline település-index ===== */
-  let OFFLINE_INDEX = null; // { "iszkaz": {lat, lng}, ... }
+  /* ===== Opcionális offline település-index (ha van) ===== */
+  let OFFLINE_INDEX = null; // { "iszkaz": {lat:.., lng:..}, ... }
   async function loadOfflineIndex() {
     if (OFFLINE_INDEX !== null) return OFFLINE_INDEX;
     try {
@@ -60,21 +75,19 @@
     return OFFLINE_INDEX;
   }
 
-  /* ===== Eredmény „behúzása” a megye bbox-ába ===== */
+  /* ===== Találat behúzása a megye határának bbox-ába ===== */
   function snapWithinBounds(lat, lng, bounds) {
     const minLat = bounds.getSouth(), maxLat = bounds.getNorth();
     const minLng = bounds.getWest(),  maxLng = bounds.getEast();
-    const m = 0.002; // kis margó
+    const m = 0.002; // apró margó
     const clampedLat = Math.min(maxLat - m, Math.max(minLat + m, lat));
     const clampedLng = Math.min(maxLng - m, Math.max(minLng + m, lng));
     return { lat: clampedLat, lng: clampedLng };
   }
 
-  /* ===== Online geokódolás (Nominatim) – county-bias viewbox-szal ===== */
+  /* ===== Online geokódolás (Nominatim) – viewbox a megyére ===== */
   async function geocodeOnline(cityName, countyDisplay, countyBounds) {
-    await sleep(900); // udvarias throttling
-
-    // viewbox: lon1,lat1,lon2,lat2 (Nominatimnál észak van a 2. értékpárban)
+    await sleep(900); // ne spammeljük
     const west  = countyBounds.getWest();
     const south = countyBounds.getSouth();
     const east  = countyBounds.getEast();
@@ -82,8 +95,7 @@
 
     const q = `${cityName}, ${countyDisplay} megye, Magyarország`;
     const url =
-      `https://nominatim.openstreetmap.org/search` +
-      `?format=jsonv2&limit=1&countrycodes=hu&accept-language=hu` +
+      `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=hu&accept-language=hu` +
       `&bounded=1&viewbox=${west},${north},${east},${south}` +
       `&q=${encodeURIComponent(q)}`;
 
@@ -99,7 +111,7 @@
     return null;
   }
 
-  /* ===== Város -> {lat,lng} feloldás ===== */
+  /* ===== Város -> {lat,lng} (cache -> offline -> online -> fallback) ===== */
   async function resolveLatLng(cityName, countyKey, countyDisplay, countyBounds) {
     const hit = cacheGet(countyKey, cityName);
     if (hit) return hit;
@@ -155,6 +167,27 @@
     map.setMaxBounds(null);
   }
 
+  /* ===================== Zoom helper (stabil) ===================== */
+  function flyFit(bounds, mode /* "overview" | "county" */) {
+    const isMobile = mapEl.clientWidth < 640;
+    const cfg = ZOOMCFG[mode][isMobile ? "mobile" : "desktop"];
+
+    // Leaflet számol egy illeszkedő zoomot, mi pedig egy maxZoom-mal kicsit "kijjebb" engedjük (bump)
+    const fitZoom = map.getBoundsZoom(bounds, true);
+    const maxZoom = Math.min(22, fitZoom + cfg.bump);
+
+    const P = cfg.pad; // {T,L,R,B}
+    map.flyToBounds(bounds, {
+      maxZoom,
+      paddingTopLeft:     [P.L, P.T],
+      paddingBottomRight: [P.R, P.B],
+      duration: cfg.duration,
+      easeLinearity: 0.15
+    });
+
+    return maxZoom; // fagyasztáshoz
+  }
+
   /* ===================== Állapot + UI ===================== */
   let geo, loc;
   let countyLayer = null;
@@ -183,27 +216,6 @@
     });
   }
 
-  /* ===================== Zoom helper (stabil) ===================== */
-  function applyFitZoomWithBump(bounds) {
-  const fitZoom    = map.getBoundsZoom(bounds, true);
-  const bump       = mapEl.clientWidth < 640 ? 0.10 : 0.10;
-  const targetZoom = Math.min(22, fitZoom + bump);
-
-  // Aszimmetrikus padding – NAGYOBB JOBB OLDAL
-  const PAD = mapEl.clientWidth < 640
-    ? { L: 10, T: 8,  R: 100, B: 16 }   // mobil
-    : { L: 16, T: 12, R: 200, B: 20 };  // desktop
-
-  map.flyToBounds(bounds, {
-    maxZoom: targetZoom,
-    paddingTopLeft:     [PAD.L, PAD.T],
-    paddingBottomRight: [PAD.R, PAD.B],
-    duration: 0.50,
-    easeLinearity: 0.15
-  });
-  return targetZoom;
-}
-
   /* ===================== Nézetek ===================== */
   function showOverview() {
     selectedCountyKey = null;
@@ -217,13 +229,13 @@
       map.invalidateSize();
 
       const b = countyLayer.getBounds();
-      const z = applyFitZoomWithBump(b);
+      const z = flyFit(b, "overview");
 
       const freeze = () => {
         map.off("moveend", freeze);
         map.setMinZoom(z);
         map.setMaxZoom(z);
-        map.setMaxBounds(b.pad(0.005));
+        map.setMaxBounds(b.pad(0.008));
       };
       map.on("moveend", freeze);
     }
@@ -239,25 +251,23 @@
 
     unlockView();
 
-    // keresett megye réteg + határ
     let target = null;
     countyLayer.eachLayer(l => { if (l.feature.__key === countyKey) target = l; });
     if (!target) return;
     const b = target.getBounds();
 
     map.invalidateSize();
-    const z = applyFitZoomWithBump(b);
+    const z = flyFit(b, "county");
 
     const freeze = () => {
       map.off("moveend", freeze);
       map.setMinZoom(z);
       map.setMaxZoom(z);
-      map.setMaxBounds(b.pad(0.0015));
+      map.setMaxBounds(b.pad(0.0035));
       setInteractions(false);
     };
     map.on("moveend", freeze);
 
-    // városok réteg újra
     if (cityLayer) { map.removeLayer(cityLayer); cityLayer = null; }
     cityLayer = L.layerGroup().addTo(map);
 
