@@ -37,8 +37,15 @@ collections:
             collapsed: false
             summary: "{{fields.county_name}} — városok: {{fields.cities.length | default(0)}}"
             fields:
-              - { label: "Megye neve", name: "county_name", widget: "string", required: true, hint: "Pl. Somogy, Veszprém, Fejér" }
-              - { label: "Megye kijelölve a térképen?", name: "completed", widget: "boolean", default: true }
+              - label: "Megye neve"
+                name: "county_name"
+                widget: "string"
+                required: true
+                hint: "Pl. Somogy, Veszprém, Fejér"
+              - label: "Megye kijelölve a térképen?"
+                name: "completed"
+                widget: "boolean"
+                default: true
               - label: "Városok"
                 name: "cities"
                 widget: "list"
@@ -46,5 +53,9 @@ collections:
                 collapsed: true
                 summary: "{{fields.city_name | default('— (névtelen)')}}"
                 fields:
-                  - { label: "Város neve", name: "city_name", widget: "string", required: true, hint: "Pl. Siófok" }
-                # NINCS lat/lng mező, a rendszer automatikusan kikeresi
+                  - label: "Város neve"
+                    name: "city_name"
+                    widget: "string"
+                    required: true
+                    hint: "Pl. Siófok"
+                # NINCS lat/lng mező – a koordinátákat a rendszer automatikusan kikeresi
