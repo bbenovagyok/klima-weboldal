@@ -6,7 +6,7 @@
   if (!mapEl) return;
 
   /* ======= Ha kész vagy a hangolással, állítsd false-ra ======= */
-  const DEV_TUNER = false;
+  const DEV_TUNER = true;
 
   // --- VÉGLEGES, BEÉGETETT NÉZETBEÁLLÍTÁSOK ---
   const DEFAULT_ZOOMCFG = {
