@@ -8,7 +8,7 @@ public_folder: "/img/uploads"
 collections:
   - name: "gallery"
     label: "Galéria"
-    editor: { preview: false }   # opcionális: JSON-hoz felesleges előnézet
+    editor: { preview: false }
     files:
       - label: "Munkáink Galéria"
         name: "munkaink"
@@ -17,7 +17,7 @@ collections:
           - label: "Galéria Képek"
             name: "images"
             widget: "list"
-            summary: "{{fields.title}}"   # opcionális: sor összefoglaló
+            summary: "{{fields.title}}"
             fields:
               - { label: "Kép", name: "image", widget: "image" }
               - { label: "Cím", name: "title", widget: "string" }
@@ -25,7 +25,7 @@ collections:
 
   - name: "locations"
     label: "Munkaterületek"
-    editor: { preview: false }   # opcionális
+    editor: { preview: false }
     files:
       - label: "Helyszínek"
         name: "locations"
@@ -34,31 +34,14 @@ collections:
           - label: "Megyék"
             name: "counties"
             widget: "list"
-            summary: "{{fields.county_name}} — városok: {{fields.cities.length | default(0)}}"
+            summary: "{{fields.county_name}} — városok: {{fields.cities.length}}"
             fields:
               - { label: "Megye neve", name: "county_name", widget: "string", hint: "Pl. Somogy, Veszprém, Fejér" }
-              - { label: "Megye kijelölve?", name: "completed", widget: "boolean", default: false }
               - label: "Városok"
                 name: "cities"
                 widget: "list"
-                collapsed: true
-                summary: "{{fields.city_name}} {{fields.completed | ternary('✓','')}}"
-                fields:
-                  - { label: "Város neve", name: "city_name", widget: "string", hint: "Pl. Siófok" }
-                  - { label: "Már dolgoztunk itt?", name: "completed", widget: "boolean", default: false }
-                  - label: "Szélesség (lat)"
-                    name: "lat"
-                    widget: "number"
-                    value_type: "float"
-                    min: -90
-                    max: 90
-                    step: 0.0001
-                    required: false
-                  - label: "Hosszúság (lng)"
-                    name: "lng"
-                    widget: "number"
-                    value_type: "float"
-                    min: -180
-                    max: 180
-                    step: 0.0001
-                    required: false
+                field:
+                  label: "Város neve"
+                  name: "city"
+                  widget: "string"
+                  hint: "Pl. Siófok"
