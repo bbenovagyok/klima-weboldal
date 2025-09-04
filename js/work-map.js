@@ -180,23 +180,24 @@
   }
 
   function flyFit(bounds, mode /* "overview" | "county" */) {
-    const cfg = currentCfg(mode);
-    const bump = Math.min(0, Number(cfg.bump) || 0);
-    const fitZoom = map.getBoundsZoom(bounds, true);
-    const maxZoom = Math.min(50, fitZoom + bump);
-    const P = cfg.pad || {T:0,L:0,R:0,B:0};
+  const cfg = currentCfg(mode);
+  const bump = Math.min(0, Number(cfg.bump) || 0);
+  const fitZoom = map.getBoundsZoom(bounds, true);
+  const maxZoom = Math.min(22, fitZoom + bump);
+  const P = cfg.pad || {T:0,L:0,R:0,B:0};
 
-    map.flyToBounds(bounds, {
-      maxZoom,
-      paddingTopLeft:     [Number(P.L)||0, Number(P.T)||0],
-      paddingBottomRight: [Number(P.R)||0, Number(P.B)||0],
-      duration: Number(cfg.duration) || 0.35,
-      easeLinearity: 0.25
-    });
+  // EDDIG: map.flyToBounds(...)  ← EZ OKOZZA A KÉTFÁZISÚ „KIUGRÁST”
+  map.fitBounds(bounds, {                      // <-- erre cseréld
+    maxZoom,
+    paddingTopLeft:     [Number(P.L)||0, Number(P.T)||0],
+    paddingBottomRight: [Number(P.R)||0, Number(P.B)||0],
+    animate: true,
+    duration: Number(cfg.duration) || 0.35     // finomabb, rövidebb anim
+    // easeLinearity itt nem kell
+  });
 
-    return { maxZoom, cfg };
-  }
-
+  return { maxZoom, cfg };
+}
   /* ===================== Állapot + UI ===================== */
   let loc;
   let countyLayer = null;
