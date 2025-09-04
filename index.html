@@ -262,7 +262,7 @@
       </div>
     </section>
 
-    <!-- Vélemények – űrlap + sötét(ebb) szürke háttér, kártyák futnak mögötte -->
+    <!-- Vélemények – űrlap -->
     <section id="velemenyek" class="py-20 bg-gray-200 relative overflow-hidden">
       <div class="reviews-bg-vertical" aria-hidden="true">
         <div class="reviews-col" id="rev-col-1"></div>
@@ -293,26 +293,6 @@
             <button type="submit" id="submitReviewBtn" class="px-5 py-2 rounded-lg bg-cyan-600 text-white font-semibold hover:bg-cyan-700">Vélemény elküldése</button>
           </div>
         </form>
-      </div>
-    </section>
-
-    <!-- Kapcsolat -->
-    <section id="kapcsolat" class="py-20 bg-cyan-700 text-white">
-      <div class="container mx-auto px-6 text-center">
-        <h2 class="text-4xl md:text-5xl font-black mb-4 reveal-on-scroll">Készen áll a tökéletes klímára?</h2>
-        <p class="text-xl mb-8 text-cyan-100 reveal-on-scroll" style="--delay:150ms">Hívjon minket bizalommal időpontért vagy egyedi ajánlatért!</p>
-        <div class="inline-block bg-white/90 text-cyan-800 rounded-xl p-8 shadow-2xl reveal-on-scroll" style="--delay:300ms">
-          <p class="text-lg mb-2">Időpontegyeztetés telefonon:</p>
-          <a href="tel:+36709304841" class="text-4xl font-bold hover:text-cyan-600 transition-colors duration-300 flex items-center justify-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.518.759a1 1 0 00-.43 1.659l4.592 4.592a1 1 0 001.659-.43l.759-1.518a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
-            +36 70 930 4841
-          </a>
-          <p class="mt-4 text-sm text-gray-600">Hívható hétköznap 8:00 és 18:00 között.</p>
-        </div>
-        <div class="mt-6 reveal-on-scroll" style="--delay:400ms">
-          <p class="text-cyan-200">Vagy írjon e-mailt:</p>
-          <a href="mailto:sandor.szanto@gmail.com" class="text-cyan-100 hover:text-white font-semibold transition-colors duration-300">sandor.szanto@gmail.com</a>
-        </div>
       </div>
     </section>
   </main>
@@ -376,25 +356,32 @@
           galleryContainer.innerHTML = '';
           if (data.images?.length) {
             const safe = s => String(s ?? '').replace(/"/g, '&quot;');
+
             data.images.forEach((item, i) => {
               const title = item.title || item.cim || '';
               const desc  = item.description || item.leiras || '';
+              const hasCaption = (title && title.trim().length) || (desc && desc.trim().length);
+
               const card = document.createElement('div');
               card.className = 'gallery-item group relative overflow-hidden rounded-lg shadow-lg cursor-pointer reveal-on-scroll';
               card.style.setProperty('--delay', `${i*80}ms`);
               card.setAttribute('data-src', safe(item.image));
               card.setAttribute('data-title', safe(title));
               card.setAttribute('data-description', safe(desc));
+
               card.innerHTML = `
-                <img src="${safe(item.image)}" alt="${safe(title)}"
+                <img src="${safe(item.image)}" alt="${safe(title || 'Galéria kép')}"
                      class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                 <div class="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors duration-300"></div>
+                ${hasCaption ? `
                 <div class="absolute inset-x-0 bottom-0 p-2">
                   <div class="backdrop-blur-md bg-black/40 text-white rounded px-2 py-1 shadow opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
-                    <h4 class="text-xs font-semibold truncate">${safe(title)}</h4>
-                    <p class="hidden sm:block text-[11px] text-white/85 mt-0.5">${safe(desc)}</p>
+                    ${title ? `<h4 class="text-xs font-semibold truncate">${safe(title)}</h4>` : ``}
+                    ${desc  ? `<p class="hidden sm:block text-[11px] text-white/85 mt-0.5">${safe(desc)}</p>` : ``}
                   </div>
-                </div>`;
+                </div>` : ``}
+              `;
+
               galleryContainer.appendChild(card);
             });
 
@@ -416,9 +403,8 @@
             function applyMobileClamp() {
               if (isMobile.matches) {
                 items.slice(4).forEach(el => el.classList.toggle('mobile-hidden', !expanded));
-                toggleWrap.classList.remove('hidden'); // gomb látszik mobilon
+                toggleWrap.classList.remove('hidden');
               } else {
-                // desktopon minden látszik, gomb se kell
                 items.forEach(el => el.classList.remove('mobile-hidden'));
                 expanded = true;
                 toggleWrap.classList.add('hidden');
@@ -431,8 +417,6 @@
             const toggleBtn = document.createElement('button');
             toggleBtn.id = 'gallery-toggle-btn';
             toggleBtn.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 text-cyan-800 font-semibold shadow-md active:scale-[0.98]';
-            const btnIcon = document.createElement('span');
-            btnIcon.className = 'i';
             toggleBtn.innerHTML = '<span class="i">▼</span> <span class="t">Több…</span>';
             toggleWrap.appendChild(toggleBtn);
             galleryContainer.after(toggleWrap);
