@@ -187,7 +187,7 @@
   function applyFitZoomWithBump(bounds) {
     // illeszkedő zoom kis korrigálással
     const fitZoom    = map.getBoundsZoom(bounds, true);
-    const bump       = mapEl.clientWidth < 640 ? -0.50 : 0.10; // mobil kicsit kijjebb
+    const bump       = mapEl.clientWidth < 640 ? -0.50 : 0.30; // mobil kicsit kijjebb
     const targetZoom = Math.min(22, fitZoom + bump);
 
     const padPx = mapEl.clientWidth < 640 ? 8 : 12;
