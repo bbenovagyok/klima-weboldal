@@ -6,17 +6,17 @@
   if (!mapEl) return;
 
   /* ======= Ha kész vagy a hangolással, állítsd false-ra ======= */
-  const DEV_TUNER = true;
+  const DEV_TUNER = false;
 
   // --- VÉGLEGES, BEÉGETETT NÉZETBEÁLLÍTÁSOK ---
   const DEFAULT_ZOOMCFG = {
     overview: {
-      desktop: { bump: -1.30, pad: {T:12, L:8,  R:200, B:20},  shiftX: 0 },
-      mobile:  { bump: -0.95, pad: {T:10, L:8,  R:120, B:16},  shiftX: 0 }
+      desktop: { bump: 0, pad: {T:0, L:0,  R:0, B:100},  shiftX: 100 },
+      mobile:  { bump: -0.6, pad: {T:0, L:0,  R:0, B:0},  shiftX: 45 }
     },
     county: {
-      desktop: { bump: -0.35, pad: {T:14, L:14, R:14,  B:14},  shiftX: 0 },
-      mobile:  { bump: -0.40, pad: {T:12, L:12, R:12,  B:12},  shiftX: 0 }
+      desktop: { bump: -1.5, pad: {T:0, L:0, R:0,  B:0},  shiftX: 0 },
+      mobile:  { bump: -0.5, pad: {T:8, L:12, R:12,  B:14},  shiftX: 0 }
     }
   };
 
