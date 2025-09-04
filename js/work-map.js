@@ -1,28 +1,40 @@
-/* interaktív megye -> város nézet + automata geokódolás (offline->online->fallback, county-bias) */
+/* interaktív megye -> város nézet + geokódolás (offline->online->fallback, county-bias)
+   + Beállító panel (Tuner) mobil/desktop nézethez, mentéssel */
 (() => {
   const mapEl = document.getElementById("work-map");
   if (!mapEl) return;
 
-  /* ===================== ÁLLÍTHATÓ PARAMÉTEREK ===================== */
-  // Ha az alap térképet még balrább szeretnéd: növeld a RIGHT paddinget (R),
-  // ha közelebb/távolabb: állíts a bump értéken (negatív = kicsit kijjebb).
-  const ZOOMCFG = {
+  /* ======= kapcsoló: ha kész vagy a finomhangolással, állítsd false-ra ======= */
+  const DEV_TUNER = true;
+
+  /* ===================== ALAP (gyári) KONFIG ===================== */
+  const DEFAULT_ZOOMCFG = {
     overview: {
       mobile:  { bump: -0.25, pad: { T:  8, L: 12, R: 170, B: 18 }, duration: 0.50 },
       desktop: { bump: -0.20, pad: { T: 10, L: 14, R: 220, B: 20 }, duration: 0.50 }
     },
     county: {
-      // hogy ne legyen túl közeli a megye nézet (városok jól látszanak)
       mobile:  { bump: -0.35, pad: { T:  8, L: 12, R: 12,  B: 14 }, duration: 0.55 },
       desktop: { bump: -0.30, pad: { T: 10, L: 14, R: 14,  B: 16 }, duration: 0.55 }
     }
   };
+
+  const CFG_KEY = "WORKMAP_CFG_V1";
+  function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
+
+  // betöltjük az esetleg korábban elmentett beállításokat
+  let ZOOMCFG = deepClone(DEFAULT_ZOOMCFG);
+  try {
+    const saved = JSON.parse(localStorage.getItem(CFG_KEY) || "null");
+    if (saved && saved.overview && saved.county) ZOOMCFG = saved;
+  } catch {}
 
   /* ===================== Segédek ===================== */
   const strip = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   const keyOf  = s => strip(s).replace(/\bmegye\b/gi, "").replace(/\s+/g, " ").trim().toLowerCase();
   const sleep  = (ms) => new Promise(r => setTimeout(r, ms));
   const round5 = n => Math.round(Number(n) * 1e-5) / 1e-5;
+  const clamp  = (v,min,max)=>Math.min(max,Math.max(min,v));
 
   const tryUrls = (file) => [
     `data/${file}`,
@@ -42,18 +54,17 @@
     throw last || new Error("Betöltési hiba");
   };
 
-  /* ===== Geokód cache (új verzió – a régi elcsúszások ne maradjanak) ===== */
+  /* ===== Cache az eltérések elkerülésére ===== */
   const CACHE_KEY = "geoCache-v3";
   let geoCache = {};
   try { geoCache = JSON.parse(localStorage.getItem(CACHE_KEY) || "{}"); } catch {}
-
   const cacheGet = (countyKey, cityName) => geoCache[`${countyKey}|${keyOf(cityName)}`];
   const cacheSet = (countyKey, cityName, lat, lng) => {
     geoCache[`${countyKey}|${keyOf(cityName)}`] = { lat: round5(lat), lng: round5(lng) };
     try { localStorage.setItem(CACHE_KEY, JSON.stringify(geoCache)); } catch {}
   };
 
-  /* ===== Opcionális offline település-index (ha van) ===== */
+  /* ===== Opcionális offline település-index ===== */
   let OFFLINE_INDEX = null; // { "iszkaz": {lat:.., lng:..}, ... }
   async function loadOfflineIndex() {
     if (OFFLINE_INDEX !== null) return OFFLINE_INDEX;
@@ -69,25 +80,23 @@
         }
       });
       OFFLINE_INDEX = idx;
-    } catch {
-      OFFLINE_INDEX = {};
-    }
+    } catch { OFFLINE_INDEX = {}; }
     return OFFLINE_INDEX;
   }
 
-  /* ===== Találat behúzása a megye határának bbox-ába ===== */
+  /* ===== Találat behúzása a megye bbox-ba ===== */
   function snapWithinBounds(lat, lng, bounds) {
     const minLat = bounds.getSouth(), maxLat = bounds.getNorth();
     const minLng = bounds.getWest(),  maxLng = bounds.getEast();
-    const m = 0.002; // apró margó
+    const m = 0.002;
     const clampedLat = Math.min(maxLat - m, Math.max(minLat + m, lat));
     const clampedLng = Math.min(maxLng - m, Math.max(minLng + m, lng));
     return { lat: clampedLat, lng: clampedLng };
   }
 
-  /* ===== Online geokódolás (Nominatim) – viewbox a megyére ===== */
+  /* ===== Online geokódolás (megye viewbox-bias) ===== */
   async function geocodeOnline(cityName, countyDisplay, countyBounds) {
-    await sleep(900); // ne spammeljük
+    await sleep(900);
     const west  = countyBounds.getWest();
     const south = countyBounds.getSouth();
     const east  = countyBounds.getEast();
@@ -111,7 +120,7 @@
     return null;
   }
 
-  /* ===== Város -> {lat,lng} (cache -> offline -> online -> fallback) ===== */
+  /* ===== Város -> {lat,lng} ===== */
   async function resolveLatLng(cityName, countyKey, countyDisplay, countyBounds) {
     const hit = cacheGet(countyKey, cityName);
     if (hit) return hit;
@@ -123,9 +132,7 @@
     try {
       const online = await geocodeOnline(cityName, countyDisplay, countyBounds);
       if (online) { cacheSet(countyKey, cityName, online.lat, online.lng); return online; }
-    } catch (e) {
-      console.warn("Online geokódolás hiba:", e);
-    }
+    } catch (e) { console.warn("Online geokódolás hiba:", e); }
 
     const c = countyBounds.getCenter();
     const fb = { lat: c.lat, lng: c.lng };
@@ -167,25 +174,26 @@
     map.setMaxBounds(null);
   }
 
-  /* ===================== Zoom helper (stabil) ===================== */
+  /* ===================== Zoom helper ===================== */
   function flyFit(bounds, mode /* "overview" | "county" */) {
     const isMobile = mapEl.clientWidth < 640;
     const cfg = ZOOMCFG[mode][isMobile ? "mobile" : "desktop"];
+    // ne engedjük, hogy túl közel menjen (bump max 0)
+    const bump = Math.min(0, Number(cfg.bump) || 0);
 
-    // Leaflet számol egy illeszkedő zoomot, mi pedig egy maxZoom-mal kicsit "kijjebb" engedjük (bump)
     const fitZoom = map.getBoundsZoom(bounds, true);
-    const maxZoom = Math.min(22, fitZoom + cfg.bump);
+    const maxZoom = Math.min(22, fitZoom + bump);
 
-    const P = cfg.pad; // {T,L,R,B}
+    const P = cfg.pad || {T:0,L:0,R:0,B:0};
     map.flyToBounds(bounds, {
       maxZoom,
-      paddingTopLeft:     [P.L, P.T],
-      paddingBottomRight: [P.R, P.B],
-      duration: cfg.duration,
+      paddingTopLeft:     [Number(P.L)||0, Number(P.T)||0],
+      paddingBottomRight: [Number(P.R)||0, Number(P.B)||0],
+      duration: Number(cfg.duration) || 0.5,
       easeLinearity: 0.15
     });
 
-    return maxZoom; // fagyasztáshoz
+    return maxZoom;
   }
 
   /* ===================== Állapot + UI ===================== */
@@ -287,7 +295,6 @@
         const pos = await resolveLatLng(name, countyKey, countyDisplay, b);
         lat = pos.lat; lng = pos.lng;
       }
-
       ({ lat, lng } = snapWithinBounds(lat, lng, b));
       lat = round5(lat); lng = round5(lng);
 
@@ -315,6 +322,137 @@
 
     backBtn.classList.remove("hidden");
     infoBadge.classList.remove("hidden");
+  }
+
+  /* ===================== Tuner panel (csak DEV_TUNER=true esetén) ===================== */
+  if (DEV_TUNER) {
+    const css = document.createElement("style");
+    css.textContent = `
+      .tuner-panel {
+        position:absolute; right:10px; top:10px; z-index:9999;
+        background:#ffffffcc; backdrop-filter: blur(6px);
+        border:1px solid #cbd5e1; border-radius:12px; padding:10px;
+        font: 12px/1.3 system-ui, -apple-system, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+        color:#0f172a; box-shadow:0 10px 24px rgba(2,6,23,.2);
+        width: 260px;
+      }
+      .tuner-panel h4 { margin:0 0 8px 0; font-size:13px; }
+      .tuner-row { display:flex; align-items:center; gap:6px; margin:6px 0; }
+      .tuner-row label { width:72px; color:#334155; }
+      .tuner-row input[type="number"] { width:70px; padding:3px 6px; border:1px solid #94a3b8; border-radius:8px; }
+      .tuner-row .padbox { width:48px; }
+      .tuner-btns { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+      .tbtn { padding:6px 8px; border-radius:8px; border:1px solid #0ea5e9; color:#0c4a6e; background:#e0f2fe; cursor:pointer; }
+      .tbtn.alt { border-color:#10b981; background:#dcfce7; color:#065f46; }
+      .tbtn.warn { border-color:#f59e0b; background:#fff7ed; color:#78350f; }
+      .tuner-selects { display:flex; gap:6px; margin-bottom:6px; }
+      .tuner-selects select { flex:1; padding:4px 6px; border:1px solid #94a3b8; border-radius:8px; }
+      .muted { color:#64748b; }
+    `;
+    document.head.appendChild(css);
+
+    const panel = document.createElement("div");
+    panel.className = "tuner-panel";
+    panel.innerHTML = `
+      <h4>🛠️ Térkép Tuner</h4>
+      <div class="tuner-selects">
+        <select id="tmode">
+          <option value="overview">Alap nézet</option>
+          <option value="county">Megye nézet</option>
+        </select>
+        <select id="tdevice">
+          <option value="mobile">Mobil</option>
+          <option value="desktop">Desktop</option>
+        </select>
+      </div>
+
+      <div class="tuner-row">
+        <label>Zoom bump</label>
+        <input id="tbump" type="number" step="0.05" min="-2" max="0" />
+        <span class="muted">(negatív = kijjebb)</span>
+      </div>
+
+      <div class="tuner-row"><label>Padding T</label><input id="tpadT" class="padbox" type="number" step="2" min="0" /></div>
+      <div class="tuner-row"><label>Padding L</label><input id="tpadL" class="padbox" type="number" step="2" min="0" /></div>
+      <div class="tuner-row"><label>Padding R</label><input id="tpadR" class="padbox" type="number" step="2" min="0" /></div>
+      <div class="tuner-row"><label>Padding B</label><input id="tpadB" class="padbox" type="number" step="2" min="0" /></div>
+
+      <div class="tuner-btns">
+        <button id="tpreviewOverview" class="tbtn">Előnézet: Alap</button>
+        <button id="tpreviewCounty" class="tbtn">Előnézet: Megye</button>
+        <button id="tsave" class="tbtn alt">Mentés</button>
+        <button id="treset" class="tbtn warn">Gyári vissza</button>
+      </div>
+      <div class="muted" style="margin-top:6px">Tipp: nagyobb <b>R</b> padding = alap nézet balra tolva.</div>
+    `;
+    mapEl.appendChild(panel);
+
+    const $ = (id) => panel.querySelector(id);
+    const els = {
+      mode:   $("#tmode"),
+      dev:    $("#tdevice"),
+      bump:   $("#tbump"),
+      padT:   $("#tpadT"),
+      padL:   $("#tpadL"),
+      padR:   $("#tpadR"),
+      padB:   $("#tpadB"),
+      prevO:  $("#tpreviewOverview"),
+      prevC:  $("#tpreviewCounty"),
+      save:   $("#tsave"),
+      reset:  $("#treset")
+    };
+
+    function currentCfg() {
+      return ZOOMCFG[els.mode.value][els.dev.value];
+    }
+    function syncInputsFromCfg() {
+      const c = currentCfg();
+      els.bump.value = String(c.bump ?? 0);
+      els.padT.value = String(c.pad?.T ?? 0);
+      els.padL.value = String(c.pad?.L ?? 0);
+      els.padR.value = String(c.pad?.R ?? 0);
+      els.padB.value = String(c.pad?.B ?? 0);
+    }
+    function applyInputsToCfg() {
+      const c = currentCfg();
+      c.bump = clamp(Number(els.bump.value||0), -2, 0);
+      c.pad  = {
+        T: clamp(Number(els.padT.value||0),0, 500),
+        L: clamp(Number(els.padL.value||0),0, 500),
+        R: clamp(Number(els.padR.value||0),0, 500),
+        B: clamp(Number(els.padB.value||0),0, 500)
+      };
+    }
+
+    els.mode.addEventListener("change", syncInputsFromCfg);
+    els.dev.addEventListener("change", syncInputsFromCfg);
+
+    [els.bump, els.padT, els.padL, els.padR, els.padB].forEach(inp=>{
+      inp.addEventListener("change", ()=>{ applyInputsToCfg(); });
+    });
+
+    els.prevO.addEventListener("click", ()=>{ applyInputsToCfg(); showOverview(); });
+    els.prevC.addEventListener("click", ()=>{
+      applyInputsToCfg();
+      if (selectedCountyKey) showCounty(selectedCountyKey);
+      else alert("Kattints egy megyére a térképen, és utána használd ezt a gombot!");
+    });
+
+    els.save.addEventListener("click", ()=>{
+      applyInputsToCfg();
+      localStorage.setItem(CFG_KEY, JSON.stringify(ZOOMCFG));
+      els.save.textContent = "Mentve ✔";
+      setTimeout(()=>els.save.textContent="Mentés",1200);
+    });
+
+    els.reset.addEventListener("click", ()=>{
+      ZOOMCFG = deepClone(DEFAULT_ZOOMCFG);
+      syncInputsFromCfg();
+      localStorage.setItem(CFG_KEY, JSON.stringify(ZOOMCFG));
+      showOverview();
+    });
+
+    syncInputsFromCfg();
   }
 
   /* ===================== Betöltés + megye-réteg ===================== */
