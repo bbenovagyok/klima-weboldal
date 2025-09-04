@@ -192,7 +192,7 @@
   // Aszimmetrikus padding – NAGYOBB JOBB OLDAL
   const PAD = mapEl.clientWidth < 640
     ? { L: 10, T: 8,  R: 140, B: 16 }   // mobil
-    : { L: 16, T: 12, R: 240, B: 20 };  // desktop
+    : { L: 16, T: 12, R: 300, B: 20 };  // desktop
 
   map.flyToBounds(bounds, {
     maxZoom: targetZoom,
