@@ -7,6 +7,7 @@
   const strip = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   const keyOf  = s => strip(s).replace(/\bmegye\b/gi, "").replace(/\s+/g, " ").trim().toLowerCase();
   const sleep  = (ms) => new Promise(r => setTimeout(r, ms));
+  const isMobile = () => mapEl.clientWidth < 640;
 
   const tryUrls = (file) => [
     `data/${file}`,
@@ -27,7 +28,7 @@
   };
 
   /* ===== Geokód cache a böngészőben ===== */
-  const CACHE_KEY = "geoCache-v2";
+  const CACHE_KEY = "geoCache-v3";   // új kulcs, hogy a régi pontatlan értékek ne maradjanak meg
   let geoCache = {};
   try { geoCache = JSON.parse(localStorage.getItem(CACHE_KEY) || "{}"); } catch {}
 
@@ -37,7 +38,9 @@
   };
   const cacheSet = (countyKey, cityName, lat, lng) => {
     const k = `${countyKey}|${keyOf(cityName)}`;
-    geoCache[k] = { lat, lng };
+    // kvantáljuk 5 tizedesre, hogy minden eszközön ugyanaz legyen
+    const q = (n) => Math.round(n * 1e5) / 1e5;
+    geoCache[k] = { lat: q(lat), lng: q(lng) };
     try { localStorage.setItem(CACHE_KEY, JSON.stringify(geoCache)); } catch {}
   };
 
@@ -46,7 +49,6 @@
   async function loadOfflineIndex() {
     if (OFFLINE_INDEX !== null) return OFFLINE_INDEX;
     try {
-      // tetszőleges fájlnéven is működik – az első létezőt használja
       const raw = await fetchFirstOk(tryUrls("hu-telepulesek.json"));
       const idx = {};
       (raw || []).forEach(r => {
@@ -64,12 +66,36 @@
     return OFFLINE_INDEX;
   }
 
-  /* ===== Online geokódolás (OSM Nominatim) – udvariasan, limitáltan ===== */
-  async function geocodeOnline(cityName, countyDisplay) {
-    // Kis késleltetés, hogy ne spammeljük a szolgáltatást
+  /* ===== kis segéd: clamp egy bounds dobozba ===== */
+  function clampToBounds(lat, lng, bounds) {
+    const south = bounds.getSouth();
+    const north = bounds.getNorth();
+    const west  = bounds.getWest();
+    const east  = bounds.getEast();
+    const cLat = Math.min(north, Math.max(south, lat));
+    const cLng = Math.min(east,  Math.max(west,  lng));
+    return { lat: cLat, lng: cLng };
+  }
+
+  /* ===== Online geokódolás (OSM Nominatim) – megye-bounding boxszal szűkítve ===== */
+  async function geocodeOnline(cityName, countyDisplay, countyBounds) {
+    // ne spammeljünk
     await sleep(900);
+
+    // Nominatim viewbox: minlon,minlat,maxlon,maxlat (FIGYELEM: lon, lat sorrend!)
+    const vb = [
+      countyBounds.getWest(),
+      countyBounds.getSouth(),
+      countyBounds.getEast(),
+      countyBounds.getNorth()
+    ].join(",");
+
     const q = `${cityName}, ${countyDisplay} megye, Magyarország`;
-    const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=hu&accept-language=hu&q=${encodeURIComponent(q)}`;
+    const url =
+      `https://nominatim.openstreetmap.org/search?` +
+      `format=jsonv2&limit=1&dedupe=1&bounded=1&countrycodes=hu&accept-language=hu&` +
+      `viewbox=${encodeURIComponent(vb)}&q=${encodeURIComponent(q)}`;
+
     const r = await fetch(url, { headers: { "Accept-Language": "hu" } });
     if (!r.ok) throw new Error(`Nominatim HTTP ${r.status}`);
     const arr = await r.json();
@@ -88,12 +114,20 @@
     // 1) offline index
     const idx = await loadOfflineIndex();
     const off = idx[keyOf(cityName)];
-    if (off) { cacheSet(countyKey, cityName, off.lat, off.lng); return off; }
+    if (off) {
+      const clamped = clampToBounds(off.lat, off.lng, countyBounds);
+      cacheSet(countyKey, cityName, clamped.lat, clamped.lng);
+      return clamped;
+    }
 
-    // 2) online – OSM Nominatim
+    // 2) online – OSM Nominatim, megye-bboxra szűkítve
     try {
-      const online = await geocodeOnline(cityName, countyDisplay);
-      if (online) { cacheSet(countyKey, cityName, online.lat, online.lng); return online; }
+      const online = await geocodeOnline(cityName, countyDisplay, countyBounds);
+      if (online) {
+        const clamped = clampToBounds(online.lat, online.lng, countyBounds);
+        cacheSet(countyKey, cityName, clamped.lat, clamped.lng);
+        return clamped;
+      }
     } catch (e) {
       console.warn("Online geokódolás hiba:", e);
     }
@@ -203,21 +237,18 @@
     if (!target) return;
     const b = target.getBounds();
 
-    // "cover" jellegű ráközelítés
-    const pad = Math.max(6, mapEl.clientWidth < 640 ? 8 : 12);
+    // "cover" zoom: kis finomhangolás külön mobil / desktop
+    const fitZoom = map.getBoundsZoom(b, true);
+    const bump = isMobile() ? -0.15 : 0.01;           // mobilon kicsit kijjebb, gépen épphogy beljebb
+    const targetZoom = Math.min(22, fitZoom + bump);
+
     map.invalidateSize();
-    map.flyToBounds(b, {
-      paddingTopLeft:     [pad, pad],
-      paddingBottomRight: [pad, pad],
-      duration: 0.65,
-      easeLinearity: 0.25
-    });
+    map.flyTo(b.getCenter(), targetZoom, { duration: 0.50, easeLinearity: 0.15 });
 
     const freeze = () => {
       map.off("moveend", freeze);
-      const nowZ = map.getZoom();
-      map.setMinZoom(nowZ);
-      map.setMaxZoom(nowZ);
+      map.setMinZoom(targetZoom);
+      map.setMaxZoom(targetZoom);
       map.setMaxBounds(b.pad(0.0015));
       setInteractions(false);
     };
@@ -231,7 +262,7 @@
     const countyRow = dataArr.find(c => keyOf(c.county_name || c.megye || c.name) === countyKey);
     const countyDisplay = countyRow?.county_name || countyRow?.megye || target.feature.__display || "";
 
-    // minden várost kirakunk (ha completed nincs, nem gond)
+    // minden várost kirakunk (ha string, objektummá alakítjuk)
     const rawCities = (countyRow?.cities || []).map(c => (typeof c === "string" ? { city_name: c } : c));
 
     let countPlaced = 0;
@@ -244,6 +275,10 @@
       if (typeof lat !== "number" || typeof lng !== "number") {
         const pos = await resolveLatLng(name, countyKey, countyDisplay, b);
         lat = pos.lat; lng = pos.lng;
+      } else {
+        // ha kézzel megadott, akkor is clamp a megye bboxába
+        const p = clampToBounds(lat, lng, b);
+        lat = p.lat; lng = p.lng;
       }
 
       const marker = L.circleMarker([lat, lng], {
@@ -274,10 +309,12 @@
 
   /* ===================== Betöltés + megye-réteg ===================== */
   (async () => {
-    [geo, loc] = await Promise.all([
+    const [geoData, locData] = await Promise.all([
       fetchFirstOk(tryUrls("hungary-counties.json")),
       fetchFirstOk(tryUrls("locations.json"))
     ]);
+    geo = geoData;
+    loc = locData;
 
     // megye kulcsok + feliratok
     const highlighted = new Set();
