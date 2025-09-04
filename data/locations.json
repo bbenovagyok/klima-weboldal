@@ -26,7 +26,7 @@
           "city_name": "Veszprém"
         },
         {
-          "city_name": "Iszkáz"
+          "city_name": "Pápa"
         }
       ]
     },
@@ -42,6 +42,15 @@
         {
           "completed": true,
           "city_name": "Szekszárd"
+        }
+      ]
+    },
+    {
+      "completed": true,
+      "county_name": "Vas",
+      "cities": [
+        {
+          "city_name": "szombathely"
         }
       ]
     }
