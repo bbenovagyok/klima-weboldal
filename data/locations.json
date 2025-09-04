@@ -33,7 +33,11 @@
     {
       "county_name": "Fejér",
       "completed": true,
-      "cities": []
+      "cities": [
+        {
+          "city_name": "Székesfehérvár"
+        }
+      ]
     },
     {
       "county_name": "Tolna",
