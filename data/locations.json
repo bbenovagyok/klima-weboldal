@@ -17,12 +17,6 @@
       "completed": true,
       "cities": [
         {
-          "city_name": "Veszprém",
-          "lat": 47.093,
-          "lng": 17.911,
-          "completed": true
-        },
-        {
           "city_name": "Balatonfüred",
           "lat": 46.961,
           "lng": 17.871,
