@@ -232,7 +232,7 @@
       unlockView();
       map.invalidateSize();
 
-      const bounds = getHighlightedBounds() || countyLayer.getBounds();
+      const bounds = (getHighlightedBounds() || countyLayer.getBounds()).pad(0.08); // 0.05–0.12 jó tartomány
       const z = applyFitZoomWithBump(bounds);
 
       // Mozgás végén „fagyasszuk be”
