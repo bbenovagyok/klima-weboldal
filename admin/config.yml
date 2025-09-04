@@ -17,11 +17,11 @@ collections:
           - label: "Galéria Képek"
             name: "images"
             widget: "list"
-            summary: "{{fields.title}}"
+            summary: "{{fields.title | default('Kép')}}"
             fields:
-              - { label: "Kép", name: "image", widget: "image" }
-              - { label: "Cím", name: "title", widget: "string" }
-              - { label: "Leírás", name: "description", widget: "string" }
+              - { label: "Kép", name: "image", widget: "image", required: true }
+              - { label: "Cím (nem kötelező)", name: "title", widget: "string", required: false }
+              - { label: "Leírás (nem kötelező)", name: "description", widget: "string", required: false }
 
   - name: "locations"
     label: "Munkaterületek"
@@ -58,4 +58,3 @@ collections:
                     widget: "string"
                     required: true
                     hint: "Pl. Siófok"
-                # NINCS lat/lng mező – a koordinátákat a rendszer automatikusan kikeresi
