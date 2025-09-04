@@ -21,6 +21,9 @@
           "lat": 46.961,
           "lng": 17.871,
           "completed": true
+        },
+        {
+          "city_name": "Veszprém"
         }
       ]
     },
