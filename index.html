@@ -321,7 +321,7 @@
     <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
   </a>
 
-  <!-- UI + Galéria (kisebb kódok) -->
+  <!-- UI + Galéria -->
   <script>
     // Mobil menü
     const mobileMenuButton=document.getElementById('mobile-menu-button');
@@ -347,7 +347,7 @@
       else { toTopButton.classList.add('opacity-0','translate-y-5'); }
     });
 
-    // Galéria betöltése + MOBIL „Több…” gomb
+    // Galéria betöltése + MOBIL „Több…” gomb (csak ha > 4 kép)
     window.addEventListener('DOMContentLoaded', () => {
       fetch('data/gallery.json', {cache: 'no-store'})
         .then(r => r.json())
@@ -395,45 +395,50 @@
               });
             });
 
-            // === Mobilon csak 4 kép + Több/Kevesebb ===
+            // === Mobilon: csak ha >4 kép, akkor van „Több…” gomb ===
             const isMobile = window.matchMedia('(max-width: 639px)');
             const items = Array.from(document.querySelectorAll('.gallery-item'));
-            let expanded = false;
+            const moreThanFour = items.length > 4;
 
-            function applyMobileClamp() {
-              if (isMobile.matches) {
-                items.slice(4).forEach(el => el.classList.toggle('mobile-hidden', !expanded));
-                toggleWrap.classList.remove('hidden');
-              } else {
-                items.forEach(el => el.classList.remove('mobile-hidden'));
-                expanded = true;
-                toggleWrap.classList.add('hidden');
+            if (moreThanFour) {
+              let expanded = false;
+
+              const toggleWrap = document.createElement('div');
+              toggleWrap.className = 'mt-4 text-center sm:hidden';
+              const toggleBtn = document.createElement('button');
+              toggleBtn.id = 'gallery-toggle-btn';
+              toggleBtn.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 text-cyan-800 font-semibold shadow-md active:scale-[0.98]';
+              toggleBtn.innerHTML = '<span class="i">▼</span> <span class="t">Több…</span>';
+              toggleWrap.appendChild(toggleBtn);
+              galleryContainer.after(toggleWrap);
+
+              function applyMobileClamp() {
+                if (isMobile.matches) {
+                  items.slice(4).forEach(el => el.classList.toggle('mobile-hidden', !expanded));
+                  toggleWrap.classList.remove('hidden'); // gomb látszik mobilon
+                } else {
+                  items.forEach(el => el.classList.remove('mobile-hidden')); // desktop: mind látszik
+                  expanded = true;
+                  toggleWrap.classList.add('hidden');   // gomb nem kell desktopon
+                }
               }
-            }
 
-            // Gomb létrehozása (csak mobilon látszik)
-            const toggleWrap = document.createElement('div');
-            toggleWrap.className = 'mt-4 text-center sm:hidden';
-            const toggleBtn = document.createElement('button');
-            toggleBtn.id = 'gallery-toggle-btn';
-            toggleBtn.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 text-cyan-800 font-semibold shadow-md active:scale-[0.98]';
-            toggleBtn.innerHTML = '<span class="i">▼</span> <span class="t">Több…</span>';
-            toggleWrap.appendChild(toggleBtn);
-            galleryContainer.after(toggleWrap);
+              toggleBtn.addEventListener('click', (e)=>{
+                e.preventDefault();
+                e.stopPropagation();
+                expanded = !expanded;
+                applyMobileClamp();
+                toggleBtn.innerHTML = expanded
+                  ? '<span class="i">▲</span> <span class="t">Kevesebb…</span>'
+                  : '<span class="i">▼</span> <span class="t">Több…</span>';
+              });
 
-            toggleBtn.addEventListener('click', (e)=>{
-              e.preventDefault();
-              e.stopPropagation();
-              expanded = !expanded;
+              isMobile.addEventListener('change', applyMobileClamp);
               applyMobileClamp();
-              toggleBtn.innerHTML = expanded
-                ? '<span class="i">▲</span> <span class="t">Kevesebb…</span>'
-                : '<span class="i">▼</span> <span class="t">Több…</span>';
-            });
-
-            // első alkalmazás + reagáljon az ablakméret váltásra
-            isMobile.addEventListener('change', applyMobileClamp);
-            applyMobileClamp();
+            } else {
+              // 4 vagy kevesebb kép: nincs gomb, minden látszik
+              items.forEach(el => el.classList.remove('mobile-hidden'));
+            }
 
             initializeScrollAnimation();
           } else {
