@@ -191,7 +191,7 @@
       paddingTopLeft:     [Number(P.L)||0, Number(P.T)||0],
       paddingBottomRight: [Number(P.R)||0, Number(P.B)||0],
       duration: Number(cfg.duration) || 0.35,
-      easeLinearity: 0.15
+      easeLinearity: 0.25
     });
 
     return { maxZoom, cfg };
