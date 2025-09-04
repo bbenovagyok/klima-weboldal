@@ -14,7 +14,7 @@
     },
     {
       "county_name": "Veszprém",
-      "completed": false,
+      "completed": true,
       "cities": [
         {
           "city_name": "Balatonfüred",
