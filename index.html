@@ -94,7 +94,6 @@
     @keyframes cardSweep{ 0%{transform:translateX(-160%);} 100%{transform:translateX(520%);} }
     @media (prefers-reduced-motion: reduce){
       .service-card::after{ animation:none !important; opacity:.4; }
-      @media (hover:hover){ .service-card:hover::after{ animation:none !important; } }
     }
 
     /* VERTIKÁLIS, KÁRTYÁS háttér-vélemények a vélemény űrlap mögé */
@@ -117,6 +116,11 @@
     #cookie-consent {transform: translateY(100%);opacity: 0;transition: transform .5s cubic-bezier(.22,.61,.36,1), opacity .5s ease;pointer-events: none;}
     #cookie-consent.show {transform: translateY(0);opacity: 1;pointer-events: auto;}
     @media (prefers-reduced-motion: reduce) {#cookie-consent { transition: none; }}
+
+    /* --- Mobilos „Több…”/„Kevesebb…” galéria --- */
+    @media (max-width: 639px){
+      .mobile-hidden{ display: none !important; }
+    }
   </style>
 </head>
 
@@ -175,7 +179,6 @@
       <div class="container mx-auto px-6">
         <h2 class="text-4xl md:text-5xl font-black text-center mb-12 text-cyan-800 reveal-on-scroll">Szolgáltatásaink</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <!-- 1. kártya -->
           <div class="service-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200 reveal-on-scroll">
             <div class="bg-cyan-100 rounded-full w-16 h-16 flex items-center justify-center mb-6">
               <img src="https://i.postimg.cc/3RrjrPmX/air-conditioner.png" alt="Klíma telepítés ikon"
@@ -186,7 +189,6 @@
             <p class="text-gray-600 leading-relaxed">Modern, energiahatékony klímák szakszerű telepítése – kiválasztás, kivitelezés, garanciával.</p>
           </div>
 
-          <!-- 2. kártya -->
           <div class="service-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200 reveal-on-scroll" style="--delay:150ms">
             <div class="bg-cyan-100 rounded-full w-16 h-16 flex items-center justify-center mb-6">
               <img src="https://i.postimg.cc/VvjqLm5k/check.png" alt="Tisztítás ikon"
@@ -208,7 +210,6 @@
             </p>
           </div>
 
-          <!-- 3. kártya -->
           <div class="service-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200 reveal-on-scroll" style="--delay:300ms">
             <div class="bg-cyan-100 rounded-full w-16 h-16 flex items-center justify-center mb-6">
               <img src="https://i.postimg.cc/DyGj848B/air-condition.png" alt="Javítás ikon"
@@ -228,20 +229,8 @@
         <h2 class="text-4xl md:text-5xl font-black text-center mb-4 text-white reveal-on-scroll">Aktuális Munkáink</h2>
         <p class="text-center text-lg text-cyan-100 mb-12 max-w-2xl mx-auto reveal-on-scroll" style="--delay:150ms">Minden klímánk mögött egy elégedett ügyfél áll!</p>
 
-        <!-- GALÉRIA GRID -->
-        <div id="gallery-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div id="gallery-container">
           <p class="gallery-loading text-center col-span-full">Galéria betöltése...</p>
-        </div>
-
-        <!-- Mobilra „Több…” gomb -->
-        <div id="gallery-more-wrap" class="mt-3 md:hidden text-center hidden">
-          <button id="gallery-more-btn"
-                  class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 text-cyan-700 font-semibold shadow-md active:scale-[.98]">
-            <span id="gallery-more-label">Több…</span>
-            <svg id="gallery-more-icon" class="w-4 h-4 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9l6 6 6-6"/>
-            </svg>
-          </button>
         </div>
 
         <div class="mt-8 sm:mt-16 reveal-on-scroll" style="--delay:300ms;">
@@ -273,7 +262,7 @@
       </div>
     </section>
 
-    <!-- Vélemények – űrlap + háttér -->
+    <!-- Vélemények – űrlap + sötét(ebb) szürke háttér, kártyák futnak mögötte -->
     <section id="velemenyek" class="py-20 bg-gray-200 relative overflow-hidden">
       <div class="reviews-bg-vertical" aria-hidden="true">
         <div class="reviews-col" id="rev-col-1"></div>
@@ -378,16 +367,8 @@
       else { toTopButton.classList.add('opacity-0','translate-y-5'); }
     });
 
-    // ------- Galéria betöltés + mobil „Több…” -------
+    // Galéria betöltése + MOBIL „Több…” gomb
     window.addEventListener('DOMContentLoaded', () => {
-      const moreWrap = document.getElementById('gallery-more-wrap');
-      const moreBtn  = document.getElementById('gallery-more-btn');
-      const moreLbl  = document.getElementById('gallery-more-label');
-      const moreIco  = document.getElementById('gallery-more-icon');
-      let expanded = false;
-
-      const isMobile = () => window.matchMedia('(max-width: 639px)').matches;
-
       fetch('data/gallery.json', {cache: 'no-store'})
         .then(r => r.json())
         .then(data => {
@@ -398,24 +379,23 @@
             data.images.forEach((item, i) => {
               const title = item.title || item.cim || '';
               const desc  = item.description || item.leiras || '';
-              galleryContainer.innerHTML += `
-  <div
-    class="gallery-item group relative overflow-hidden rounded-lg shadow-lg cursor-pointer reveal-on-scroll"
-    data-src="${safe(item.image)}"
-    data-title="${safe(title)}"
-    data-description="${safe(desc)}"
-    style="--delay:${i * 80}ms"
-  >
-    <img src="${safe(item.image)}" alt="${safe(title)}"
-         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors duration-300"></div>
-    <div class="absolute inset-x-0 bottom-0 p-2">
-      <div class="backdrop-blur-md bg-black/40 text-white rounded px-2 py-1 shadow opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
-        <h4 class="text-xs font-semibold truncate">${safe(title)}</h4>
-        <p class="hidden sm:block text-[11px] text-white/85 mt-0.5">${safe(desc)}</p>
-      </div>
-    </div>
-  </div>`;
+              const card = document.createElement('div');
+              card.className = 'gallery-item group relative overflow-hidden rounded-lg shadow-lg cursor-pointer reveal-on-scroll';
+              card.style.setProperty('--delay', `${i*80}ms`);
+              card.setAttribute('data-src', safe(item.image));
+              card.setAttribute('data-title', safe(title));
+              card.setAttribute('data-description', safe(desc));
+              card.innerHTML = `
+                <img src="${safe(item.image)}" alt="${safe(title)}"
+                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors duration-300"></div>
+                <div class="absolute inset-x-0 bottom-0 p-2">
+                  <div class="backdrop-blur-md bg-black/40 text-white rounded px-2 py-1 shadow opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
+                    <h4 class="text-xs font-semibold truncate">${safe(title)}</h4>
+                    <p class="hidden sm:block text-[11px] text-white/85 mt-0.5">${safe(desc)}</p>
+                  </div>
+                </div>`;
+              galleryContainer.appendChild(card);
             });
 
             // Lightbox kattintás
@@ -428,46 +408,50 @@
               });
             });
 
-            // Mobil: első 4 kép látszik, a többi rejtve
-            const applyMobileClamp = () => {
-              const items = Array.from(document.querySelectorAll('.gallery-item'));
-              if (!items.length) return;
+            // === Mobilon csak 4 kép + Több/Kevesebb ===
+            const isMobile = window.matchMedia('(max-width: 639px)');
+            const items = Array.from(document.querySelectorAll('.gallery-item'));
+            let expanded = false;
 
-              if (isMobile()) {
-                expanded = false;
-                items.forEach((el, idx) => {
-                  if (idx >= 4) el.classList.add('hidden'); else el.classList.remove('hidden');
-                });
-                moreWrap.classList.toggle('hidden', items.length <= 4);
-                moreLbl.textContent = 'Több…';
-                moreIco.style.transform = 'rotate(0deg)';
+            function applyMobileClamp() {
+              if (isMobile.matches) {
+                items.slice(4).forEach(el => el.classList.toggle('mobile-hidden', !expanded));
+                toggleWrap.classList.remove('hidden'); // gomb látszik mobilon
               } else {
-                // Desktop: minden látszik, gomb el
-                items.forEach(el => el.classList.remove('hidden'));
-                moreWrap.classList.add('hidden');
+                // desktopon minden látszik, gomb se kell
+                items.forEach(el => el.classList.remove('mobile-hidden'));
+                expanded = true;
+                toggleWrap.classList.add('hidden');
               }
-              initializeScrollAnimation();
-            };
+            }
 
-            // Gomb kezelése
-            moreBtn?.addEventListener('click', () => {
-              const items = Array.from(document.querySelectorAll('.gallery-item'));
+            // Gomb létrehozása (csak mobilon látszik)
+            const toggleWrap = document.createElement('div');
+            toggleWrap.className = 'mt-4 text-center sm:hidden';
+            const toggleBtn = document.createElement('button');
+            toggleBtn.id = 'gallery-toggle-btn';
+            toggleBtn.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 text-cyan-800 font-semibold shadow-md active:scale-[0.98]';
+            const btnIcon = document.createElement('span');
+            btnIcon.className = 'i';
+            toggleBtn.innerHTML = '<span class="i">▼</span> <span class="t">Több…</span>';
+            toggleWrap.appendChild(toggleBtn);
+            galleryContainer.after(toggleWrap);
+
+            toggleBtn.addEventListener('click', (e)=>{
+              e.preventDefault();
+              e.stopPropagation();
               expanded = !expanded;
-              if (expanded) {
-                items.slice(4).forEach(el => el.classList.remove('hidden'));
-                moreLbl.textContent = 'Kevesebb';
-                moreIco.style.transform = 'rotate(180deg)';
-                initializeScrollAnimation();
-              } else {
-                items.slice(4).forEach(el => el.classList.add('hidden'));
-                moreLbl.textContent = 'Több…';
-                moreIco.style.transform = 'rotate(0deg)';
-              }
+              applyMobileClamp();
+              toggleBtn.innerHTML = expanded
+                ? '<span class="i">▲</span> <span class="t">Kevesebb…</span>'
+                : '<span class="i">▼</span> <span class="t">Több…</span>';
             });
 
-            // Első alkalmazás + ablakméret változás
+            // első alkalmazás + reagáljon az ablakméret váltásra
+            isMobile.addEventListener('change', applyMobileClamp);
             applyMobileClamp();
-            window.addEventListener('resize', () => applyMobileClamp());
+
+            initializeScrollAnimation();
           } else {
             galleryContainer.innerHTML = '<p class="text-center col-span-full">Jelenleg nincsenek képek a galériában.</p>';
           }
