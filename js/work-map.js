@@ -6,7 +6,7 @@
   if (!mapEl) return;
 
   /* ======= Ha kész vagy a hangolással, állítsd false-ra ======= */
-  const DEV_TUNER = true;
+  const DEV_TUNER = false;
 
   /* ===================== ALAP KONFIG ===================== */
   const DEFAULT_ZOOMCFG = {
