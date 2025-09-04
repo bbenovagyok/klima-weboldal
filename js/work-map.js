@@ -191,7 +191,7 @@
     maxZoom,
     paddingTopLeft:     [Number(P.L)||0, Number(P.T)||0],
     paddingBottomRight: [Number(P.R)||0, Number(P.B)||0],
-    animate: true,
+    animate: false,
     duration: Number(cfg.duration) || 0.35     // finomabb, rövidebb anim
     // easeLinearity itt nem kell
   });
