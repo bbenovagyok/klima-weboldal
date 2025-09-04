@@ -186,7 +186,7 @@
   /* ===================== Zoom helper (stabil) ===================== */
   function applyFitZoomWithBump(bounds) {
   const fitZoom    = map.getBoundsZoom(bounds, true);
-  const bump       = mapEl.clientWidth < 640 ? -0.30 : -0.60;
+  const bump       = mapEl.clientWidth < 640 ? -0.10 : -0.10;
   const targetZoom = Math.min(22, fitZoom + bump);
 
   // Aszimmetrikus padding – NAGYOBB JOBB OLDAL
