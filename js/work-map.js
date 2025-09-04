@@ -8,17 +8,18 @@
   /* ======= Ha kész vagy a hangolással, állítsd false-ra ======= */
   const DEV_TUNER = false;
 
-  /* ===================== ALAP KONFIG ===================== */
-  const DEFAULT_ZOOMCFG = {
-    overview: {
-      mobile:  { bump: -0.25, pad: { T:  8, L: 12, R: 170, B: 18 }, shiftX:  80, duration: 0.50 },
-      desktop: { bump: -0.20, pad: { T: 10, L: 14, R: 220, B: 20 }, shiftX: 120, duration: 0.50 }
-    },
-    county: {
-      mobile:  { bump: -0.35, pad: { T:  8, L: 12, R: 12,  B: 14 }, shiftX:   0, duration: 0.55 },
-      desktop: { bump: -0.30, pad: { T: 10, L: 14, R: 14,  B: 16 }, shiftX:   0, duration: 0.55 }
-    }
-  };
+  // --- VÉGLEGES, BEÉGETETT NÉZETBEÁLLÍTÁSOK ---
+const ZOOMCFG = {
+  overview: {
+    desktop: { bump: -1.30, pad: [12, 8, 200, 20] },
+    mobile:  { bump: -0.95, pad: [10, 8, 120, 16] }
+  },
+  county: {
+    desktop: { bump: -0.35, pad: [14, 14, 14, 14] },
+    mobile:  { bump: -0.40, pad: [12, 12, 12, 12] }
+  }
+};
+// (Ha a kódod eddig localStorage-ból töltött, cseréld ZOOMCFG-re.)
 
   const CFG_KEY = "WORKMAP_CFG_V1";
   function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
