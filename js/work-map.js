@@ -183,7 +183,7 @@
     const cfg = currentCfg(mode);
     const bump = Math.min(0, Number(cfg.bump) || 0);
     const fitZoom = map.getBoundsZoom(bounds, true);
-    const maxZoom = Math.min(10, fitZoom + bump);
+    const maxZoom = Math.min(50, fitZoom + bump);
     const P = cfg.pad || {T:0,L:0,R:0,B:0};
 
     map.flyToBounds(bounds, {
