@@ -1,4 +1,3 @@
-<script>
 /* interaktív megye -> város nézet + geokódolás (offline->online->fallback, county-bias)
    + Beállító panel (Tuner) mobil/desktop nézethez, mentéssel
    + Tartós vízszintes eltolás (shiftX) – pozitív = balra tolás */
@@ -199,7 +198,7 @@
   }
 
   /* ===================== Állapot + UI ===================== */
-  let geo, loc;
+  let loc;
   let countyLayer = null;
   let cityLayer   = null;
   let selectedCountyKey = null;
@@ -344,7 +343,138 @@
 
   /* ===================== Tuner panel ===================== */
   if (DEV_TUNER) {
-    // ... (a tuner kódod marad, itt nem változik)
+    const css = document.createElement("style");
+    css.textContent = `
+      .tuner-panel {
+        position:absolute; right:10px; top:10px; z-index:9999;
+        background:#ffffffcc; backdrop-filter: blur(6px);
+        border:1px solid #cbd5e1; border-radius:12px; padding:10px;
+        font: 12px/1.3 system-ui, -apple-system, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+        color:#0f172a; box-shadow:0 10px 24px rgba(2,6,23,.2); width: 270px;
+      }
+      .tuner-panel h4 { margin:0 0 8px 0; font-size:13px; }
+      .tuner-row { display:flex; align-items:center; gap:6px; margin:6px 0; }
+      .tuner-row label { width:88px; color:#334155; }
+      .tuner-row input[type="number"] { width:72px; padding:3px 6px; border:1px solid #94a3b8; border-radius:8px; }
+      .tuner-row .padbox { width:52px; }
+      .tuner-btns { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+      .tbtn { padding:6px 8px; border-radius:8px; border:1px solid #0ea5e9; color:#0c4a6e; background:#e0f2fe; cursor:pointer; }
+      .tbtn.alt { border-color:#10b981; background:#dcfce7; color:#065f46; }
+      .tbtn.warn { border-color:#f59e0b; background:#fff7ed; color:#78350f; }
+      .tuner-selects { display:flex; gap:6px; margin-bottom:6px; }
+      .tuner-selects select { flex:1; padding:4px 6px; border:1px solid #94a3b8; border-radius:8px; }
+      .muted { color:#64748b; }
+    `;
+    document.head.appendChild(css);
+
+    const panel = document.createElement("div");
+    panel.className = "tuner-panel";
+    panel.innerHTML = `
+      <h4>🛠️ Térkép Tuner</h4>
+      <div class="tuner-selects">
+        <select id="tmode">
+          <option value="overview">Alap nézet</option>
+          <option value="county">Megye nézet</option>
+        </select>
+        <select id="tdevice">
+          <option value="mobile">Mobil</option>
+          <option value="desktop">Desktop</option>
+        </select>
+      </div>
+
+      <div class="tuner-row">
+        <label>Zoom bump</label>
+        <input id="tbump" type="number" step="0.05" min="-2" max="0" />
+        <span class="muted">(negatív = kijjebb)</span>
+      </div>
+
+      <div class="tuner-row"><label>Padding T</label><input id="tpadT" class="padbox" type="number" step="2" min="0" /></div>
+      <div class="tuner-row"><label>Padding L</label><input id="tpadL" class="padbox" type="number" step="2" min="0" /></div>
+      <div class="tuner-row"><label>Padding R</label><input id="tpadR" class="padbox" type="number" step="2" min="0" /></div>
+      <div class="tuner-row"><label>Padding B</label><input id="tpadB" class="padbox" type="number" step="2" min="0" /></div>
+
+      <div class="tuner-row">
+        <label>Eltolás X (px)</label>
+        <input id="tshiftX" type="number" step="10" min="-600" max="600" />
+        <span class="muted" title="Pozitív = balra tolás">(+ = balra)</span>
+      </div>
+
+      <div class="tuner-btns">
+        <button id="tpreviewOverview" class="tbtn">Előnézet: Alap</button>
+        <button id="tpreviewCounty" class="tbtn">Előnézet: Megye</button>
+        <button id="tsave" class="tbtn alt">Mentés</button>
+        <button id="treset" class="tbtn warn">Gyári vissza</button>
+      </div>
+      <div class="muted" style="margin-top:6px">Tipp: nagyobb <b>R</b> padding + pozitív <b>Eltolás X</b> = alap nézet balra tolva.</div>
+    `;
+    mapEl.appendChild(panel);
+
+    const $ = (id) => panel.querySelector(id);
+    const els = {
+      mode:   $("#tmode"),
+      dev:    $("#tdevice"),
+      bump:   $("#tbump"),
+      padT:   $("#tpadT"),
+      padL:   $("#tpadL"),
+      padR:   $("#tpadR"),
+      padB:   $("#tpadB"),
+      shiftX: $("#tshiftX"),
+      prevO:  $("#tpreviewOverview"),
+      prevC:  $("#tpreviewCounty"),
+      save:   $("#tsave"),
+      reset:  $("#treset")
+    };
+
+    function currentCfgUI() { return ZOOMCFG[els.mode.value][els.dev.value]; }
+    function syncInputsFromCfg() {
+      const c = currentCfgUI();
+      els.bump.value  = String(c.bump ?? 0);
+      els.padT.value  = String(c.pad?.T ?? 0);
+      els.padL.value  = String(c.pad?.L ?? 0);
+      els.padR.value  = String(c.pad?.R ?? 0);
+      els.padB.value  = String(c.pad?.B ?? 0);
+      els.shiftX.value= String(c.shiftX ?? 0);
+    }
+    function applyInputsToCfg() {
+      const c = currentCfgUI();
+      c.bump  = clamp(Number(els.bump.value||0), -2, 0);
+      c.pad   = {
+        T: clamp(Number(els.padT.value||0),0, 500),
+        L: clamp(Number(els.padL.value||0),0, 500),
+        R: clamp(Number(els.padR.value||0),0, 500),
+        B: clamp(Number(els.padB.value||0),0, 500)
+      };
+      c.shiftX = clamp(Number(els.shiftX.value||0), -600, 600);
+    }
+
+    els.mode.addEventListener("change", syncInputsFromCfg);
+    els.dev.addEventListener("change", syncInputsFromCfg);
+    [els.bump, els.padT, els.padL, els.padR, els.padB, els.shiftX].forEach(inp=>{
+      inp.addEventListener("change", ()=>{ applyInputsToCfg(); });
+    });
+
+    els.prevO.addEventListener("click", ()=>{ applyInputsToCfg(); showOverview(); });
+    els.prevC.addEventListener("click", ()=>{
+      applyInputsToCfg();
+      if (selectedCountyKey) showCounty(selectedCountyKey);
+      else alert("Kattints egy megyére a térképen, és utána használd ezt a gombot!");
+    });
+
+    els.save.addEventListener("click", ()=>{
+      applyInputsToCfg();
+      localStorage.setItem(CFG_KEY, JSON.stringify(ZOOMCFG));
+      els.save.textContent = "Mentve ✔";
+      setTimeout(()=>els.save.textContent="Mentés",1200);
+    });
+
+    els.reset.addEventListener("click", ()=>{
+      ZOOMCFG = deepClone(DEFAULT_ZOOMCFG);
+      localStorage.setItem(CFG_KEY, JSON.stringify(ZOOMCFG));
+      syncInputsFromCfg();
+      showOverview();
+    });
+
+    syncInputsFromCfg();
   }
 
   /* ===================== Betöltés + megye-réteg ===================== */
@@ -393,4 +523,3 @@
     mapEl.innerHTML = '<p class="text-center text-white">Hiba történt a térkép betöltésekor.</p>';
   });
 })();
-</script>
