@@ -96,6 +96,24 @@
       "cities": [
         {
           "city_name": "Székesfehérvár"
+        },
+        {
+          "city_name": "Polgárdi"
+        },
+        {
+          "city_name": "Kőszárhegy"
+        },
+        {
+          "city_name": "Szabadhídvég"
+        },
+        {
+          "city_name": "Kőszárhegy"
+        },
+        {
+          "city_name": "Sárszentmihály"
+        },
+        {
+          "city_name": "Simontornya"
         }
       ]
     },
