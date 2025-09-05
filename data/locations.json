@@ -9,6 +9,24 @@
           "lat": 46.909,
           "lng": 18.1046,
           "completed": true
+        },
+        {
+          "city_name": "Kaposvár"
+        },
+        {
+          "city_name": "Balatonlelle"
+        },
+        {
+          "city_name": "Tab"
+        },
+        {
+          "city_name": "Som"
+        },
+        {
+          "city_name": "Andocs"
+        },
+        {
+          "city_name": "Csokonmyavisonta"
         }
       ]
     },
