@@ -156,7 +156,15 @@
     },
     {
       "completed": false,
-      "county_name": "Zala megye"
+      "county_name": "Zala megye",
+      "cities": [
+        {
+          "city_name": "Zalaegerszeg"
+        },
+        {
+          "city_name": "Várvölgy"
+        }
+      ]
     },
     {
       "completed": true,
