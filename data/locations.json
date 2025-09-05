@@ -216,6 +216,18 @@
           "city_name": "Komló"
         }
       ]
+    },
+    {
+      "completed": false,
+      "county_name": "Győr-Moson-Sopron megye",
+      "cities": [
+        {
+          "city_name": "Hegyeshalom"
+        },
+        {
+          "city_name": "Zsebeháza"
+        }
+      ]
     }
   ]
 }
