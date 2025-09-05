@@ -153,6 +153,14 @@
           "city_name": "Sárvár"
         }
       ]
+    },
+    {
+      "completed": false,
+      "county_name": "Zala megye"
+    },
+    {
+      "completed": true,
+      "county_name": "Nagykanizsa"
     }
   ]
 }
