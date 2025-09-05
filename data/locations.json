@@ -134,11 +134,23 @@
     },
     {
       "county_name": "Tolna",
-      "completed": true,
+      "completed": false,
       "cities": [
         {
           "completed": true,
           "city_name": "Szekszárd"
+        },
+        {
+          "city_name": "Simontornya"
+        },
+        {
+          "city_name": "Paks"
+        },
+        {
+          "city_name": "Dunaföldvár"
+        },
+        {
+          "city_name": "Bölcske"
         }
       ]
     },
