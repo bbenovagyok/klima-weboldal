@@ -228,6 +228,21 @@
           "city_name": "Zsebeháza"
         }
       ]
+    },
+    {
+      "completed": false,
+      "county_name": "Bács-Kiskun ",
+      "cities": [
+        {
+          "city_name": "Kecskemét"
+        },
+        {
+          "city_name": "Baks"
+        },
+        {
+          "city_name": "Akasztó"
+        }
+      ]
     }
   ]
 }
