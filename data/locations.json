@@ -178,12 +178,11 @@
         },
         {
           "city_name": "Várvölgy"
+        },
+        {
+          "city_name": "Nagykanizsa"
         }
       ]
-    },
-    {
-      "completed": true,
-      "county_name": "Nagykanizsa"
     }
   ]
 }
