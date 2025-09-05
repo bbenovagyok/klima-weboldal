@@ -2,7 +2,7 @@
   "counties": [
     {
       "county_name": "Somogy",
-      "completed": true,
+      "completed": false,
       "cities": [
         {
           "city_name": "Siófok",
@@ -181,6 +181,21 @@
         },
         {
           "city_name": "Nagykanizsa"
+        }
+      ]
+    },
+    {
+      "completed": false,
+      "county_name": "Baranya megye",
+      "cities": [
+        {
+          "city_name": "Sásd"
+        },
+        {
+          "city_name": "Kiskassa"
+        },
+        {
+          "city_name": "Lothard"
         }
       ]
     }
