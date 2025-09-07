@@ -26,9 +26,6 @@
           "city_name": "Andocs"
         },
         {
-          "city_name": "Csokonmyavisonta"
-        },
-        {
           "city_name": "Nyim"
         },
         {
@@ -75,6 +72,9 @@
         },
         {
           "city_name": "Hencse"
+        },
+        {
+          "city_name": "Csokonyavisonta"
         }
       ]
     },
