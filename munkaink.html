@@ -18,17 +18,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 
   <!-- Leaflet -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-    crossorigin=""
-  />
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin=""
-  ></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
   <!-- Saját komponens-stílusok (lightbox + térkép) -->
   <link rel="stylesheet" href="/css/components.css" />
@@ -47,7 +38,6 @@
     .text-shadow{ text-shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06)}
     .text-shadow-md{ text-shadow:0 2px 4px rgba(0,0,0,.2)}
 
-    /* ugyanaz a belibbenős animáció mint indexen */
     .reveal-on-scroll{opacity:0;transform:translateY(30px);transition:opacity .8s ease-out,transform .8s ease-out;transition-delay:var(--delay,0ms)}
     .reveal-on-scroll.is-visible{opacity:1;transform:translateY(0)}
 
@@ -59,7 +49,7 @@
     .header-scrolled #header-logo{height:1.75rem}
     .header-scrolled #header-company-name{font-size:1.125rem}
 
-    /* Galéria – ugyanaz a telós kártyastílus mint az index.html-ben */
+    /* Galéria kártya */
     .dekor-card{ position:relative; overflow:hidden; border-radius:14px; }
     .dekor-card img{ width:100%; height:100%; object-fit:cover; display:block; transition: transform .5s ease; }
     .dekor-card:hover img{ transform: scale(1.05); }
@@ -67,23 +57,20 @@
     .dekor-card:hover .overlay{ background:rgba(0,0,0,.22); }
     .aspect-4-3{ aspect-ratio: 4/3; }
 
-    /* Mobil „Több…” logikához – galéria */
+    /* Mobil „Több…” logika */
     @media (max-width: 639px){ .mobile-hidden{ display: none !important; } }
 
-    /* Lightbox scroll-lock helper */
+    /* Scroll-lock helper a lightboxhoz */
     .lock-scroll { overflow: hidden !important; }
 
     /* --- Z-index fixek a térkép ellen --- */
-    .leaflet-container,
-    .leaflet-pane,
-    .leaflet-top,
-    .leaflet-bottom { z-index: 0 !important; }
+    .leaflet-container,.leaflet-pane,.leaflet-top,.leaflet-bottom { z-index: 0 !important; }
   </style>
 </head>
 
 <body class="bg-gray-100 text-gray-800">
 
-  <!-- Header: animációs fejléc -->
+  <!-- Header -->
   <header id="main-header" class="fixed top-0 left-0 right-0 z-[1500] p-4">
     <div class="max-w-6xl mx-auto">
       <div id="header-container" class="bg-white/80 backdrop-blur-xl shadow-lg rounded-full px-4 sm:px-6 py-2 flex items-center">
@@ -116,7 +103,7 @@
   </header>
 
   <main>
-    <!-- Hero – pontosan a klíma-dekor méretezéssel -->
+    <!-- Hero -->
     <section class="hero-bg text-white relative overflow-hidden">
       <div class="hero-content container mx-auto px-6 pt-28 pb-12 md:pt-32 md:pb-14 text-center">
         <h1 class="text-3xl md:text-5xl font-black leading-tight mb-3 reveal-on-scroll">Aktuális Munkáink</h1>
@@ -126,16 +113,17 @@
       </div>
     </section>
 
-    <!-- Galéria – TELÓS NÉZET MÁSOLVA AZ INDEXBŐL (dekor-card, aspect-4-3) -->
+    <!-- Galéria – TELÓ: 2 oszlop, >=4 képnél „Több…” -->
     <section class="py-16 bg-gradient-to-b from-cyan-50 to-white">
       <div class="container mx-auto px-6">
         <div class="max-w-6xl mx-auto bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-cyan-900/5 p-6 md:p-8">
           <h2 class="text-2xl md:text-3xl font-black text-cyan-800 mb-6 text-center reveal-on-scroll">Galéria</h2>
 
-          <!-- Ugyanaz a rács mint indexen (mobilon 1 oszlop, sm: 2, lg: 3) -->
-          <div id="gallery-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- 2 oszlop telón, 3 sm-nél, 4 nagy kijelzőn -->
+          <div id="gallery-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             <p class="gallery-loading text-center col-span-full">Galéria betöltése...</p>
           </div>
+          <!-- A „Több…” gombot a JS adja hozzá, csak ha >= 4 kép és sm alatt -->
         </div>
       </div>
     </section>
@@ -160,9 +148,7 @@
         <div class="grid md:grid-cols-2 gap-6">
           <div class="bg-white rounded-xl border border-gray-200 shadow p-5">
             <h3 class="font-bold text-lg mb-2">Kiszállási területek</h3>
-            <p class="text-gray-700">
-              Szolgáltatásaink Siófokon és annak 150 km-es körzetében érhetők el.
-            </p>
+            <p class="text-gray-700">Szolgáltatásaink Siófokon és annak 150 km-es körzetében érhetők el.</p>
           </div>
           <div class="bg-white rounded-xl border border-gray-200 shadow p-5">
             <h3 class="font-bold text-lg mb-2">Miért minket válasszon?</h3>
@@ -183,7 +169,7 @@
     </section>
   </main>
 
-  <!-- Lightbox (extra magas z-index) -->
+  <!-- Lightbox -->
   <div id="lightbox" class="fixed inset-0 z-[2000] hidden">
     <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
     <div class="relative w-full h-full flex items-center justify-center p-4">
@@ -240,33 +226,25 @@
     mobileMenuButton?.addEventListener('click',()=>mobileMenu.classList.toggle('hidden'));
     mobileMenu?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>mobileMenu.classList.add('hidden')));
 
-    // Scroll animáció (reveal)
+    // Scroll animáció
     function initializeScrollAnimation(){
       const obs=new IntersectionObserver((entries)=>{
-        entries.forEach(e=>{
-          if(e.isIntersecting){
-            e.target.classList.add('is-visible');
-            obs.unobserve(e.target);
-          }
-        });
+        entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('is-visible'); obs.unobserve(e.target);} });
       },{threshold:.1});
       document.querySelectorAll('.reveal-on-scroll').forEach(el=>obs.observe(el));
     }
     initializeScrollAnimation();
 
-    // Header zsugorítás + „fel” gomb
+    // Header zsugor + „fel” gomb
     const toTopButton=document.getElementById('to-top-button');
     const header=document.getElementById('main-header');
     window.addEventListener('scroll',()=>{
       header.classList.toggle('header-scrolled',window.scrollY>50);
-      if(window.scrollY>window.innerHeight/2){
-        toTopButton.classList.remove('opacity-0','translate-y-5');
-      } else {
-        toTopButton.classList.add('opacity-0','translate-y-5');
-      }
+      if(window.scrollY>window.innerHeight/2){ toTopButton.classList.remove('opacity-0','translate-y-5'); }
+      else { toTopButton.classList.add('opacity-0','translate-y-5'); }
     });
 
-    // ===== Galéria betöltés – TELÓS NÉZET MINT INDEXEN =====
+    // ===== Galéria betöltés – TELÓ: 2 oszlop, >=4 -> Több… =====
     window.addEventListener('DOMContentLoaded', () => {
       fetch('/data/gallery.json', {cache: 'no-store'})
         .then(r => r.json())
@@ -281,7 +259,6 @@
               const title = item.title || item.cim || '';
               const desc  = item.description || item.leiras || '';
 
-              // Ugyanaz a kártya markup mint az index.html-ben
               const card = document.createElement('div');
               card.className = 'dekor-card cursor-pointer reveal-on-scroll';
               card.style.setProperty('--delay', `${i*80}ms`);
@@ -295,35 +272,27 @@
                   <span class="overlay"></span>
                 </div>
               `;
-
               galleryContainer.appendChild(card);
             });
 
-            // Lightbox megnyitás – háttérre kattintva is zár
+            // Lightbox fallback (ha nincs global openLightbox)
             const modal = document.getElementById('lightbox');
             const imgEl = document.getElementById('lightbox-image');
             const ttlEl = document.getElementById('lightbox-title');
             const dscEl = document.getElementById('lightbox-description');
             const contentEl = document.getElementById('lightbox-content');
-
             function openLB(src, title, desc){
               imgEl.src = src || '';
               ttlEl.textContent = title || '';
               dscEl.textContent = desc || '';
               modal.classList.remove('hidden');
               document.body.classList.add('lock-scroll');
-              window.addEventListener('wheel', preventScroll, { passive:false, capture:true });
-              window.addEventListener('touchmove', preventScroll, { passive:false, capture:true });
             }
             function closeLB(){
               modal.classList.add('hidden');
               imgEl.src = '';
               document.body.classList.remove('lock-scroll');
-              window.removeEventListener('wheel', preventScroll, { capture:true });
-              window.removeEventListener('touchmove', preventScroll, { capture:true });
             }
-            function preventScroll(e){ e.preventDefault(); }
-
             document.querySelectorAll('.dekor-card').forEach(card=>{
               card.addEventListener('click',()=>{
                 const src = card.getAttribute('data-src');
@@ -337,21 +306,17 @@
                 }
               });
             });
-
             document.getElementById('close-lightbox')?.addEventListener('click', closeLB);
             document.getElementById('lightbox')?.addEventListener('click', e=>{
-              // kép MELLÉ kattintva is zárjon
               if (!contentEl.contains(e.target)) closeLB();
             });
             document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeLB(); });
 
-            // Mobil "Több… / Kevesebb…" – teljesen az index logika szerint
+            // Mobil „Több…/Kevesebb…” – csak ha >= 4 kép
             const isMobile = window.matchMedia('(max-width: 639px)');
             const items = Array.from(document.querySelectorAll('.dekor-card'));
-
-            if (items.length > 4) {
+            if (items.length >= 4) {
               let expanded = false;
-
               const toggleWrap = document.createElement('div');
               toggleWrap.className = 'mt-4 text-center sm:hidden';
               const toggleBtn = document.createElement('button');
@@ -374,7 +339,6 @@
 
               toggleBtn.addEventListener('click',(e)=>{
                 e.preventDefault();
-                e.stopPropagation();
                 expanded = !expanded;
                 applyMobileClamp();
                 toggleBtn.innerHTML = expanded
