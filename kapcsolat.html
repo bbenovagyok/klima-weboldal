@@ -11,7 +11,7 @@
   <meta property="og:type" content="website">
   <meta property="og:locale" content="hu_HU">
   <meta property="og:title" content="Kapcsolat | Eszes Tiszta Klíma – Siófok és 150 km-es körzete">
-  <meta property="og:description" content="Hívj vagy írj üzenetet! Gyors, tiszta és megbízható klímaszerelés a Balaton körül és 150 km-en belül.">
+  <meta property="og:description" content="Hívj vagy írj! Gyors, tiszta és megbízható klímaszerelés a Balaton körül és 150 km-en belül.">
   <meta property="og:url" content="https://eszestisztaklima.hu/kapcsolat">
   <meta property="og:image" content="https://i.postimg.cc/3J1W66pj/fdsffsf.jpg">
   <meta name="twitter:card" content="summary_large_image">
@@ -137,7 +137,7 @@
       <div class="hero-content container mx-auto px-6 pt-32 pb-16 md:pt-40 md:pb-20 text-center">
         <h1 class="text-4xl md:text-6xl font-black leading-tight mb-4 reveal-on-scroll">Kapcsolat</h1>
         <p class="text-lg md:text-xl max-w-3xl mx-auto text-gray-100 reveal-on-scroll" style="--delay:150ms">
-          Hívj nyugodtan <strong>hétköznap 8:00–18:00</strong> között vagy írj üzenetet – Siófok és a Balaton térsége, illetve
+          Hívj nyugodtan <strong>hétköznap 8:00–18:00</strong> között vagy írj e-mailt – Siófok és a Balaton térsége, illetve
           kb. <strong>150 km-es körzet</strong> gyors kiszállással.
         </p>
         <div class="mt-6 flex items-center justify-center gap-3 reveal-on-scroll" style="--delay:300ms">
@@ -183,70 +183,6 @@
             </div>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- Kapcsolati űrlap (Netlify-ready) -->
-    <section class="py-6">
-      <div class="container mx-auto px-6 max-w-4xl">
-        <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
-          <h2 class="text-3xl md:text-4xl font-black mb-2 text-cyan-800 text-center">Írj üzenetet</h2>
-          <p class="text-center text-gray-600 mb-8">Ajánlatkéréshez írd meg röviden a helyszínt és a feladatot – gyorsan visszajelzünk.</p>
-
-          <form name="kapcsolat" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input type="hidden" name="form-name" value="kapcsolat">
-            <p class="hidden">
-              <label>Ne töltsd ki: <input name="bot-field" /></label>
-            </p>
-
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1">Név</label>
-              <input name="nev" required class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600" placeholder="Pl. Kovács Anna">
-            </div>
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1">E-mail</label>
-              <input name="email" type="email" required class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600" placeholder="pelda@email.hu">
-            </div>
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1">Telefon</label>
-              <input name="telefon" class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600" placeholder="+36 …">
-            </div>
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1">Város / helyszín</label>
-              <input name="helyszin" class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600" placeholder="Pl. Siófok, Zamárdi, Balatonfüred…">
-            </div>
-            <div class="md:col-span-2">
-              <label class="block text-sm font-semibold text-gray-700 mb-1">Üzenet</label>
-              <textarea name="uzenet" rows="5" required class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600" placeholder="Röviden írd le a feladatot (telepítés / tisztítás / javítás)…"></textarea>
-            </div>
-
-            <div class="md:col-span-2 flex items-center justify-between gap-3">
-              <label class="text-sm text-gray-600 flex items-center gap-2">
-                <input type="checkbox" required class="rounded border-gray-300">
-                Hozzájárulok, hogy a megadott adataim alapján felvegyétek velem a kapcsolatot.
-              </label>
-              <button type="submit" class="px-6 py-2 rounded-lg bg-cyan-600 text-white font-semibold hover:bg-cyan-700">
-                Üzenet küldése
-              </button>
-            </div>
-
-            <p class="md:col-span-2 text-xs text-gray-500 mt-2">TIP: sürgős esetben a leggyorsabb a telefonos egyeztetés.</p>
-          </form>
-        </div>
-      </div>
-    </section>
-
-    <!-- Térkép (Siófok központ) -->
-    <section class="py-12">
-      <div class="container mx-auto px-6 max-w-5xl">
-        <h3 class="text-2xl font-black text-cyan-800 mb-4 text-center">Bázis: Siófok – gyors kiszállás a Balaton körül</h3>
-        <div class="rounded-2xl shadow overflow-hidden">
-          <iframe title="Siófok térkép"
-            class="w-full h-[380px]"
-            src="https://www.openstreetmap.org/export/embed.html?bbox=17.695%2C46.845%2C17.900%2C46.960&layer=mapnik&marker=46.9089%2C17.7815"
-            style="border:0"></iframe>
-        </div>
-        <p class="text-center text-gray-600 mt-3 text-sm">Előzetes egyeztetéssel kb. 150 km-es körzetben is vállalunk munkát.</p>
       </div>
     </section>
 
