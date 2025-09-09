@@ -46,8 +46,15 @@
     .hero-content{position:relative;z-index:2}
     .text-shadow{ text-shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06)}
     .text-shadow-md{ text-shadow:0 2px 4px rgba(0,0,0,.2)}
-    .reveal-on-scroll{opacity:0;transform:translateY(30px);transition:opacity .8s ease-out,transform .8s ease-out;transition-delay:var(--delay,0ms)}
-    .reveal-on-scroll.is-visible{opacity:1;transform:translateY(0)}
+
+    /* index-szerű belibbenős animáció */
+    .reveal-on-scroll{
+      opacity:0;transform:translateY(28px) scale(.98);
+      transition:opacity .7s ease, transform .7s cubic-bezier(.2,.65,.2,1);
+      transition-delay:var(--delay,0ms)
+    }
+    .reveal-on-scroll.is-visible{opacity:1;transform:translateY(0) scale(1)}
+
     #header-container,#header-logo,#header-company-name,#main-nav,#mobile-menu-button{transition:all .5s cubic-bezier(.65,0,.35,1)}
     #header-container{justify-content:space-between}
     #main-header .max-w-6xl{text-align:center}
@@ -56,6 +63,12 @@
     .header-scrolled #header-logo{height:1.75rem}
     .header-scrolled #header-company-name{font-size:1.125rem}
 
+    /* Kártya-hover mint az indexen */
+    .card-anim{will-change:transform,box-shadow}
+    .card-anim:hover{transform:translateY(-2px)}
+    .card-anim img{transition:transform .5s ease}
+    .card-anim:hover img{transform:scale(1.04)}
+
     /* Mobil „Több…” logikához – galéria */
     @media (max-width: 639px){ .mobile-hidden{ display: none !important; } }
 
@@ -63,13 +76,10 @@
     .lock-scroll { overflow: hidden !important; }
 
     /* --- Z-index fixek a térkép ellen --- */
-    /* A Leaflet pane-jei magas z-indexet használnak; lenyomjuk, hogy a header és a lightbox mindig felette legyen */
     .leaflet-container,
     .leaflet-pane,
     .leaflet-top,
-    .leaflet-bottom {
-      z-index: 0 !important;
-    }
+    .leaflet-bottom { z-index: 0 !important; }
   </style>
 </head>
 
@@ -123,7 +133,9 @@
       <div class="container mx-auto px-6">
         <div class="max-w-6xl mx-auto bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-cyan-900/5 p-6 md:p-8">
           <h2 class="text-2xl md:text-3xl font-black text-cyan-800 mb-6 text-center reveal-on-scroll">Galéria</h2>
-          <div id="gallery-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+
+          <!-- Mobilon 2 oszlop (kisebb képek), md-től 3 oszlop -->
+          <div id="gallery-container" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
             <p class="gallery-loading text-center col-span-full">Galéria betöltése...</p>
           </div>
         </div>
@@ -233,7 +245,12 @@
     // Scroll animáció (reveal)
     function initializeScrollAnimation(){
       const obs=new IntersectionObserver((entries)=>{
-        entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('is-visible'); obs.unobserve(e.target);} });
+        entries.forEach(e=>{
+          if(e.isIntersecting){
+            e.target.classList.add('is-visible');
+            obs.unobserve(e.target);
+          }
+        });
       },{threshold:.1});
       document.querySelectorAll('.reveal-on-scroll').forEach(el=>obs.observe(el));
     }
@@ -244,11 +261,14 @@
     const header=document.getElementById('main-header');
     window.addEventListener('scroll',()=>{
       header.classList.toggle('header-scrolled',window.scrollY>50);
-      if(window.scrollY>window.innerHeight/2){ toTopButton.classList.remove('opacity-0','translate-y-5'); }
-      else { toTopButton.classList.add('opacity-0','translate-y-5'); }
+      if(window.scrollY>window.innerHeight/2){
+        toTopButton.classList.remove('opacity-0','translate-y-5');
+      } else {
+        toTopButton.classList.add('opacity-0','translate-y-5');
+      }
     });
 
-    // ===== Galéria betöltés =====
+    // ===== Galéria betöltés – index.html-hez igazítva =====
     window.addEventListener('DOMContentLoaded', () => {
       fetch('/data/gallery.json', {cache: 'no-store'})
         .then(r => r.json())
@@ -262,10 +282,10 @@
               const title = item.title || item.cim || '';
               const desc  = item.description || item.leiras || '';
 
+              // index-szerű kártya: mobilon négyzet (kisebb), md-től 4/3
               const el = document.createElement('a');
               el.href = '#';
-              /* mobilon maradhat a laposabb arány, desktopon 4/3 */
-              el.className = 'gallery-item relative block aspect-[16/10] md:aspect-[4/3] overflow-hidden rounded-xl ring-1 ring-gray-200 bg-white shadow hover:shadow-lg transition cursor-zoom-in reveal-on-scroll';
+              el.className = 'gallery-item group card-anim relative block aspect-square md:aspect-[4/3] overflow-hidden rounded-xl ring-1 ring-gray-200 bg-white shadow hover:shadow-lg transition cursor-zoom-in reveal-on-scroll';
               el.style.setProperty('--delay', `${i*70}ms`);
               el.dataset.src  = safe(item.image);
               el.dataset.title = safe(title);
@@ -273,7 +293,7 @@
               el.innerHTML = `
                 <img src="${safe(item.image)}" alt="${safe(title || 'Galéria kép')}"
                      class="absolute inset-0 w-full h-full object-cover select-none">
-                <span class="pointer-events-none absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors"></span>
+                <span class="pointer-events-none absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></span>
               `;
               wrap.appendChild(el);
             });
@@ -316,14 +336,14 @@
 
             document.getElementById('close-lightbox')?.addEventListener('click', closeLB);
 
-            // <<< Itt módosítottuk: a KÉP MELLÉ kattintva is zárjon >>>
+            // háttérre kattintva is zárjon (kép MELLÉ katt)
             modal?.addEventListener('click', (e)=>{
               if (!contentEl.contains(e.target)) closeLB();
             });
 
             document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeLB(); });
 
-            // Mobil "Több… / Kevesebb…" ha >4 kép
+            // Mobil "Több… / Kevesebb…" ha >4 kép (pont mint az indexen)
             const isMobile = window.matchMedia('(max-width: 639px)');
             const items = Array.from(document.querySelectorAll('.gallery-item'));
             if (items.length > 4) {
