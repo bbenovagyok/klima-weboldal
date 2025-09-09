@@ -30,7 +30,7 @@
     crossorigin=""
   ></script>
 
-  <!-- Saját komponens-stílusok (lightbox + térkép + galéria) -->
+  <!-- Saját komponens-stílusok (lightbox + térkép) -->
   <link rel="stylesheet" href="/css/components.css" />
 
   <!-- Külső saját JS-ek -->
@@ -124,7 +124,7 @@
       </div>
     </section>
 
-    <!-- SEO-s tartalom: városok, USP-k, CTA -->
+    <!-- SEO-s tartalom -->
     <section class="py-16">
       <div class="container mx-auto px-6 max-w-5xl">
         <h2 class="text-3xl font-black text-cyan-800 mb-4">Klíma tisztítás és telepítés Siófokon és környékén</h2>
@@ -137,11 +137,12 @@
           <div class="bg-white rounded-xl border border-gray-200 shadow p-5">
             <h3 class="font-bold text-lg mb-2">Kiszállási területek</h3>
             <p class="text-gray-700">
-              Szolgáltatásaink Siófokon és annak 150 km-es körzetében érhetők el.
+              Siófok, Zamárdi, Balatonföldvár, Balatonvilágos, Ádánd, Ságvár, Szántód, Fonyód, Balatonlelle,
+              Balatonboglár és környékük.
             </p>
           </div>
           <div class="bg-white rounded-xl border border-gray-200 shadow p-5">
-            <h3 class="font-bold text-lg mb-2">Miért válasszon minket?</h3>
+            <h3 class="font-bold text-lg mb-2">Miért minket?</h3>
             <ul class="list-disc pl-5 text-gray-700 space-y-1">
               <li>Gyors időpont – jellemzően 48 órán belül</li>
               <li>Tiszta, higiénikus munka, rendet hagyunk magunk után</li>
@@ -160,13 +161,13 @@
   </main>
 
   <!-- Lightbox -->
-  <div id="lightbox" class="fixed inset-0 z-[110] flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm hidden transition-opacity duration-300">
+  <div id="lightbox" class="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 backdrop-blur-sm hidden transition-opacity duration-300">
     <div id="lightbox-content" class="relative max-w-4xl max-h-[90vh] w-full p-4">
-      <button id="close-lightbox" aria-label="Bezárás">&times;</button>
+      <button id="close-lightbox" aria-label="Bezárás" class="absolute top-2 right-3 text-white text-3xl leading-none">&times;</button>
       <img id="lightbox-image" src="" alt="" class="max-w-full max-h-[75vh] mx-auto rounded-lg shadow-2xl">
       <div id="lightbox-caption" class="text-center text-white mt-4">
         <h4 id="lightbox-title" class="text-xl font-bold"></h4>
-        <p id="lightbox-description" class="text-gray-300"></p>
+        <p id="lightbox-description" class="text-white/80"></p>
       </div>
     </div>
   </div>
@@ -185,7 +186,7 @@
     <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
   </a>
 
-  <!-- FAQ strukturált adat (SEO boost) -->
+  <!-- FAQ strukturált adat -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -193,24 +194,15 @@
     "mainEntity": [{
       "@type": "Question",
       "name": "Mennyi idő alatt tudtok időpontot adni klíma tisztításra Siófokon?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Általában 48 órán belül vállaljuk a kiszállást Siófokon és környékén, szezonban egyeztetés alapján."
-      }
+      "acceptedAnswer": { "@type": "Answer", "text": "Általában 48 órán belül vállaljuk a kiszállást Siófokon és környékén, szezonban egyeztetés alapján." }
     },{
       "@type": "Question",
       "name": "Vállaltok garanciát a munkára?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Igen, minden telepítésre és karbantartásra garanciát adunk, számlával."
-      }
+      "acceptedAnswer": { "@type": "Answer", "text": "Igen, minden telepítésre és karbantartásra garanciát adunk, számlával." }
     },{
       "@type": "Question",
       "name": "Milyen területeken dolgoztok?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Siófok és a Balaton környéke: Zamárdi, Szántód, Balatonföldvár, Balatonlelle, Fonyód, Balatonboglár stb."
-      }
+      "acceptedAnswer": { "@type": "Answer", "text": "Siófok és a Balaton környéke: Zamárdi, Szántód, Balatonföldvár, Balatonlelle, Fonyód, Balatonboglár stb." }
     }]
   }
   </script>
@@ -222,7 +214,7 @@
     mobileMenuButton?.addEventListener('click',()=>mobileMenu.classList.toggle('hidden'));
     mobileMenu?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>mobileMenu.classList.add('hidden')));
 
-    // Scroll animáció (reveal) – főoldaléval egyező
+    // Scroll animáció (reveal)
     function initializeScrollAnimation(){
       const obs=new IntersectionObserver((entries)=>{
         entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('is-visible'); obs.unobserve(e.target);} });
@@ -231,7 +223,7 @@
     }
     initializeScrollAnimation();
 
-    // Header zsugorítás + „fel” gomb – főoldaléval egyező
+    // Header zsugorítás + „fel” gomb
     const toTopButton=document.getElementById('to-top-button');
     const header=document.getElementById('main-header');
     window.addEventListener('scroll',()=>{
@@ -240,23 +232,22 @@
       else { toTopButton.classList.add('opacity-0','translate-y-5'); }
     });
 
-    // Galéria betöltés – kártyás grid + egységes arányok
+    // Galéria betöltés – csak kép (nincs caption => nincs fehér csík)
     window.addEventListener('DOMContentLoaded', () => {
       fetch('/data/gallery.json', {cache: 'no-store'})
         .then(r => r.json())
         .then(data => {
-          const galleryContainer=document.getElementById('gallery-container');
-          galleryContainer.innerHTML = '';
+          const wrap=document.getElementById('gallery-container');
+          wrap.innerHTML = '';
           if (data.images?.length) {
             const safe = s => String(s ?? '').replace(/"/g, '&quot;');
 
             data.images.forEach((item, i) => {
               const title = item.title || item.cim || '';
               const desc  = item.description || item.leiras || '';
-              const hasCaption = (title && title.trim().length) || (desc && desc.trim().length);
 
               const card = document.createElement('div');
-              card.className = 'gallery-item group bg-white rounded-xl border border-gray-200 shadow hover:shadow-lg transition overflow-hidden reveal-on-scroll';
+              card.className = 'gallery-item group bg-white rounded-xl border border-gray-200 shadow hover:shadow-lg transition overflow-hidden reveal-on-scroll cursor-zoom-in';
               card.style.setProperty('--delay', `${i*70}ms`);
               card.setAttribute('data-src', safe(item.image));
               card.setAttribute('data-title', safe(title));
@@ -266,26 +257,36 @@
                 <div class="relative aspect-[4/3] overflow-hidden">
                   <img src="${safe(item.image)}" alt="${safe(title || 'Galéria kép')}"
                        class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                  <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
+                  <div class="pointer-events-none absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
                 </div>
-                ${hasCaption ? `
-                <div class="px-3 py-2">
-                  ${title ? `<h4 class="text-sm font-semibold text-gray-800 truncate">${safe(title)}</h4>` : ``}
-                  ${desc  ? `<p class="text-xs text-gray-600 mt-0.5 line-clamp-2">${safe(desc)}</p>` : ``}
-                </div>` : ``}
               `;
 
-              galleryContainer.appendChild(card);
+              wrap.appendChild(card);
             });
 
-            // Lightbox
+            // Lightbox kattintás
             document.querySelectorAll('.gallery-item').forEach(card=>{
               card.addEventListener('click',()=>{
                 const src = card.getAttribute('data-src');
                 const title = card.getAttribute('data-title') || '';
                 const desc  = card.getAttribute('data-description') || '';
-                if (window.openLightbox) window.openLightbox(src, title, desc);
+                if (typeof window.openLightbox === 'function') {
+                  window.openLightbox(src, title, desc);
+                } else {
+                  // Fallback lightbox, ha a külső JS nem töltődött be
+                  const modal = document.getElementById('lightbox');
+                  document.getElementById('lightbox-image').src = src;
+                  document.getElementById('lightbox-title').textContent = title;
+                  document.getElementById('lightbox-description').textContent = desc;
+                  modal.classList.remove('hidden');
+                }
               });
+            });
+
+            // Fallback close
+            document.getElementById('close-lightbox')?.addEventListener('click',()=>document.getElementById('lightbox').classList.add('hidden'));
+            document.getElementById('lightbox')?.addEventListener('click',e=>{
+              if(e.target.id==='lightbox') document.getElementById('lightbox').classList.add('hidden');
             });
 
             // Mobil "Több…" / "Kevesebb…" csak ha >4 kép
@@ -302,7 +303,7 @@
               toggleBtn.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 text-cyan-800 font-semibold shadow active:scale-[0.98]';
               toggleBtn.innerHTML = '<span class="i">▼</span> <span class="t">Több…</span>';
               toggleWrap.appendChild(toggleBtn);
-              galleryContainer.after(toggleWrap);
+              wrap.after(toggleWrap);
 
               function applyMobileClamp() {
                 if (isMobile.matches) {
@@ -327,14 +328,12 @@
 
               isMobile.addEventListener('change', applyMobileClamp);
               applyMobileClamp();
-            } else {
-              items.forEach(el => el.classList.remove('mobile-hidden'));
             }
 
             initializeScrollAnimation();
           } else {
-            galleryContainer.classList.remove('grid');
-            galleryContainer.innerHTML = '<p class="text-center">Jelenleg nincsenek képek a galériában.</p>';
+            wrap.classList.remove('grid');
+            wrap.innerHTML = '<p class="text-center">Jelenleg nincsenek képek a galériában.</p>';
           }
         })
         .catch(() => {
