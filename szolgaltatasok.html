@@ -16,7 +16,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 
   <style>
-    /* alap tipó + hero + header animáció + reveal */
     body{font-family:'Inter',sans-serif}
     .hero-bg{position:relative;background-image:url('https://i.postimg.cc/3J1W66pj/fdsffsf.jpg');background-size:cover;background-position:center}
     .hero-bg::before{content:'';position:absolute;inset:0;background-color:rgba(0,74,111,.7);z-index:1}
@@ -33,7 +32,6 @@
     .header-scrolled #header-logo{height:1.75rem}
     .header-scrolled #header-company-name{font-size:1.125rem}
 
-    /* szolgáltatás kártyák fénycsík */
     .service-card{ position:relative; overflow:hidden; }
     .service-card::after{
       content:""; position:absolute; top:0; left:-30%;
@@ -44,15 +42,16 @@
     @media (hover:hover){ .service-card:hover::after{ opacity:1; animation: cardSweep 1.2s ease both; } }
     @media (hover:none){ .service-card::after{ opacity:1; animation: cardSweep 2.2s linear infinite; } }
     @keyframes cardSweep{ 0%{transform:translateX(-160%);} 100%{transform:translateX(520%);} }
-    @media (prefers-reduced-motion: reduce){
-      .service-card::after{ animation:none !important; opacity:.4; }
-    }
+    @media (prefers-reduced-motion: reduce){ .service-card::after{ animation:none !important; opacity:.4; } }
+
+    /* kis util a piros kiemeléshez */
+    .hi-red{ color:#dc2626; font-weight:700; }
   </style>
 </head>
 
 <body class="bg-gray-100 text-gray-800">
 
-  <!-- Header (ugyanaz az animált fejléc) -->
+  <!-- Header -->
   <header id="main-header" class="fixed top-0 left-0 right-0 z-50 p-4">
     <div class="max-w-6xl mx-auto">
       <div id="header-container" class="bg-white/80 backdrop-blur-xl shadow-lg rounded-full px-4 sm:px-6 py-2 flex items-center">
@@ -93,10 +92,11 @@
       </div>
     </section>
 
-    <!-- Szolgáltatások grid (1:1 a főoldali tartalommal) -->
+    <!-- Szolgáltatások -->
     <section id="szolgaltatasok" class="py-20">
       <div class="container mx-auto px-6">
         <h2 class="text-4xl md:text-5xl font-black text-center mb-12 text-cyan-800 reveal-on-scroll">Mit vállalunk?</h2>
+
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <!-- Telepítés -->
           <div class="service-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200 reveal-on-scroll">
@@ -107,11 +107,13 @@
             </div>
             <h3 class="text-xl md:text-2xl font-bold mb-3">Klíma Telepítés</h3>
             <p class="text-gray-600 leading-relaxed">
-              Modern, energiahatékony berendezések szakszerű beépítése – helyszíni felmérés, korrekt kábelezés és tiszta kivitelezés, gyártói és kivitelezői garanciával.
+              Modern, energiahatékony berendezések szakszerű beépítése – helyszíni felmérés, korrekt kábelezés és tiszta kivitelezés,
+              gyártói és kivitelezői garanciával. Kiemelten figyelünk a
+              <span class="hi-red">szivárgásmentes csatlakozásokra</span> és az esztétikus nyomvonalra.
             </p>
           </div>
 
-          <!-- Tisztítás & karbantartás -->
+          <!-- Tisztítás & karbantartás – főoldali minta SZÓ SZERINT -->
           <div class="service-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200 reveal-on-scroll" style="--delay:150ms">
             <div class="bg-cyan-100 rounded-full w-16 h-16 flex items-center justify-center mb-6">
               <img src="https://i.postimg.cc/VvjqLm5k/check.png" alt="Tisztítás ikon"
@@ -119,10 +121,11 @@
                    loading="lazy" referrerpolicy="no-referrer">
             </div>
             <h3 class="text-xl md:text-2xl font-bold mb-2">Tisztítás és Karbantartás</h3>
-            <p class="text-gray-800 font-extrabold mb-2">Miért fontos?</p>
+            <p class="text-gray-800 font-extrabold mb-2">Hogy miért fontos?</p>
             <p class="text-gray-700 leading-relaxed">
-              Az elhanyagolt klíma <span class="text-red-600 font-semibold">egészségre is káros</span> lehet, és többet fogyaszt.
-              Professzionális fertőtlenítés, hőcserélő-tisztítás, szűrők karbantartása – hatékonyabb működés, tisztább levegő.
+              Ne legyen <span class="hi-red">poros, gombás, penészes</span> a beltéri! Az elhanyagolt klíma akár
+              <span class="hi-red">egészségre is káros lehet</span>, de az elszennyeződött hőcserélő rontja a hatásfokot,
+              <span class="hi-red">több energiát</span> fogyaszt és <span class="hi-red">meghibásodáshoz</span> vezethet.
             </p>
           </div>
 
@@ -135,27 +138,17 @@
             </div>
             <h3 class="text-xl md:text-2xl font-bold mb-3">Javítás és Hibaelhárítás</h3>
             <p class="text-gray-600 leading-relaxed">
-              Márkafüggetlen gyorsszerviz – zajos, csöpög, nem hűt/fűt? Felmérjük, javítjuk, ha kell cserejavaslatot adunk.
+              Márkafüggetlen gyorsszerviz Siófokon és környékén – zajos, csöpög, nem hűt/fűt?
+              Gyors diagnosztika, pontos árajánlat, és ha szükséges cserejavaslat.
+              Kritikus hibáknál első a <span class="hi-red">biztonságos üzem</span> és a megbízhatóság.
             </p>
           </div>
         </div>
 
-        <!-- Kis SEO-blokk -->
-        <div class="max-w-4xl mx-auto mt-12">
-          <div class="bg-white rounded-2xl shadow border border-gray-200 p-6 md:p-8">
-            <h3 class="text-2xl font-bold text-cyan-800 mb-3">Hol dolgozunk?</h3>
-            <p class="text-gray-700">
-              Főként <strong>Siófok</strong> és a Balaton déli partján vállalunk munkát: Zamárdi, Szántód, Balatonföldvár,
-              Balatonlelle, Fonyód, Balatonboglár és környékük. Kérj ajánlatot – gyorsan válaszolunk!
-            </p>
-          </div>
-        </div>
-
-        <div class="text-center mt-10">
-          <a href="/kapcsolat" class="inline-flex items-center gap-2 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-6 py-3 rounded-full shadow">
-            <i class="fa-solid fa-envelope"></i> Kérek ajánlatot
-          </a>
-          <a href="tel:+36709304841" class="inline-flex items-center gap-2 ml-3 bg-yellow-400 hover:bg-yellow-300 text-black font-semibold px-6 py-3 rounded-full shadow">
+        <!-- Csak a sárga telefon gomb, középen -->
+        <div class="text-center mt-12">
+          <a href="tel:+36709304841"
+             class="inline-flex items-center gap-2 bg-yellow-400 hover:bg-yellow-300 text-black font-semibold px-7 py-3 rounded-full shadow">
             <i class="fa-solid fa-phone"></i> +36 70 930 4841
           </a>
         </div>
@@ -171,7 +164,7 @@
     </div>
   </footer>
 
-  <!-- „Fel” gomb (főoldali logika) -->
+  <!-- „Fel” gomb (fejléc logika) -->
   <a href="#" id="to-top-button" class="fixed bottom-5 right-5 z-50 w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg hover:bg-yellow-500 transition-all duration-300 opacity-0 translate-y-5">
     <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
   </a>
