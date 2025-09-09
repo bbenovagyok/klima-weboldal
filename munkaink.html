@@ -65,6 +65,20 @@
 
     /* --- Z-index fixek a térkép ellen --- */
     .leaflet-container,.leaflet-pane,.leaflet-top,.leaflet-bottom { z-index: 0 !important; }
+
+    /* ************ KRITIKUS: kényszerített 2 oszlop mobilon ************ */
+    /* Felülírja a components.css bármely #gallery-container beállítását */
+    #gallery-container{
+      display:grid !important;
+      grid-template-columns: repeat(2, minmax(0,1fr)) !important; /* 2 oszlop TELÓN */
+      gap: .75rem !important;
+    }
+    @media (min-width:640px){
+      #gallery-container{ grid-template-columns: repeat(3, minmax(0,1fr)) !important; }
+    }
+    @media (min-width:1024px){
+      #gallery-container{ grid-template-columns: repeat(4, minmax(0,1fr)) !important; }
+    }
   </style>
 </head>
 
@@ -113,17 +127,24 @@
       </div>
     </section>
 
-    <!-- Galéria – TELÓ: 2 oszlop, >=4 képnél „Több…” -->
+    <!-- Galéria – TELÓ: 2 oszlop, ≥4 képnél „Több…” -->
     <section class="py-16 bg-gradient-to-b from-cyan-50 to-white">
       <div class="container mx-auto px-6">
         <div class="max-w-6xl mx-auto bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-cyan-900/5 p-6 md:p-8">
           <h2 class="text-2xl md:text-3xl font-black text-cyan-800 mb-6 text-center reveal-on-scroll">Galéria</h2>
 
-          <!-- 2 oszlop telón, 3 sm-nél, 4 nagy kijelzőn -->
-          <div id="gallery-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          <!-- Rács (2 oszlop mobilon – CSS kényszeríti) -->
+          <div id="gallery-container" class="grid gap-3">
             <p class="gallery-loading text-center col-span-full">Galéria betöltése...</p>
           </div>
-          <!-- A „Több…” gombot a JS adja hozzá, csak ha >= 4 kép és sm alatt -->
+
+          <!-- A gomb itt van; JS csak mutatja/elrejti a feltételek szerint -->
+          <div id="gallery-toggle-wrap" class="mt-4 text-center sm:hidden hidden">
+            <button id="gallery-toggle-btn"
+              class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 text-cyan-800 font-semibold shadow-md active:scale-[0.98]">
+              <span class="i">▼</span> <span class="t">Több…</span>
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -249,8 +270,10 @@
       fetch('/data/gallery.json', {cache: 'no-store'})
         .then(r => r.json())
         .then(data => {
-          const galleryContainer=document.getElementById('gallery-container');
-          galleryContainer.innerHTML = '';
+          const grid=document.getElementById('gallery-container');
+          const wrap=document.getElementById('gallery-toggle-wrap');
+          const btn=document.getElementById('gallery-toggle-btn');
+          grid.innerHTML = '';
 
           if (data.images?.length) {
             const safe = s => String(s ?? '').replace(/"/g, '&quot;');
@@ -270,9 +293,8 @@
                 <div class="aspect-4-3 bg-gray-100 rounded-[14px] overflow-hidden">
                   <img src="${safe(item.image)}" alt="${safe(title || 'Galéria kép')}" loading="lazy" referrerpolicy="no-referrer">
                   <span class="overlay"></span>
-                </div>
-              `;
-              galleryContainer.appendChild(card);
+                </div>`;
+              grid.appendChild(card);
             });
 
             // Lightbox fallback (ha nincs global openLightbox)
@@ -312,55 +334,42 @@
             });
             document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeLB(); });
 
-            // Mobil „Több…/Kevesebb…” – csak ha >= 4 kép
+            // Mobil „Több…/Kevesebb…”
             const isMobile = window.matchMedia('(max-width: 639px)');
             const items = Array.from(document.querySelectorAll('.dekor-card'));
-            if (items.length >= 4) {
-              let expanded = false;
-              const toggleWrap = document.createElement('div');
-              toggleWrap.className = 'mt-4 text-center sm:hidden';
-              const toggleBtn = document.createElement('button');
-              toggleBtn.id = 'gallery-toggle-btn';
-              toggleBtn.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 text-cyan-800 font-semibold shadow-md active:scale-[0.98]';
-              toggleBtn.innerHTML = '<span class="i">▼</span> <span class="t">Több…</span>';
-              toggleWrap.appendChild(toggleBtn);
-              galleryContainer.after(toggleWrap);
 
-              function applyMobileClamp() {
-                if (isMobile.matches) {
-                  items.slice(4).forEach(el => el.classList.toggle('mobile-hidden', !expanded));
-                  toggleWrap.classList.remove('hidden');
-                } else {
-                  items.forEach(el => el.classList.remove('mobile-hidden'));
-                  expanded = true;
-                  toggleWrap.classList.add('hidden');
-                }
+            function applyMobileClamp(expanded){
+              if (isMobile.matches && items.length >= 4) {
+                items.slice(4).forEach(el => el.classList.toggle('mobile-hidden', !expanded));
+                wrap.classList.remove('hidden');
+              } else {
+                items.forEach(el => el.classList.remove('mobile-hidden'));
+                wrap.classList.add('hidden');
               }
-
-              toggleBtn.addEventListener('click',(e)=>{
-                e.preventDefault();
-                expanded = !expanded;
-                applyMobileClamp();
-                toggleBtn.innerHTML = expanded
-                  ? '<span class="i">▲</span> <span class="t">Kevesebb…</span>'
-                  : '<span class="i">▼</span> <span class="t">Több…</span>';
-              });
-
-              isMobile.addEventListener('change', applyMobileClamp);
-              applyMobileClamp();
-            } else {
-              items.forEach(el => el.classList.remove('mobile-hidden'));
             }
+
+            let expanded = false;
+            btn.addEventListener('click',(e)=>{
+              e.preventDefault();
+              expanded = !expanded;
+              applyMobileClamp(expanded);
+              btn.innerHTML = expanded
+                ? '<span class="i">▲</span> <span class="t">Kevesebb…</span>'
+                : '<span class="i">▼</span> <span class="t">Több…</span>';
+            });
+
+            isMobile.addEventListener('change', ()=>applyMobileClamp(expanded));
+            applyMobileClamp(expanded);
 
             initializeScrollAnimation();
           } else {
-            galleryContainer.classList.remove('grid');
-            galleryContainer.innerHTML = '<p class="text-center col-span-full">Jelenleg nincsenek képek a galériában.</p>';
+            grid.classList.remove('grid');
+            grid.innerHTML = '<p class="text-center col-span-full">Jelenleg nincsenek képek a galériában.</p>';
           }
         })
         .catch(() => {
-          const gc=document.getElementById('gallery-container');
-          gc.innerHTML = '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben.</p>';
+          const grid=document.getElementById('gallery-container');
+          grid.innerHTML = '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben.</p>';
         });
     });
   </script>
