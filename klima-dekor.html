@@ -1,26 +1,42 @@
 <!DOCTYPE html>
 <html lang="hu" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Klíma Dekor | Eszes Tiszta Klíma Kft. – esztétikus dekorcsövek, burkolatok Siófokon és 150 km-es körzetben</title>
+  <title>Klíma Dekor – kábelcsatornák és burkolatok | Eszes Tiszta Klíma Kft.</title>
 
-  <!-- Primary SEO -->
-  <meta name="description" content="Klíma dekor megoldások Siófokon és 150 km-es körzetében: esztétikus dekorcső, kábelcsatorna, burkolat és takarás kültéri-beltéri klímákhoz. Galéria és referenciák." />
-  <link rel="canonical" href="https://eszestisztaklima.hu/klima-dekor" />
+  <!-- SEO -->
+  <meta name="description" content="Esztétikus klíma-dekor Siófokon és 150 km-es vonzáskörzetében: kábelcsatornák, kültéri-beltéri burkolatok, takarások. Nézd meg a galériát!"/>
+  <link rel="canonical" href="https://eszesztisztaklima.hu/klima-dekor"/>
+  <meta property="og:title" content="Klíma Dekor – Esztétikus megoldások | Eszes Tiszta Klíma Kft."/>
+  <meta property="og:description" content="Esztétikus klíma-dekor Siófokon és környékén (150 km). Galéria, referenciák."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://eszesztisztaklima.hu/klima-dekor"/>
+  <meta property="og:image" content="https://i.postimg.cc/xTYhg4gG/image.png"/>
+  <meta name="robots" content="index,follow"/>
 
-  <!-- Open Graph -->
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="Klíma Dekor | Eszes Tiszta Klíma Kft." />
-  <meta property="og:description" content="Esztétikus klíma dekor Siófokon és környékén: dekorcső, burkolatok, kábelcsatorna. Nézd meg a galériát!" />
-  <meta property="og:url" content="https://eszestisztaklima.hu/klima-dekor" />
-  <meta property="og:image" content="https://i.postimg.cc/xTYhg4gG/image.png" />
-
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Klíma Dekor | Eszes Tiszta Klíma Kft." />
-  <meta name="twitter:description" content="Esztétikus klíma dekor Siófokon és környékén. Galéria és referenciák." />
-  <meta name="twitter:image" content="https://i.postimg.cc/xTYhg4gG/image.png" />
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"CollectionPage",
+    "name":"Klíma Dekor – kábelcsatornák és burkolatok",
+    "description":"Esztétikus klíma-dekor Siófokon és 150 km-es körzetében.",
+    "url":"https://eszesztisztaklima.hu/klima-dekor",
+    "breadcrumb":{
+      "@type":"BreadcrumbList",
+      "itemListElement":[
+        {"@type":"ListItem","position":1,"name":"Főoldal","item":"https://eszesztisztaklima.hu/"},
+        {"@type":"ListItem","position":2,"name":"Klíma Dekor","item":"https://eszesztisztaklima.hu/klima-dekor"}
+      ]
+    },
+    "provider":{
+      "@type":"LocalBusiness",
+      "name":"Eszes Tiszta Klíma Kft.",
+      "areaServed":{"@type":"Place","name":"Siófok és 150 km-es körzete"}
+    }
+  }
+  </script>
 
   <link rel="icon" href="https://i.postimg.cc/xTYhg4gG/image.png" type="image/png">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -29,152 +45,102 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 
-  <!-- Saját komponens-stílusok (lightbox + képkártyák + térkép méret) -->
-  <link rel="stylesheet" href="/css/components.css" />
-
-  <!-- Lightbox & UI -->
-  <script src="/js/lightbox.js" defer></script>
-
+  <!-- Saját stílusok a galériához -->
   <style>
     body{font-family:'Inter',sans-serif}
-    .hero-bg{position:relative;background-image:url('https://i.postimg.cc/3J1W66pj/fdsffsf.jpg');background-size:cover;background-position:center}
-    .hero-bg::before{content:'';position:absolute;inset:0;background-color:rgba(0,74,111,.72);z-index:1}
-    .hero-content{position:relative;z-index:2}
+    .hero-bg{position:relative;background:#0f6e85}
+    .hero-bg::before{content:'';position:absolute;inset:0;background-image:url('https://i.postimg.cc/3J1W66pj/fdsffsf.jpg');background-size:cover;background-position:center;opacity:.25}
+    .hero-content{position:relative;z-index:1}
 
-    .reveal-on-scroll{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease;transition-delay:var(--delay,0ms)}
-    .reveal-on-scroll.is-visible{opacity:1;transform:translateY(0)}
-
-    /* kártya */
-    .dekor-card{ position:relative; overflow:hidden; }
-    .dekor-card img{ display:block; width:100%; height:100%; object-fit:cover; }
-
-    /* mobil clamp */
-    @media (max-width: 639px){
-      .mobile-hidden{ display:none !important; }
-    }
-
-    /* CTA gomb (sárga) */
-    .cta-yellow{ background:#FACC15; color:#111827; }
-    .cta-yellow:hover{ filter:brightness(0.98); }
+    /* Képkártya – felirat NINCS, teljes kártya kattintható */
+    .pic-card{position:relative;overflow:hidden;border-radius:14px}
+    .pic-card img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+    .pic-card:hover img{transform:scale(1.04)}
+    .no-scroll{overflow:hidden}
+    /* rács: magasabb kártya mobilon is kulturált */
+    .h-card{height: 220px}
+    @media(min-width:640px){ .h-card{height: 260px} }
+    @media(min-width:1024px){ .h-card{height: 280px} }
   </style>
 
-  <!-- Szervezeti struktúrált adat -->
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"LocalBusiness",
-    "name":"Eszes Tiszta Klíma Kft.",
-    "image":"https://i.postimg.cc/xTYhg4gG/image.png",
-    "url":"https://eszestisztaklima.hu/klima-dekor",
-    "telephone":"+36 70 930 4841",
-    "areaServed":"Siófok és 150 km-es körzete",
-    "description":"Klíma dekor megoldások: dekorcsövek, kábelcsatornák, esztétikus burkolatok – kültéri-beltéri klímákhoz.",
-    "address":{
-      "@type":"PostalAddress",
-      "addressLocality":"Siófok",
-      "addressCountry":"HU"
-    }
-  }
-  </script>
+  <!-- Lightbox (saját) -->
+  <script defer src="/js/lightbox.js"></script>
 </head>
 <body class="bg-gray-100 text-gray-800">
 
   <!-- Header -->
-  <header id="main-header" class="fixed top-0 left-0 right-0 z-50 p-4">
-    <div class="max-w-6xl mx-auto">
-      <div id="header-container" class="bg-white/80 backdrop-blur-xl shadow-lg rounded-full px-4 sm:px-6 py-2 flex items-center justify-between">
-        <a href="/" class="flex items-center">
-          <img id="header-logo" src="https://i.postimg.cc/xTYhg4gG/image.png" alt="Cég logó" class="h-8 mr-2 sm:mr-3">
-          <span id="header-company-name" class="text-base sm:text-xl font-bold text-yellow-600">Eszes Tiszta Klíma Kft.</span>
-        </a>
-
-        <nav id="main-nav" class="hidden md:flex items-center space-x-2">
-          <a href="/szolgaltatasok" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full font-semibold">Szolgáltatások</a>
-          <a href="/munkaink" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full font-semibold">Munkáink</a>
-          <a href="/klima-dekor" class="bg-cyan-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-cyan-700">Klíma Dekor</a>
-          <a href="/rolunk" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full font-semibold">Rólunk</a>
-          <a href="/kapcsolat" class="text-white bg-cyan-700 px-5 py-2 rounded-full font-semibold hover:bg-cyan-800">Kapcsolat</a>
-        </nav>
-
-        <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
-        </button>
-      </div>
-
-      <div id="mobile-menu" class="hidden md:hidden bg-white/90 backdrop-blur-lg mt-2 rounded-2xl shadow-lg overflow-hidden">
-        <a href="/szolgaltatasok" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Szolgáltatások</a>
-        <a href="/munkaink" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Munkáink</a>
-        <a href="/klima-dekor" class="block text-center py-3 px-4 text-sm bg-cyan-600 text-white font-semibold hover:bg-cyan-700">Klíma Dekor</a>
-        <a href="/rolunk" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Rólunk</a>
-        <a href="/kapcsolat" class="block text-center py-4 px-4 text-sm text-white bg-cyan-700 font-semibold hover:bg-cyan-800">Kapcsolat</a>
-      </div>
+  <header id="main-header" class="sticky top-0 left-0 right-0 z-50 p-4 bg-white/80 backdrop-blur-xl shadow">
+    <div class="max-w-6xl mx-auto flex items-center justify-between rounded-full px-4 sm:px-6 py-2">
+      <a href="/" class="flex items-center gap-2">
+        <img src="https://i.postimg.cc/xTYhg4gG/image.png" alt="Logó" class="h-8">
+        <span class="text-base sm:text-xl font-bold text-yellow-600">Eszes Tiszta Klíma Kft.</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-2">
+        <a href="/szolgaltatasok" class="px-4 py-2 rounded-full text-gray-700 hover:text-cyan-700 font-semibold">Szolgáltatások</a>
+        <a href="/munkaink" class="px-4 py-2 rounded-full text-gray-700 hover:text-cyan-700 font-semibold">Munkáink</a>
+        <a href="/rolunk" class="px-4 py-2 rounded-full text-gray-700 hover:text-cyan-700 font-semibold">Rólunk</a>
+        <a href="/klima-dekor" class="px-5 py-2 rounded-full font-semibold bg-cyan-600 text-white hover:bg-cyan-700">Klíma Dekor</a>
+        <a href="/kapcsolat" class="px-4 py-2 rounded-full text-gray-700 hover:text-cyan-700 font-semibold">Kapcsolat</a>
+      </nav>
+      <button id="mobile-menu-button" class="md:hidden text-gray-700">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+      </button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-lg mt-2 rounded-2xl shadow-lg overflow-hidden max-w-6xl mx-auto">
+      <a href="/szolgaltatasok" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Szolgáltatások</a>
+      <a href="/munkaink" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Munkáink</a>
+      <a href="/rolunk" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Rólunk</a>
+      <a href="/klima-dekor" class="block text-center py-3 px-4 text-sm bg-cyan-600 text-white font-semibold hover:bg-cyan-700">Klíma Dekor</a>
+      <a href="/kapcsolat" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Kapcsolat</a>
     </div>
   </header>
 
   <main>
     <!-- Hero -->
-    <section class="hero-bg text-white relative overflow-hidden">
-      <div class="hero-content container mx-auto px-6 pt-32 pb-20 md:pt-40 md:pb-24 text-center">
-        <h1 class="text-4xl md:text-6xl font-black leading-tight mb-4 reveal-on-scroll">Klíma Dekor – esztétikus megoldások</h1>
-        <p class="text-lg md:text-xl max-w-3xl mx-auto text-cyan-50 reveal-on-scroll" style="--delay:160ms">
-          Szép kivitelezés, rendezett burkolatok és dekorcsövek – <strong>Siófokon és 150&nbsp;km-es körzetében</strong>.
-          Nézd meg a referenciáinkat!
+    <section class="hero-bg text-white">
+      <div class="hero-content container mx-auto px-6 pt-16 pb-12 text-center">
+        <h1 class="text-4xl md:text-5xl font-black mb-3">Klíma Dekor – esztétikus megoldások</h1>
+        <p class="max-w-3xl mx-auto text-cyan-50">
+          Siófokon és <strong>150 km-es körzetében</strong> vállalunk igényes, esztétikus dekor kivitelezést:
+          kábelcsatornák, burkolatok, takarások – hogy a klíma ne csak jól működjön, de szépen is mutasson.
         </p>
-      </div>
-    </section>
-
-    <!-- Bevezető szöveg (SEO) -->
-    <section class="py-12">
-      <div class="container mx-auto px-6 max-w-5xl">
-        <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 reveal-on-scroll">
-          <h2 class="text-2xl md:text-3xl font-black text-cyan-800 mb-3">Mit jelent a „Klíma Dekor”?</h2>
-          <p class="text-gray-700 leading-relaxed">
-            A klíma dekor lényege, hogy az esztétikát is szem előtt tartva alakítjuk ki a
-            <span class="font-semibold">kábelcsatornákat, dekorcsöveket, burkolatokat és takarásokat</span>.
-            Célunk, hogy a felszerelt klíma ne csak hatékonyan működjön, hanem szépen illeszkedjen az otthonod stílusához is.
-            Vállaljuk a <strong>kültéri és beltéri</strong> esztétikus vezetését Siófokon, a Balaton környékén,
-            valamint <strong>kb. 150 km-es körzetben</strong>.
-          </p>
-        </div>
       </div>
     </section>
 
     <!-- Galéria -->
     <section class="py-12">
-      <div class="container mx-auto px-6">
-        <h2 class="text-3xl md:text-4xl font-black text-center mb-8 text-cyan-800 reveal-on-scroll">Galéria</h2>
+      <div class="container mx-auto px-6 max-w-6xl">
+        <h2 class="text-3xl md:text-4xl font-black text-cyan-800 mb-6 text-center">Klíma dekor galéria</h2>
 
-        <div id="gallery-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <p class="gallery-loading text-center col-span-full">Galéria betöltése…</p>
+        <div id="decor-gallery" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- ide jönnek a kártyák JS-ből -->
         </div>
 
-        <!-- Mobil „Több/Kevesebb” gomb itt jelenik meg JS-ből, ha >4 kép van -->
+        <p id="decor-empty" class="hidden mt-6 text-center text-gray-500">
+          Jelenleg még nincsenek feltöltött dekor képek.
+        </p>
       </div>
     </section>
 
-    <!-- Központi CTA – telefon -->
-    <section class="pb-16">
-      <div class="container mx-auto px-6 text-center">
+    <!-- Call to action -->
+    <section class="pb-16 text-center">
+      <div class="container mx-auto px-6">
         <a href="tel:+36709304841"
-           class="inline-flex items-center gap-3 px-6 py-3 rounded-full font-bold shadow-xl cta-yellow">
-          <i class="fa-solid fa-phone"></i>
+           class="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-yellow-400 text-black font-bold shadow hover:bg-yellow-300">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.518.759a1 1 0 00-.43 1.659l4.592 4.592a1 1 0 001.659-.43l.759-1.518a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
           +36 70 930 4841
         </a>
       </div>
     </section>
   </main>
 
-  <!-- Lightbox (központi, a site többi oldalán is ilyen) -->
-  <div id="lightbox" class="fixed inset-0 z-[110] flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm hidden transition-opacity duration-300">
-    <div id="lightbox-content" class="relative max-w-4xl max-h-[90vh] w-full p-4">
-      <button id="close-lightbox" aria-label="Bezárás">&times;</button>
+  <!-- Lightbox DOM -->
+  <div id="lightbox" class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/80 backdrop-blur-sm">
+    <div id="lightbox-content" class="relative max-w-5xl max-h-[90vh] w-full p-4">
+      <button id="close-lightbox" aria-label="Bezárás"
+              class="absolute -top-2 right-2 text-white text-4xl leading-none hover:opacity-80">&times;</button>
       <img id="lightbox-image" src="" alt="" class="max-w-full max-h-[75vh] mx-auto rounded-lg shadow-2xl">
-      <div id="lightbox-caption" class="text-center text-white mt-4">
-        <h4 id="lightbox-title" class="text-xl font-bold"></h4>
-        <p id="lightbox-description" class="text-gray-300"></p>
-      </div>
     </div>
   </div>
 
@@ -186,109 +152,52 @@
   </footer>
 
   <script>
-    // Mobil menü
-    const mobileMenuButton=document.getElementById('mobile-menu-button');
-    const mobileMenu=document.getElementById('mobile-menu');
-    mobileMenuButton?.addEventListener('click',()=>mobileMenu.classList.toggle('hidden'));
-    mobileMenu?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>mobileMenu.classList.add('hidden')));
+    // mobil menü
+    const mobileBtn = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileBtn?.addEventListener('click', ()=> mobileMenu.classList.toggle('hidden'));
 
-    // Scroll animáció
-    function initializeScrollAnimation(){
-      const obs=new IntersectionObserver((entries)=>{
-        entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('is-visible'); obs.unobserve(e.target);} });
-      },{threshold:.1});
-      document.querySelectorAll('.reveal-on-scroll').forEach(el=>obs.observe(el));
-    }
-    initializeScrollAnimation();
-
-    // Dekor galéria betöltése
-    window.addEventListener('DOMContentLoaded', () => {
-      fetch('/data/dekor.json', { cache: 'no-store' })
-        .then(r => r.json())
-        .then(data => {
-          const wrap = document.getElementById('gallery-container');
+    // dekor galéria betöltése
+    (function loadDecor(){
+      fetch('/data/dekor.json', {cache:'no-store'})
+        .then(r=>r.ok? r.json(): {images:[]})
+        .then(data=>{
+          const wrap = document.getElementById('decor-gallery');
+          const empty = document.getElementById('decor-empty');
           wrap.innerHTML = '';
+          const items = Array.isArray(data.images)? data.images : [];
+          if(!items.length){ empty.classList.remove('hidden'); return; }
 
-          if (!data?.images?.length){
-            wrap.innerHTML = '<p class="col-span-full text-center text-gray-600">Jelenleg nincsenek dekor képek feltöltve.</p>';
-            return;
-          }
-
-          const safe = s => String(s ?? '').replace(/"/g, '&quot;');
-          data.images.forEach((item,i)=>{
-            const title = item.title || item.cim || '';
-            const desc  = item.description || item.leiras || '';
-            const card = document.createElement('div');
-            card.className = 'dekor-card rounded-xl shadow-lg overflow-hidden cursor-pointer reveal-on-scroll';
-            card.style.setProperty('--delay', `${i*70}ms`);
-            card.setAttribute('data-src', safe(item.image));
-            card.setAttribute('data-title', safe(title));
-            card.setAttribute('data-description', safe(desc));
-            card.innerHTML = `
-              <div class="aspect-[4/3] bg-gray-100">
-                <img src="${safe(item.image)}" alt="${safe(title || 'Klíma dekor')}" loading="lazy" referrerpolicy="no-referrer">
-              </div>
-              ${ (title||desc) ? `
-                <div class="px-4 py-3 bg-white">
-                  ${ title ? `<h3 class="text-base font-semibold text-gray-800">${safe(title)}</h3>` : ``}
-                  ${ desc  ? `<p class="text-sm text-gray-600 mt-1">${safe(desc)}</p>` : ``}
-                </div>` : ``}
-            `;
+          items.forEach((it, i)=>{
+            const url = String(it.image||'').trim();
+            if(!url) return;
+            const card = document.createElement('a');
+            card.className = 'pic-card h-card bg-white shadow hover:shadow-lg transition';
+            card.href = url;
+            card.setAttribute('data-src', url);
+            card.innerHTML = `<img src="${url}" alt="Klíma dekor kép ${i+1}">`;
+            card.addEventListener('click', (e)=>{
+              e.preventDefault();
+              if(window.openLightbox){ window.openLightbox(url, '', ''); }
+            });
             wrap.appendChild(card);
           });
-
-          // Lightbox kattintás
-          document.querySelectorAll('.dekor-card').forEach(card=>{
-            card.addEventListener('click',()=>{
-              const src = card.getAttribute('data-src');
-              const title = card.getAttribute('data-title') || '';
-              const desc  = card.getAttribute('data-description') || '';
-              if (window.openLightbox) window.openLightbox(src, title, desc);
-            });
-          });
-
-          // Mobilon "Több / Kevesebb" ha sok kép van
-          const isMobile = window.matchMedia('(max-width: 639px)');
-          const items = Array.from(document.querySelectorAll('.dekor-card'));
-          const moreThanFour = items.length > 4;
-
-          if (moreThanFour){
-            let expanded = false;
-            const toggleWrap = document.createElement('div');
-            toggleWrap.className = 'mt-4 text-center sm:hidden';
-            const btn = document.createElement('button');
-            btn.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 text-cyan-800 font-semibold shadow-md active:scale-[0.98]';
-            btn.innerHTML = '<span class="i">▼</span> <span class="t">Több…</span>';
-            toggleWrap.appendChild(btn);
-            wrap.after(toggleWrap);
-
-            function applyMobileClamp(){
-              if (isMobile.matches){
-                items.slice(4).forEach(el=>el.classList.toggle('mobile-hidden', !expanded));
-                toggleWrap.classList.remove('hidden');
-              } else {
-                items.forEach(el=>el.classList.remove('mobile-hidden'));
-                expanded = true;
-                toggleWrap.classList.add('hidden');
-              }
-            }
-            btn.addEventListener('click', (e)=>{
-              e.preventDefault(); e.stopPropagation();
-              expanded = !expanded;
-              applyMobileClamp();
-              btn.innerHTML = expanded ? '<span class="i">▲</span> <span class="t">Kevesebb…</span>' : '<span class="i">▼</span> <span class="t">Több…</span>';
-            });
-            isMobile.addEventListener('change', applyMobileClamp);
-            applyMobileClamp();
-          }
-
-          initializeScrollAnimation();
         })
-        .catch(()=>{
-          document.getElementById('gallery-container').innerHTML =
-            '<p class="col-span-full text-center text-red-500">Hiba történt a dekor galéria betöltésekor.</p>';
+        .catch(()=> {
+          document.getElementById('decor-empty').classList.remove('hidden');
         });
-    });
+    })();
+  </script>
+
+  <!-- Hash -> perjeles kompatibilitás (nem kötelező, de egységes) -->
+  <script>
+    (function(){
+      const map = {
+        '#dekor':'/klima-dekor',
+        '#klima-dekor':'/klima-dekor'
+      };
+      if(location.hash && map[location.hash]) location.replace(map[location.hash]);
+    })();
   </script>
 </body>
 </html>
