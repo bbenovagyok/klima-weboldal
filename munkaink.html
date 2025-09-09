@@ -134,8 +134,8 @@
         <div class="max-w-6xl mx-auto bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-cyan-900/5 p-6 md:p-8">
           <h2 class="text-2xl md:text-3xl font-black text-cyan-800 mb-6 text-center reveal-on-scroll">Galéria</h2>
 
-          <!-- Mobilon 2 oszlop (kisebb képek), md-től 3 oszlop -->
-          <div id="gallery-container" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+          <!-- MOBILON 2 oszlop, md-től 3 oszlop. Kisebb gap mobilon. -->
+          <div id="gallery-container" class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
             <p class="gallery-loading text-center col-span-full">Galéria betöltése...</p>
           </div>
         </div>
@@ -268,7 +268,7 @@
       }
     });
 
-    // ===== Galéria betöltés – index.html-hez igazítva =====
+    // ===== Galéria betöltés – mobilon 2 oszlop, md-től 3; „Több…” gomb mobilon =====
     window.addEventListener('DOMContentLoaded', () => {
       fetch('/data/gallery.json', {cache: 'no-store'})
         .then(r => r.json())
@@ -282,7 +282,7 @@
               const title = item.title || item.cim || '';
               const desc  = item.description || item.leiras || '';
 
-              // index-szerű kártya: mobilon négyzet (kisebb), md-től 4/3
+              // MOBILON négyzetes kártya (kisebb), md-től 4/3
               const el = document.createElement('a');
               el.href = '#';
               el.className = 'gallery-item group card-anim relative block aspect-square md:aspect-[4/3] overflow-hidden rounded-xl ring-1 ring-gray-200 bg-white shadow hover:shadow-lg transition cursor-zoom-in reveal-on-scroll';
@@ -335,17 +335,14 @@
             });
 
             document.getElementById('close-lightbox')?.addEventListener('click', closeLB);
-
-            // háttérre kattintva is zárjon (kép MELLÉ katt)
-            modal?.addEventListener('click', (e)=>{
-              if (!contentEl.contains(e.target)) closeLB();
-            });
-
+            // háttérre kattintva is zárjon
+            modal?.addEventListener('click', (e)=>{ if (!contentEl.contains(e.target)) closeLB(); });
             document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeLB(); });
 
-            // Mobil "Több… / Kevesebb…" ha >4 kép (pont mint az indexen)
+            // Mobil "Több… / Kevesebb…" ha >4 kép (és csak mobilon látszik)
             const isMobile = window.matchMedia('(max-width: 639px)');
             const items = Array.from(document.querySelectorAll('.gallery-item'));
+
             if (items.length > 4) {
               let expanded = false;
               const toggleWrap = document.createElement('div');
@@ -355,10 +352,12 @@
               toggleBtn.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 text-cyan-800 font-semibold shadow active:scale-[0.98]';
               toggleBtn.innerHTML = '<span class="i">▼</span> <span class="t">Több…</span>';
               toggleWrap.appendChild(toggleBtn);
+              // gomb a grid UTÁN
               wrap.after(toggleWrap);
 
               function applyMobileClamp() {
                 if (isMobile.matches) {
+                  // mobilon csak az első 4 látszik kezdetben
                   items.slice(4).forEach(el => el.classList.toggle('mobile-hidden', !expanded));
                   toggleWrap.classList.remove('hidden');
                 } else {
@@ -367,6 +366,7 @@
                   toggleWrap.classList.add('hidden');
                 }
               }
+
               toggleBtn.addEventListener('click',(e)=>{
                 e.preventDefault(); e.stopPropagation();
                 expanded = !expanded; applyMobileClamp();
@@ -374,7 +374,9 @@
                   ? '<span class="i">▲</span> <span class="t">Kevesebb…</span>'
                   : '<span class="i">▼</span> <span class="t">Több…</span>';
               });
+
               isMobile.addEventListener('change', applyMobileClamp);
+              // első beállítás (mobilon rejtse a 4 utániakat)
               applyMobileClamp();
             }
 
