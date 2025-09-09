@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Munkáink | Eszes Tiszta Klíma Kft.</title>
+  <meta name="description" content="Eszes Tiszta Klíma Kft. referenciák: klíma tisztítás, karbantartás és telepítés Siófokon és környékén. Valódi helyszínek, elégedett ügyfelek, gyors kiszállás.">
   <link rel="icon" href="https://i.postimg.cc/xTYhg4gG/image.png" type="image/png">
+  <link rel="canonical" href="https://eszestisztaklima.hu/munkaink">
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -36,19 +38,16 @@
   <script src="/js/work-map.js" defer></script>
 
   <style>
-    /* Alap tipó */
     body{font-family:'Inter',sans-serif}
 
-    /* --- A FŐOLDALRÓL: hero + header animáció + reveal --- */
+    /* ---- hero + header animáció + reveal (főoldal stílusai) ---- */
     .hero-bg{position:relative;background-image:url('https://i.postimg.cc/3J1W66pj/fdsffsf.jpg');background-size:cover;background-position:center}
     .hero-bg::before{content:'';position:absolute;inset:0;background-color:rgba(0,74,111,.7);z-index:1}
     .hero-content{position:relative;z-index:2}
     .text-shadow{ text-shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06)}
     .text-shadow-md{ text-shadow:0 2px 4px rgba(0,0,0,.2)}
-
     .reveal-on-scroll{opacity:0;transform:translateY(30px);transition:opacity .8s ease-out,transform .8s ease-out;transition-delay:var(--delay,0ms)}
     .reveal-on-scroll.is-visible{opacity:1;transform:translateY(0)}
-
     #header-container,#header-logo,#header-company-name,#main-nav,#mobile-menu-button{transition:all .5s cubic-bezier(.65,0,.35,1)}
     #header-container{justify-content:space-between}
     #main-header .max-w-6xl{text-align:center}
@@ -57,14 +56,14 @@
     .header-scrolled #header-logo{height:1.75rem}
     .header-scrolled #header-company-name{font-size:1.125rem}
 
-    /* Mobil "Több…" logikához */
+    /* Mobil „Több…” logikához – galéria */
     @media (max-width: 639px){ .mobile-hidden{ display: none !important; } }
   </style>
 </head>
 
 <body class="bg-gray-100 text-gray-800">
 
-  <!-- Header: ugyanaz a szerkezet/animáció mint a főoldalon -->
+  <!-- Header: főoldali animációs fejléc -->
   <header id="main-header" class="fixed top-0 left-0 right-0 z-50 p-4">
     <div class="max-w-6xl mx-auto">
       <div id="header-container" class="bg-white/80 backdrop-blur-xl shadow-lg rounded-full px-4 sm:px-6 py-2 flex items-center">
@@ -95,7 +94,7 @@
   </header>
 
   <main>
-    <!-- Hero: ugyanaz a „hero-bg” overlay stílus mint a főoldalon -->
+    <!-- Hero -->
     <section class="hero-bg text-white relative overflow-hidden">
       <div class="hero-content container mx-auto px-6 pt-32 pb-20 md:pt-40 md:pb-24 text-center">
         <h1 class="text-4xl md:text-6xl font-black leading-tight mb-4 reveal-on-scroll">Aktuális Munkáink</h1>
@@ -105,21 +104,58 @@
       </div>
     </section>
 
-    <!-- Galéria -->
-    <section class="py-12 bg-white">
+    <!-- Galéria – márkás háttér + kártyarács -->
+    <section class="py-16 bg-gradient-to-b from-cyan-50 to-white">
       <div class="container mx-auto px-6">
-        <h2 class="text-2xl md:text-3xl font-black text-cyan-800 mb-6 text-center reveal-on-scroll">Galéria</h2>
-        <div id="gallery-container">
-          <p class="gallery-loading text-center">Galéria betöltése...</p>
+        <div class="max-w-6xl mx-auto bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-cyan-900/5 p-6 md:p-8">
+          <h2 class="text-2xl md:text-3xl font-black text-cyan-800 mb-6 text-center reveal-on-scroll">Galéria</h2>
+          <div id="gallery-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <p class="gallery-loading text-center col-span-full">Galéria betöltése...</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Térkép blokk: egyező tipográfia/színek a főoldali „Munkáink” résszel -->
+    <!-- Térkép blokk -->
     <section class="py-16 bg-cyan-700 text-white">
       <div class="container mx-auto px-6">
         <h2 class="text-2xl md:text-3xl font-black mb-6 text-center reveal-on-scroll">Ahol már dolgoztunk</h2>
         <div id="work-map" class="mx-auto max-w-5xl"></div>
+      </div>
+    </section>
+
+    <!-- SEO-s tartalom: városok, USP-k, CTA -->
+    <section class="py-16">
+      <div class="container mx-auto px-6 max-w-5xl">
+        <h2 class="text-3xl font-black text-cyan-800 mb-4">Klíma tisztítás és telepítés Siófokon és környékén</h2>
+        <p class="text-gray-700 leading-relaxed mb-4">
+          Családi vállalkozásként <strong>Siófok</strong> központtal dolgozunk, de rendszeresen vállalunk munkát a
+          Balaton partján és a Dunántúlon. Fő profilunk a <strong>klíma tisztítás és karbantartás</strong>, valamint
+          a <strong>szakszerű telepítés</strong> garanciával.
+        </p>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="bg-white rounded-xl border border-gray-200 shadow p-5">
+            <h3 class="font-bold text-lg mb-2">Kiszállási területek</h3>
+            <p class="text-gray-700">
+              Siófok, Zamárdi, Balatonföldvár, Balatonvilágos, Ádánd, Ságvár, Szántód, Fonyód, Balatonlelle,
+              Balatonboglár és környékük.
+            </p>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 shadow p-5">
+            <h3 class="font-bold text-lg mb-2">Miért minket?</h3>
+            <ul class="list-disc pl-5 text-gray-700 space-y-1">
+              <li>Gyors időpont – jellemzően 48 órán belül</li>
+              <li>Tiszta, higiénikus munka, rendet hagyunk magunk után</li>
+              <li>Márkafüggetlen szerviz és karbantartás</li>
+              <li>Garanciás kivitelezés, számlával</li>
+            </ul>
+          </div>
+        </div>
+        <div class="text-center mt-8">
+          <a href="tel:+36709304841" class="inline-flex items-center gap-2 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-6 py-3 rounded-full shadow">
+            <i class="fa-solid fa-phone"></i> Hívjon most: +36 70 930 4841
+          </a>
+        </div>
       </div>
     </section>
   </main>
@@ -136,7 +172,7 @@
     </div>
   </div>
 
-  <!-- Lábléc – egyezik a főoldal tónusával -->
+  <!-- Lábléc -->
   <footer class="bg-gray-800 text-white py-10">
     <div class="container mx-auto px-6 text-center">
       <p class="text-xl font-bold text-white mb-2">Eszes Tiszta Klíma Kft.</p>
@@ -145,10 +181,40 @@
     </div>
   </footer>
 
-  <!-- “Fel” gomb mint a főoldalon (a header-animáció script ezt használja) -->
+  <!-- „Fel” gomb -->
   <a href="#" id="to-top-button" class="fixed bottom-5 right-5 z-50 w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg hover:bg-yellow-500 transition-all duration-300 opacity-0 translate-y-5">
     <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
   </a>
+
+  <!-- FAQ strukturált adat (SEO boost) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [{
+      "@type": "Question",
+      "name": "Mennyi idő alatt tudtok időpontot adni klíma tisztításra Siófokon?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Általában 48 órán belül vállaljuk a kiszállást Siófokon és környékén, szezonban egyeztetés alapján."
+      }
+    },{
+      "@type": "Question",
+      "name": "Vállaltok garanciát a munkára?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Igen, minden telepítésre és karbantartásra garanciát adunk, számlával."
+      }
+    },{
+      "@type": "Question",
+      "name": "Milyen területeken dolgoztok?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Siófok és a Balaton környéke: Zamárdi, Szántód, Balatonföldvár, Balatonlelle, Fonyód, Balatonboglár stb."
+      }
+    }]
+  }
+  </script>
 
   <script>
     // Mobil menü
@@ -175,7 +241,7 @@
       else { toTopButton.classList.add('opacity-0','translate-y-5'); }
     });
 
-    // Galéria betöltés (ugyanaz a logika, mint a főoldalon)
+    // Galéria betöltés – kártyás grid + egységes arányok
     window.addEventListener('DOMContentLoaded', () => {
       fetch('/data/gallery.json', {cache: 'no-store'})
         .then(r => r.json())
@@ -191,29 +257,29 @@
               const hasCaption = (title && title.trim().length) || (desc && desc.trim().length);
 
               const card = document.createElement('div');
-              card.className = 'gallery-item group relative overflow-hidden rounded-lg shadow-lg cursor-pointer reveal-on-scroll';
-              card.style.setProperty('--delay', `${i*80}ms`);
+              card.className = 'gallery-item group bg-white rounded-xl border border-gray-200 shadow hover:shadow-lg transition overflow-hidden reveal-on-scroll';
+              card.style.setProperty('--delay', `${i*70}ms`);
               card.setAttribute('data-src', safe(item.image));
               card.setAttribute('data-title', safe(title));
               card.setAttribute('data-description', safe(desc));
 
               card.innerHTML = `
-                <img src="${safe(item.image)}" alt="${safe(title || 'Galéria kép')}"
-                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors duration-300"></div>
+                <div class="relative aspect-[4/3] overflow-hidden">
+                  <img src="${safe(item.image)}" alt="${safe(title || 'Galéria kép')}"
+                       class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                  <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
+                </div>
                 ${hasCaption ? `
-                <div class="absolute inset-x-0 bottom-0 p-2">
-                  <div class="backdrop-blur-md bg-black/40 text-white rounded px-2 py-1 shadow opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
-                    ${title ? `<h4 class="text-xs font-semibold truncate">${safe(title)}</h4>` : ``}
-                    ${desc  ? `<p class="hidden sm:block text-[11px] text-white/85 mt-0.5">${safe(desc)}</p>` : ``}
-                  </div>
+                <div class="px-3 py-2">
+                  ${title ? `<h4 class="text-sm font-semibold text-gray-800 truncate">${safe(title)}</h4>` : ``}
+                  ${desc  ? `<p class="text-xs text-gray-600 mt-0.5 line-clamp-2">${safe(desc)}</p>` : ``}
                 </div>` : ``}
               `;
 
               galleryContainer.appendChild(card);
             });
 
-            // Lightbox kattintás
+            // Lightbox
             document.querySelectorAll('.gallery-item').forEach(card=>{
               card.addEventListener('click',()=>{
                 const src = card.getAttribute('data-src');
@@ -231,10 +297,10 @@
             if (moreThanFour) {
               let expanded = false;
               const toggleWrap = document.createElement('div');
-              toggleWrap.className = 'mt-4 text-center sm:hidden';
+              toggleWrap.className = 'mt-6 text-center sm:hidden';
               const toggleBtn = document.createElement('button');
               toggleBtn.id = 'gallery-toggle-btn';
-              toggleBtn.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 text-cyan-800 font-semibold shadow-md active:scale-[0.98]';
+              toggleBtn.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 text-cyan-800 font-semibold shadow active:scale-[0.98]';
               toggleBtn.innerHTML = '<span class="i">▼</span> <span class="t">Több…</span>';
               toggleWrap.appendChild(toggleBtn);
               galleryContainer.after(toggleWrap);
@@ -268,11 +334,12 @@
 
             initializeScrollAnimation();
           } else {
+            galleryContainer.classList.remove('grid');
             galleryContainer.innerHTML = '<p class="text-center">Jelenleg nincsenek képek a galériában.</p>';
           }
         })
         .catch(() => {
-          document.getElementById('gallery-container').innerHTML = '<p class="text-center text-red-500">Hiba történt a galéria betöltése közben.</p>';
+          document.getElementById('gallery-container').innerHTML = '<p class="text-center text-red-500 col-span-full">Hiba történt a galéria betöltése közben.</p>';
         });
     });
   </script>
