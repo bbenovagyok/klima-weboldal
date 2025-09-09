@@ -47,13 +47,9 @@
     .text-shadow{ text-shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06)}
     .text-shadow-md{ text-shadow:0 2px 4px rgba(0,0,0,.2)}
 
-    /* index-szerű belibbenős animáció */
-    .reveal-on-scroll{
-      opacity:0;transform:translateY(28px) scale(.98);
-      transition:opacity .7s ease, transform .7s cubic-bezier(.2,.65,.2,1);
-      transition-delay:var(--delay,0ms)
-    }
-    .reveal-on-scroll.is-visible{opacity:1;transform:translateY(0) scale(1)}
+    /* ugyanaz a belibbenős animáció mint indexen */
+    .reveal-on-scroll{opacity:0;transform:translateY(30px);transition:opacity .8s ease-out,transform .8s ease-out;transition-delay:var(--delay,0ms)}
+    .reveal-on-scroll.is-visible{opacity:1;transform:translateY(0)}
 
     #header-container,#header-logo,#header-company-name,#main-nav,#mobile-menu-button{transition:all .5s cubic-bezier(.65,0,.35,1)}
     #header-container{justify-content:space-between}
@@ -63,11 +59,13 @@
     .header-scrolled #header-logo{height:1.75rem}
     .header-scrolled #header-company-name{font-size:1.125rem}
 
-    /* Kártya-hover mint az indexen */
-    .card-anim{will-change:transform,box-shadow}
-    .card-anim:hover{transform:translateY(-2px)}
-    .card-anim img{transition:transform .5s ease}
-    .card-anim:hover img{transform:scale(1.04)}
+    /* Galéria – ugyanaz a telós kártyastílus mint az index.html-ben */
+    .dekor-card{ position:relative; overflow:hidden; border-radius:14px; }
+    .dekor-card img{ width:100%; height:100%; object-fit:cover; display:block; transition: transform .5s ease; }
+    .dekor-card:hover img{ transform: scale(1.05); }
+    .dekor-card .overlay{ position:absolute; inset:0; background:rgba(0,0,0,0); transition: background .35s ease; }
+    .dekor-card:hover .overlay{ background:rgba(0,0,0,.22); }
+    .aspect-4-3{ aspect-ratio: 4/3; }
 
     /* Mobil „Több…” logikához – galéria */
     @media (max-width: 639px){ .mobile-hidden{ display: none !important; } }
@@ -128,14 +126,14 @@
       </div>
     </section>
 
-    <!-- Galéria -->
+    <!-- Galéria – TELÓS NÉZET MÁSOLVA AZ INDEXBŐL (dekor-card, aspect-4-3) -->
     <section class="py-16 bg-gradient-to-b from-cyan-50 to-white">
       <div class="container mx-auto px-6">
         <div class="max-w-6xl mx-auto bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-cyan-900/5 p-6 md:p-8">
           <h2 class="text-2xl md:text-3xl font-black text-cyan-800 mb-6 text-center reveal-on-scroll">Galéria</h2>
 
-          <!-- MOBILON 2 oszlop, md-től 3 oszlop. Kisebb gap mobilon. -->
-          <div id="gallery-container" class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
+          <!-- Ugyanaz a rács mint indexen (mobilon 1 oszlop, sm: 2, lg: 3) -->
+          <div id="gallery-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <p class="gallery-loading text-center col-span-full">Galéria betöltése...</p>
           </div>
         </div>
@@ -268,13 +266,14 @@
       }
     });
 
-    // ===== Galéria betöltés – mobilon 2 oszlop, md-től 3; „Több…” gomb mobilon =====
+    // ===== Galéria betöltés – TELÓS NÉZET MINT INDEXEN =====
     window.addEventListener('DOMContentLoaded', () => {
       fetch('/data/gallery.json', {cache: 'no-store'})
         .then(r => r.json())
         .then(data => {
-          const wrap=document.getElementById('gallery-container');
-          wrap.innerHTML = '';
+          const galleryContainer=document.getElementById('gallery-container');
+          galleryContainer.innerHTML = '';
+
           if (data.images?.length) {
             const safe = s => String(s ?? '').replace(/"/g, '&quot;');
 
@@ -282,23 +281,25 @@
               const title = item.title || item.cim || '';
               const desc  = item.description || item.leiras || '';
 
-              // MOBILON négyzetes kártya (kisebb), md-től 4/3
-              const el = document.createElement('a');
-              el.href = '#';
-              el.className = 'gallery-item group card-anim relative block aspect-square md:aspect-[4/3] overflow-hidden rounded-xl ring-1 ring-gray-200 bg-white shadow hover:shadow-lg transition cursor-zoom-in reveal-on-scroll';
-              el.style.setProperty('--delay', `${i*70}ms`);
-              el.dataset.src  = safe(item.image);
-              el.dataset.title = safe(title);
-              el.dataset.description = safe(desc);
-              el.innerHTML = `
-                <img src="${safe(item.image)}" alt="${safe(title || 'Galéria kép')}"
-                     class="absolute inset-0 w-full h-full object-cover select-none">
-                <span class="pointer-events-none absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></span>
+              // Ugyanaz a kártya markup mint az index.html-ben
+              const card = document.createElement('div');
+              card.className = 'dekor-card cursor-pointer reveal-on-scroll';
+              card.style.setProperty('--delay', `${i*80}ms`);
+              card.setAttribute('data-src', safe(item.image));
+              card.setAttribute('data-title', safe(title));
+              card.setAttribute('data-description', safe(desc));
+
+              card.innerHTML = `
+                <div class="aspect-4-3 bg-gray-100 rounded-[14px] overflow-hidden">
+                  <img src="${safe(item.image)}" alt="${safe(title || 'Galéria kép')}" loading="lazy" referrerpolicy="no-referrer">
+                  <span class="overlay"></span>
+                </div>
               `;
-              wrap.appendChild(el);
+
+              galleryContainer.appendChild(card);
             });
 
-            // Lightbox megnyitás + SCROLL LOCK
+            // Lightbox megnyitás – háttérre kattintva is zár
             const modal = document.getElementById('lightbox');
             const imgEl = document.getElementById('lightbox-image');
             const ttlEl = document.getElementById('lightbox-title');
@@ -306,7 +307,9 @@
             const contentEl = document.getElementById('lightbox-content');
 
             function openLB(src, title, desc){
-              imgEl.src = src; ttlEl.textContent = title || ''; dscEl.textContent = desc || '';
+              imgEl.src = src || '';
+              ttlEl.textContent = title || '';
+              dscEl.textContent = desc || '';
               modal.classList.remove('hidden');
               document.body.classList.add('lock-scroll');
               window.addEventListener('wheel', preventScroll, { passive:false, capture:true });
@@ -321,11 +324,12 @@
             }
             function preventScroll(e){ e.preventDefault(); }
 
-            document.querySelectorAll('.gallery-item').forEach(a=>{
-              a.addEventListener('click',(e)=>{
-                e.preventDefault();
-                const src = a.dataset.src, title=a.dataset.title||'', desc=a.dataset.description||'';
-                if (typeof window.openLightbox === 'function') {
+            document.querySelectorAll('.dekor-card').forEach(card=>{
+              card.addEventListener('click',()=>{
+                const src = card.getAttribute('data-src');
+                const title = card.getAttribute('data-title') || '';
+                const desc  = card.getAttribute('data-description') || '';
+                if (typeof window.openLightbox === 'function'){
                   window.openLightbox(src, title, desc);
                   document.body.classList.add('lock-scroll');
                 } else {
@@ -335,29 +339,30 @@
             });
 
             document.getElementById('close-lightbox')?.addEventListener('click', closeLB);
-            // háttérre kattintva is zárjon
-            modal?.addEventListener('click', (e)=>{ if (!contentEl.contains(e.target)) closeLB(); });
+            document.getElementById('lightbox')?.addEventListener('click', e=>{
+              // kép MELLÉ kattintva is zárjon
+              if (!contentEl.contains(e.target)) closeLB();
+            });
             document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeLB(); });
 
-            // Mobil "Több… / Kevesebb…" ha >4 kép (és csak mobilon látszik)
+            // Mobil "Több… / Kevesebb…" – teljesen az index logika szerint
             const isMobile = window.matchMedia('(max-width: 639px)');
-            const items = Array.from(document.querySelectorAll('.gallery-item'));
+            const items = Array.from(document.querySelectorAll('.dekor-card'));
 
             if (items.length > 4) {
               let expanded = false;
+
               const toggleWrap = document.createElement('div');
-              toggleWrap.className = 'mt-6 text-center sm:hidden';
+              toggleWrap.className = 'mt-4 text-center sm:hidden';
               const toggleBtn = document.createElement('button');
               toggleBtn.id = 'gallery-toggle-btn';
-              toggleBtn.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 text-cyan-800 font-semibold shadow active:scale-[0.98]';
+              toggleBtn.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 text-cyan-800 font-semibold shadow-md active:scale-[0.98]';
               toggleBtn.innerHTML = '<span class="i">▼</span> <span class="t">Több…</span>';
               toggleWrap.appendChild(toggleBtn);
-              // gomb a grid UTÁN
-              wrap.after(toggleWrap);
+              galleryContainer.after(toggleWrap);
 
               function applyMobileClamp() {
                 if (isMobile.matches) {
-                  // mobilon csak az első 4 látszik kezdetben
                   items.slice(4).forEach(el => el.classList.toggle('mobile-hidden', !expanded));
                   toggleWrap.classList.remove('hidden');
                 } else {
@@ -368,26 +373,30 @@
               }
 
               toggleBtn.addEventListener('click',(e)=>{
-                e.preventDefault(); e.stopPropagation();
-                expanded = !expanded; applyMobileClamp();
+                e.preventDefault();
+                e.stopPropagation();
+                expanded = !expanded;
+                applyMobileClamp();
                 toggleBtn.innerHTML = expanded
                   ? '<span class="i">▲</span> <span class="t">Kevesebb…</span>'
                   : '<span class="i">▼</span> <span class="t">Több…</span>';
               });
 
               isMobile.addEventListener('change', applyMobileClamp);
-              // első beállítás (mobilon rejtse a 4 utániakat)
               applyMobileClamp();
+            } else {
+              items.forEach(el => el.classList.remove('mobile-hidden'));
             }
 
             initializeScrollAnimation();
           } else {
-            wrap.classList.remove('grid');
-            wrap.innerHTML = '<p class="text-center">Jelenleg nincsenek képek a galériában.</p>';
+            galleryContainer.classList.remove('grid');
+            galleryContainer.innerHTML = '<p class="text-center col-span-full">Jelenleg nincsenek képek a galériában.</p>';
           }
         })
         .catch(() => {
-          document.getElementById('gallery-container').innerHTML = '<p class="text-center text-red-500 col-span-full">Hiba történt a galéria betöltése közben.</p>';
+          const gc=document.getElementById('gallery-container');
+          gc.innerHTML = '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben.</p>';
         });
     });
   </script>
