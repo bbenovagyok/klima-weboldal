@@ -58,6 +58,9 @@
 
     /* Mobil „Több…” logikához – galéria */
     @media (max-width: 639px){ .mobile-hidden{ display: none !important; } }
+
+    /* Lightbox scroll-lock helper (ráteszem/leszedem JS-ből) */
+    .lock-scroll { overflow: hidden !important; }
   </style>
 </head>
 
@@ -141,7 +144,7 @@
             </p>
           </div>
           <div class="bg-white rounded-xl border border-gray-200 shadow p-5">
-            <h3 class="font-bold text-lg mb-2">Miért válasszon minket?</h3>
+            <h3 class="font-bold text-lg mb-2">Miért minket válasszon?</h3>
             <ul class="list-disc pl-5 text-gray-700 space-y-1">
               <li>Gyors időpont – jellemzően 48 órán belül</li>
               <li>Tiszta, higiénikus munka, rendet hagyunk magunk után</li>
@@ -160,13 +163,16 @@
   </main>
 
   <!-- Lightbox -->
-  <div id="lightbox" class="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 backdrop-blur-sm hidden transition-opacity duration-300">
-    <div id="lightbox-content" class="relative max-w-4xl max-h-[90vh] w-full p-4">
-      <button id="close-lightbox" aria-label="Bezárás" class="absolute top-2 right-3 text-white text-3xl leading-none">&times;</button>
-      <img id="lightbox-image" src="" alt="" class="max-w-full max-h-[75vh] mx-auto rounded-lg shadow-2xl">
-      <div id="lightbox-caption" class="text-center text-white mt-4">
-        <h4 id="lightbox-title" class="text-xl font-bold"></h4>
-        <p id="lightbox-description" class="text-white/80"></p>
+  <div id="lightbox" class="fixed inset-0 z-[110] hidden">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+    <div class="relative w-full h-full flex items-center justify-center p-4">
+      <div id="lightbox-content" class="relative max-w-4xl max-h-[90vh] w-full">
+        <button id="close-lightbox" aria-label="Bezárás" class="absolute -top-2 -right-2 md:-top-4 md:-right-4 text-white text-3xl leading-none bg-black/50 rounded-full w-10 h-10 flex items-center justify-center">&times;</button>
+        <img id="lightbox-image" src="" alt="" class="max-w-full max-h-[75vh] mx-auto rounded-lg shadow-2xl select-none">
+        <div id="lightbox-caption" class="text-center text-white mt-4">
+          <h4 id="lightbox-title" class="text-xl font-bold"></h4>
+          <p id="lightbox-description" class="text-white/80"></p>
+        </div>
       </div>
     </div>
   </div>
@@ -231,7 +237,7 @@
       else { toTopButton.classList.add('opacity-0','translate-y-5'); }
     });
 
-    // Galéria betöltés – csak kép (nincs caption => nincs fehér csík)
+    // ===== Galéria betöltés – nincs felesleges wrapper, ezért nincs fehér csík =====
     window.addEventListener('DOMContentLoaded', () => {
       fetch('/data/gallery.json', {cache: 'no-store'})
         .then(r => r.json())
@@ -245,55 +251,71 @@
               const title = item.title || item.cim || '';
               const desc  = item.description || item.leiras || '';
 
-              const card = document.createElement('div');
-              card.className = 'gallery-item group bg-white rounded-xl border border-gray-200 shadow hover:shadow-lg transition overflow-hidden reveal-on-scroll cursor-zoom-in';
-              card.style.setProperty('--delay', `${i*70}ms`);
-              card.setAttribute('data-src', safe(item.image));
-              card.setAttribute('data-title', safe(title));
-              card.setAttribute('data-description', safe(desc));
-
-              card.innerHTML = `
-                <div class="relative aspect-[4/3] overflow-hidden">
-                  <img src="${safe(item.image)}" alt="${safe(title || 'Galéria kép')}"
-                       class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                  <div class="pointer-events-none absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
-                </div>
+              // A KÉP MAGA A GRID-ELEM (anchor) -> nincs alsó üres blokk
+              const el = document.createElement('a');
+              el.href = '#';
+              el.className = 'gallery-item relative block aspect-[4/3] overflow-hidden rounded-xl ring-1 ring-gray-200 bg-white shadow hover:shadow-lg transition cursor-zoom-in reveal-on-scroll';
+              el.style.setProperty('--delay', `${i*70}ms`);
+              el.dataset.src  = safe(item.image);
+              el.dataset.title = safe(title);
+              el.dataset.description = safe(desc);
+              el.innerHTML = `
+                <img src="${safe(item.image)}" alt="${safe(title || 'Galéria kép')}"
+                     class="absolute inset-0 w-full h-full object-cover select-none">
+                <span class="pointer-events-none absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors"></span>
               `;
-
-              wrap.appendChild(card);
+              wrap.appendChild(el);
             });
 
-            // Lightbox kattintás
-            document.querySelectorAll('.gallery-item').forEach(card=>{
-              card.addEventListener('click',()=>{
-                const src = card.getAttribute('data-src');
-                const title = card.getAttribute('data-title') || '';
-                const desc  = card.getAttribute('data-description') || '';
+            // Lightbox megnyitás + SCROLL LOCK
+            const modal = document.getElementById('lightbox');
+            const imgEl = document.getElementById('lightbox-image');
+            const ttlEl = document.getElementById('lightbox-title');
+            const dscEl = document.getElementById('lightbox-description');
+
+            function openLB(src, title, desc){
+              imgEl.src = src; ttlEl.textContent = title || ''; dscEl.textContent = desc || '';
+              modal.classList.remove('hidden');
+              document.body.classList.add('lock-scroll');
+              // extra védelem: egérgörgő / touch tiltása
+              window.addEventListener('wheel', preventScroll, { passive:false, capture:true });
+              window.addEventListener('touchmove', preventScroll, { passive:false, capture:true });
+            }
+            function closeLB(){
+              modal.classList.add('hidden');
+              imgEl.src = '';
+              document.body.classList.remove('lock-scroll');
+              window.removeEventListener('wheel', preventScroll, { capture:true });
+              window.removeEventListener('touchmove', preventScroll, { capture:true });
+            }
+            function preventScroll(e){ e.preventDefault(); }
+
+            document.querySelectorAll('.gallery-item').forEach(a=>{
+              a.addEventListener('click',(e)=>{
+                e.preventDefault();
+                const src = a.dataset.src, title=a.dataset.title||'', desc=a.dataset.description||'';
                 if (typeof window.openLightbox === 'function') {
+                  // ha van külső implementáció, azt hívjuk, de scroll-lockot akkor is adunk
                   window.openLightbox(src, title, desc);
+                  document.body.classList.add('lock-scroll');
                 } else {
-                  // Fallback lightbox, ha a külső JS nem töltődött be
-                  const modal = document.getElementById('lightbox');
-                  document.getElementById('lightbox-image').src = src;
-                  document.getElementById('lightbox-title').textContent = title;
-                  document.getElementById('lightbox-description').textContent = desc;
-                  modal.classList.remove('hidden');
+                  openLB(src,title,desc);
                 }
               });
             });
 
-            // Fallback close
-            document.getElementById('close-lightbox')?.addEventListener('click',()=>document.getElementById('lightbox').classList.add('hidden'));
-            document.getElementById('lightbox')?.addEventListener('click',e=>{
-              if(e.target.id==='lightbox') document.getElementById('lightbox').classList.add('hidden');
+            document.getElementById('close-lightbox')?.addEventListener('click', closeLB);
+            // háttérre kattintva zár
+            document.getElementById('lightbox')?.addEventListener('click', e=>{
+              if (e.target.id === 'lightbox') closeLB();
             });
+            // Esc zár
+            document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeLB(); });
 
-            // Mobil "Több…" / "Kevesebb…" csak ha >4 kép
+            // Mobil "Több… / Kevesebb…" ha >4 kép
             const isMobile = window.matchMedia('(max-width: 639px)');
             const items = Array.from(document.querySelectorAll('.gallery-item'));
-            const moreThanFour = items.length > 4;
-
-            if (moreThanFour) {
+            if (items.length > 4) {
               let expanded = false;
               const toggleWrap = document.createElement('div');
               toggleWrap.className = 'mt-6 text-center sm:hidden';
@@ -314,17 +336,13 @@
                   toggleWrap.classList.add('hidden');
                 }
               }
-
-              toggleBtn.addEventListener('click', (e)=>{
-                e.preventDefault();
-                e.stopPropagation();
-                expanded = !expanded;
-                applyMobileClamp();
+              toggleBtn.addEventListener('click',(e)=>{
+                e.preventDefault(); e.stopPropagation();
+                expanded = !expanded; applyMobileClamp();
                 toggleBtn.innerHTML = expanded
                   ? '<span class="i">▲</span> <span class="t">Kevesebb…</span>'
                   : '<span class="i">▼</span> <span class="t">Több…</span>';
               });
-
               isMobile.addEventListener('change', applyMobileClamp);
               applyMobileClamp();
             }
