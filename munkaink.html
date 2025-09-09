@@ -40,7 +40,7 @@
   <style>
     body{font-family:'Inter',sans-serif}
 
-    /* ---- hero + header animáció + reveal (főoldal stílusai) ---- */
+    /* ---- hero + header animáció + reveal ---- */
     .hero-bg{position:relative;background-image:url('https://i.postimg.cc/3J1W66pj/fdsffsf.jpg');background-size:cover;background-position:center}
     .hero-bg::before{content:'';position:absolute;inset:0;background-color:rgba(0,74,111,.7);z-index:1}
     .hero-content{position:relative;z-index:2}
@@ -59,15 +59,24 @@
     /* Mobil „Több…” logikához – galéria */
     @media (max-width: 639px){ .mobile-hidden{ display: none !important; } }
 
-    /* Lightbox scroll-lock helper (ráteszem/leszedem JS-ből) */
+    /* Lightbox scroll-lock helper */
     .lock-scroll { overflow: hidden !important; }
+
+    /* --- Z-index fixek a térkép ellen --- */
+    /* A Leaflet pane-jei magas z-indexet használnak; lenyomjuk, hogy a header és a lightbox mindig felette legyen */
+    .leaflet-container,
+    .leaflet-pane,
+    .leaflet-top,
+    .leaflet-bottom {
+      z-index: 0 !important;
+    }
   </style>
 </head>
 
 <body class="bg-gray-100 text-gray-800">
 
-  <!-- Header: főoldali animációs fejléc -->
-  <header id="main-header" class="fixed top-0 left-0 right-0 z-50 p-4">
+  <!-- Header: animációs fejléc -->
+  <header id="main-header" class="fixed top-0 left-0 right-0 z-[1500] p-4">
     <div class="max-w-6xl mx-auto">
       <div id="header-container" class="bg-white/80 backdrop-blur-xl shadow-lg rounded-full px-4 sm:px-6 py-2 flex items-center">
         <a href="/" class="flex items-center">
@@ -99,17 +108,17 @@
   </header>
 
   <main>
-    <!-- Hero -->
+    <!-- Hero – kicsit kisebb, mint korábban (mobilon is) -->
     <section class="hero-bg text-white relative overflow-hidden">
-      <div class="hero-content container mx-auto px-6 pt-32 pb-20 md:pt-40 md:pb-24 text-center">
-        <h1 class="text-4xl md:text-6xl font-black leading-tight mb-4 reveal-on-scroll">Aktuális Munkáink</h1>
-        <p class="text-lg md:text-xl max-w-2xl mx-auto text-gray-100 reveal-on-scroll" style="--delay:150ms">
+      <div class="hero-content container mx-auto px-6 pt-28 pb-16 md:pt-36 md:pb-20 text-center">
+        <h1 class="text-[2.2rem] leading-tight md:text-6xl font-black mb-3 reveal-on-scroll">Aktuális Munkáink</h1>
+        <p class="text-base md:text-xl max-w-2xl mx-auto text-gray-100 reveal-on-scroll" style="--delay:150ms">
           Valódi helyszínek, valódi eredmények – nézd meg referenciáinkat és a térképet, hol jártunk már.
         </p>
       </div>
     </section>
 
-    <!-- Galéria – márkás háttér + kártyarács -->
+    <!-- Galéria -->
     <section class="py-16 bg-gradient-to-b from-cyan-50 to-white">
       <div class="container mx-auto px-6">
         <div class="max-w-6xl mx-auto bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-cyan-900/5 p-6 md:p-8">
@@ -164,8 +173,8 @@
     </section>
   </main>
 
-  <!-- Lightbox -->
-  <div id="lightbox" class="fixed inset-0 z-[110] hidden">
+  <!-- Lightbox (extra magas z-index) -->
+  <div id="lightbox" class="fixed inset-0 z-[2000] hidden">
     <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
     <div class="relative w-full h-full flex items-center justify-center p-4">
       <div id="lightbox-content" class="relative max-w-4xl max-h-[90vh] w-full">
@@ -189,7 +198,7 @@
   </footer>
 
   <!-- „Fel” gomb -->
-  <a href="#" id="to-top-button" class="fixed bottom-5 right-5 z-50 w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg hover:bg-yellow-500 transition-all duration-300 opacity-0 translate-y-5">
+  <a href="#" id="to-top-button" class="fixed bottom-5 right-5 z-[1600] w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg hover:bg-yellow-500 transition-all duration-300 opacity-0 translate-y-5">
     <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
   </a>
 
@@ -239,7 +248,7 @@
       else { toTopButton.classList.add('opacity-0','translate-y-5'); }
     });
 
-    // ===== Galéria betöltés – nincs felesleges wrapper, ezért nincs fehér csík =====
+    // ===== Galéria betöltés =====
     window.addEventListener('DOMContentLoaded', () => {
       fetch('/data/gallery.json', {cache: 'no-store'})
         .then(r => r.json())
@@ -253,10 +262,10 @@
               const title = item.title || item.cim || '';
               const desc  = item.description || item.leiras || '';
 
-              // A KÉP MAGA A GRID-ELEM (anchor) -> nincs alsó üres blokk
               const el = document.createElement('a');
               el.href = '#';
-              el.className = 'gallery-item relative block aspect-[4/3] overflow-hidden rounded-xl ring-1 ring-gray-200 bg-white shadow hover:shadow-lg transition cursor-zoom-in reveal-on-scroll';
+              // Mobilon laposabb (16/10), desktopon marad 4/3
+              el.className = 'gallery-item relative block aspect-[16/10] md:aspect-[4/3] overflow-hidden rounded-xl ring-1 ring-gray-200 bg-white shadow hover:shadow-lg transition cursor-zoom-in reveal-on-scroll';
               el.style.setProperty('--delay', `${i*70}ms`);
               el.dataset.src  = safe(item.image);
               el.dataset.title = safe(title);
@@ -279,7 +288,6 @@
               imgEl.src = src; ttlEl.textContent = title || ''; dscEl.textContent = desc || '';
               modal.classList.remove('hidden');
               document.body.classList.add('lock-scroll');
-              // extra védelem: egérgörgő / touch tiltása
               window.addEventListener('wheel', preventScroll, { passive:false, capture:true });
               window.addEventListener('touchmove', preventScroll, { passive:false, capture:true });
             }
@@ -297,7 +305,6 @@
                 e.preventDefault();
                 const src = a.dataset.src, title=a.dataset.title||'', desc=a.dataset.description||'';
                 if (typeof window.openLightbox === 'function') {
-                  // ha van külső implementáció, azt hívjuk, de scroll-lockot akkor is adunk
                   window.openLightbox(src, title, desc);
                   document.body.classList.add('lock-scroll');
                 } else {
@@ -307,11 +314,9 @@
             });
 
             document.getElementById('close-lightbox')?.addEventListener('click', closeLB);
-            // háttérre kattintva zár
             document.getElementById('lightbox')?.addEventListener('click', e=>{
               if (e.target.id === 'lightbox') closeLB();
             });
-            // Esc zár
             document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeLB(); });
 
             // Mobil "Több… / Kevesebb…" ha >4 kép
