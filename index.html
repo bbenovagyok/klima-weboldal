@@ -14,17 +14,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 
   <!-- Leaflet -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-    crossorigin=""
-  />
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin=""
-  ></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
   <!-- Saját komponens-stílusok (lightbox + térkép + galéria) -->
   <link rel="stylesheet" href="css/components.css" />
@@ -32,11 +23,9 @@
   <!-- Külső saját JS-ek -->
   <script src="js/lightbox.js" defer></script>
   <script src="js/work-map.js" defer></script>
-  <!-- Firebase + vélemény logika külön fájlokban -->
   <script type="module" src="js/reviews-firebase.js" defer></script>
 
   <style>
-    /* Alap tipó + hero + header animáció + reviews sáv „kerete” */
     body{font-family:'Inter',sans-serif}
     .hero-bg{position:relative;background-image:url('https://i.postimg.cc/3J1W66pj/fdsffsf.jpg');background-size:cover;background-position:center}
     .hero-bg::before{content:'';position:absolute;inset:0;background-color:rgba(0,74,111,.7);z-index:1}
@@ -63,10 +52,7 @@
       overflow: hidden;
     }
     .reviews-strip::before,
-    .reviews-strip::after{
-      content:"";
-      position:absolute; top:0; bottom:0; width:72px; z-index:2; pointer-events:none;
-    }
+    .reviews-strip::after{ content:""; position:absolute; top:0; bottom:0; width:72px; z-index:2; pointer-events:none; }
     .reviews-strip::before{ left:0; background: linear-gradient(to right, rgba(0,32,48,.85), rgba(0,32,48,0)); }
     .reviews-strip::after{ right:0; background: linear-gradient(to left, rgba(0,32,48,.85), rgba(0,32,48,0)); }
     #reviews-container{ display:inline-flex; gap:1rem; align-items:center; padding-inline:1rem; white-space:nowrap; }
@@ -81,7 +67,6 @@
     @media (hover:hover){ .marquee:hover{ animation-play-state: paused; } }
     @keyframes marquee{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
 
-    /* Fénycsík animáció a szolgáltatás kártyákon */
     .service-card{ position:relative; overflow:hidden; }
     .service-card::after{
       content:""; position:absolute; top:0; left:-30%;
@@ -92,11 +77,8 @@
     @media (hover:hover){ .service-card:hover::after{ opacity:1; animation: cardSweep 1.2s ease both; } }
     @media (hover:none){ .service-card::after{ opacity:1; animation: cardSweep 2.2s linear infinite; } }
     @keyframes cardSweep{ 0%{transform:translateX(-160%);} 100%{transform:translateX(520%);} }
-    @media (prefers-reduced-motion: reduce){
-      .service-card::after{ animation:none !important; opacity:.4; }
-    }
+    @media (prefers-reduced-motion: reduce){ .service-card::after{ animation:none !important; opacity:.4; } }
 
-    /* VERTIKÁLIS, KÁRTYÁS háttér-vélemények a vélemény űrlap mögé */
     .reviews-bg-vertical{ position:absolute; inset:0; padding:24px 16px; display:grid; grid-template-columns:1fr; gap:16px; pointer-events:none; opacity:.30; filter:blur(1px);}
     @media (min-width:640px){ .reviews-bg-vertical{ grid-template-columns:repeat(2,1fr);} }
     @media (min-width:1024px){ .reviews-bg-vertical{ grid-template-columns:repeat(3,1fr);} }
@@ -112,17 +94,13 @@
     @keyframes scrollUp{ 0%{transform:translateY(0);} 100%{transform:translateY(-50%);} }
     @media (prefers-reduced-motion: reduce){ .reviews-track{ animation:none !important; } }
 
-    /* Cookie sáv */
     #cookie-consent {transform: translateY(100%);opacity: 0;transition: transform .5s cubic-bezier(.22,.61,.36,1), opacity .5s ease;pointer-events: none;}
     #cookie-consent.show {transform: translateY(0);opacity: 1;pointer-events: auto;}
     @media (prefers-reduced-motion: reduce) {#cookie-consent { transition: none; }}
 
-    /* --- Mobilos „Több…”/„Kevesebb…” galéria --- */
-    @media (max-width: 639px){
-      .mobile-hidden{ display: none !important; }
-    }
+    @media (max-width: 639px){ .mobile-hidden{ display: none !important; } }
 
-    /* ——— ÚJ: Galériakártya (mint a Klíma Dekor oldalon) ——— */
+    /* Galériakártya (mint a Klíma Dekor oldalon) */
     .dekor-card{ position:relative; overflow:hidden; border-radius:14px; }
     .dekor-card img{ width:100%; height:100%; object-fit:cover; display:block; transition: transform .5s ease; }
     .dekor-card:hover img{ transform: scale(1.05); }
@@ -144,12 +122,10 @@
         </a>
 
         <nav id="main-nav" class="hidden md:flex items-center space-x-2">
-          <!-- ÚJ: Klíma Dekor az első helyen -->
           <a href="/klima-dekor" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Klíma Dekor</a>
           <a href="/szolgaltatasok" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Szolgáltatások</a>
           <a href="/munkaink" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Munkáink</a>
           <a href="/rolunk" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Rólunk</a>
-          <!-- „Időpontfoglalás” -> „Kapcsolat”, színezés nélkül -->
           <a href="/kapcsolat" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Kapcsolat</a>
         </nav>
 
@@ -169,33 +145,28 @@
   </header>
 
   <main>
-    <!-- Hero -->
+    <!-- Hero (kb. -5%) -->
     <section class="hero-bg text-white relative overflow-hidden">
-      <div class="hero-content container mx-auto px-6 pt-32 pb-28 md:pt-40 md:pb-24 text-center">
+      <div class="hero-content container mx-auto px-6 pt-28 pb-24 md:pt-36 md:pb-22 text-center">
         <h1 class="text-4xl md:text-6xl font-black leading-tight mb-4 reveal-on-scroll">Tökéletes klíma otthonodba 48 órán belül</h1>
         <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-gray-200 reveal-on-scroll" style="--delay:200ms">Forró nyarak és hideg telek ellen – mi gondoskodunk az otthonod kényelméről Siófokon és környékén.</p>
-        <div class="mt-10 reveal-on-scroll" style="--delay:400ms">
+        <div class="mt-8 reveal-on-scroll" style="--delay:400ms">
           <a href="/kapcsolat" class="bg-yellow-400 text-gray-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition duration-300 shadow-xl inline-block">Ingyenes ajánlat</a>
         </div>
       </div>
-      <!-- Reviews strip -->
       <div class="reviews-strip absolute bottom-0 left-0 right-0 py-4">
-        <div class="w-full flex">
-          <div id="reviews-container" class="marquee items-center"></div>
-        </div>
+        <div class="w-full flex"><div id="reviews-container" class="marquee items-center"></div></div>
       </div>
     </section>
 
-    <!-- Szolgáltatások – kisebb, kompaktabb -->
+    <!-- Szolgáltatások (kompakt) -->
     <section id="szolgaltatasok" class="py-14">
       <div class="container mx-auto px-6">
         <h2 class="text-3xl md:text-4xl font-black text-center mb-10 text-cyan-800 reveal-on-scroll">Szolgáltatásaink</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div class="service-card bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-gray-200 reveal-on-scroll">
             <div class="bg-cyan-100 rounded-full w-14 h-14 flex items-center justify-center mb-5">
-              <img src="https://i.postimg.cc/3RrjrPmX/air-conditioner.png" alt="Klíma telepítés ikon"
-                   class="w-12 h-12 object-contain pointer-events-none select-none"
-                   loading="lazy" referrerpolicy="no-referrer">
+              <img src="https://i.postimg.cc/3RrjrPmX/air-conditioner.png" alt="Klíma telepítés ikon" class="w-12 h-12 object-contain pointer-events-none select-none" loading="lazy" referrerpolicy="no-referrer">
             </div>
             <h3 class="text-lg md:text-xl font-bold mb-2">Klíma Telepítés</h3>
             <p class="text-gray-600 leading-relaxed text-[15px]">Modern, energiahatékony klímák szakszerű telepítése – kiválasztás, kivitelezés, garanciával.</p>
@@ -203,9 +174,7 @@
 
           <div class="service-card bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-gray-200 reveal-on-scroll" style="--delay:150ms">
             <div class="bg-cyan-100 rounded-full w-14 h-14 flex items-center justify-center mb-5">
-              <img src="https://i.postimg.cc/VvjqLm5k/check.png" alt="Tisztítás ikon"
-                   class="w-12 h-12 object-contain pointer-events-none select-none"
-                   loading="lazy" referrerpolicy="no-referrer">
+              <img src="https://i.postimg.cc/VvjqLm5k/check.png" alt="Tisztítás ikon" class="w-12 h-12 object-contain pointer-events-none select-none" loading="lazy" referrerpolicy="no-referrer">
             </div>
             <h3 class="text-lg md:text-xl font-bold mb-1">Tisztítás és Karbantartás</h3>
             <p class="text-gray-800 font-extrabold mb-1 text-[15px]">Hogy miért fontos?</p>
@@ -219,9 +188,7 @@
 
           <div class="service-card bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-gray-200 reveal-on-scroll" style="--delay:300ms">
             <div class="bg-cyan-100 rounded-full w-14 h-14 flex items-center justify-center mb-5">
-              <img src="https://i.postimg.cc/DyGj848B/air-condition.png" alt="Javítás ikon"
-                   class="w-12 h-12 object-contain pointer-events-none select-none"
-                   loading="lazy" referrerpolicy="no-referrer">
+              <img src="https://i.postimg.cc/DyGj848B/air-condition.png" alt="Javítás ikon" class="w-12 h-12 object-contain pointer-events-none select-none" loading="lazy" referrerpolicy="no-referrer">
             </div>
             <h3 class="text-lg md:text-xl font-bold mb-2">Javítás és Hibaelhárítás</h3>
             <p class="text-gray-600 leading-relaxed text-[15px]">Márkafüggetlen gyorsszerviz Siófokon és környékén – hívjon bizalommal!</p>
@@ -236,7 +203,6 @@
         <h2 class="text-4xl md:text-5xl font-black text-center mb-4 text-white reveal-on-scroll">Aktuális Munkáink</h2>
         <p class="text-center text-lg text-cyan-100 mb-12 max-w-2xl mx-auto reveal-on-scroll" style="--delay:150ms">Minden klímánk mögött egy elégedett ügyfél áll!</p>
 
-        <!-- ÚJ: ugyanaz a kártya/hover mint a Klíma Dekor oldalon -->
         <div id="gallery-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <p class="gallery-loading text-center col-span-full">Galéria betöltése...</p>
         </div>
@@ -248,30 +214,30 @@
       </div>
     </section>
 
-    <!-- Rólunk -->
-    <section id="rolunk" class="py-20">
+    <!-- Rólunk (kompakt) -->
+    <section id="rolunk" class="py-16">
       <div class="container mx-auto px-6">
-        <div class="flex flex-col md:flex-row items-center gap-12">
+        <div class="flex flex-col md:flex-row items-center gap-10">
           <div class="md:w-1/2 reveal-on-scroll">
             <img src="https://i.postimg.cc/4yCkJ4zj/20250705-112625.jpg" alt="Barátságos klímaszerelő csapat" class="rounded-2xl shadow-2xl w-full">
           </div>
           <div class="md:w-1/2 reveal-on-scroll" style="--delay:200ms">
-            <h2 class="text-4xl md:text-5xl font-black mb-6 text-cyan-800 text-center">Rólunk</h2>
-            <div class="bg-white p-6 rounded-2xl shadow-lg">
-              <div class="space-y-4 text-gray-700 text-base md:text-lg leading-relaxed">
+            <h2 class="text-3xl md:text-4xl font-black mb-5 text-cyan-800 text-center">Rólunk</h2>
+            <div class="bg-white p-5 rounded-2xl shadow-lg">
+              <div class="space-y-3 text-gray-700 text-base leading-relaxed">
                 <p>Az Eszes Tiszta Klíma Kft. egy családi vállalkozás, ahol a tiszta és megbízható klímákért dolgozunk.</p>
                 <p>A rendszeres tisztítás és karbantartás növeli az élettartamot, csökkenti a fogyasztást, és egészségesebb beltéri levegőt ad.</p>
                 <p>Több ezer karbantartás és több száz telepítés tapasztalatával dolgozunk.</p>
               </div>
-              <blockquote class="border-l-4 border-yellow-400 pl-4 italic mt-6 text-xl text-gray-800 font-semibold">Mottónk: Legyen a te klímád is tiszta!</blockquote>
+              <blockquote class="border-l-4 border-yellow-400 pl-4 italic mt-5 text-lg text-gray-800 font-semibold">Mottónk: Legyen a te klímád is tiszta!</blockquote>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Vélemények – űrlap (a háttér „kártyás” függőleges sávok intact) -->
-    <section id="velemenyek" class="py-20 bg-gray-200 relative overflow-hidden">
+    <!-- Vélemények – űrlap (kompakt, háttér animáció változatlan) -->
+    <section id="velemenyek" class="py-16 bg-gray-200 relative overflow-hidden">
       <div class="reviews-bg-vertical" aria-hidden="true">
         <div class="reviews-col" id="rev-col-1"></div>
         <div class="reviews-col" id="rev-col-2"></div>
@@ -279,10 +245,10 @@
       </div>
 
       <div class="container mx-auto px-6 max-w-3xl relative">
-        <h2 class="text-4xl md:text-5xl font-black text-center mb-6 text-cyan-800">Vélemény írása</h2>
-        <p class="text-center text-gray-600 mb-8">Írd meg röviden a tapasztalatod – köszönjük!</p>
+        <h2 class="text-3xl md:text-4xl font-black text-center mb-5 text-cyan-800">Vélemény írása</h2>
+        <p class="text-center text-gray-600 mb-6">Írd meg röviden a tapasztalatod – köszönjük!</p>
 
-        <form id="reviewForm" class="bg-white rounded-2xl shadow-xl p-6 md:p-8 space-y-4">
+        <form id="reviewForm" class="bg-white rounded-2xl shadow-xl p-6 md:p-7 space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label for="reviewerName" class="block text-sm font-semibold text-gray-700 mb-1">Név</label>
@@ -304,13 +270,11 @@
       </div>
     </section>
 
-    <!-- KAPCSOLAT – CTA blokk visszarakva -->
+    <!-- KAPCSOLAT – CTA -->
     <section id="kapcsolat" class="py-20 bg-cyan-700 text-white">
       <div class="container mx-auto px-6 text-center">
         <h2 class="text-4xl md:text-5xl font-black mb-4 reveal-on-scroll">Készen áll a tökéletes klímára?</h2>
-        <p class="text-xl mb-8 text-cyan-100 reveal-on-scroll" style="--delay:150ms">
-          Hívjon minket bizalommal időpontért vagy egyedi ajánlatért!
-        </p>
+        <p class="text-xl mb-8 text-cyan-100 reveal-on-scroll" style="--delay:150ms">Hívjon minket bizalommal időpontért vagy egyedi ajánlatért!</p>
 
         <div class="inline-block bg-white/90 text-cyan-800 rounded-xl p-8 shadow-2xl reveal-on-scroll" style="--delay:300ms">
           <p class="text-lg mb-2">Időpontegyeztetés telefonon:</p>
@@ -331,14 +295,14 @@
     </section>
   </main>
 
-  <!-- Lightbox -->
-  <div id="lightbox" class="fixed inset-0 z-[110] flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm hidden transition-opacity duration-300">
+  <!-- Lightbox (HTML) -->
+  <div id="lightbox" class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/80 backdrop-blur-sm">
     <div id="lightbox-content" class="relative max-w-4xl max-h-[90vh] w-full p-4">
-      <button id="close-lightbox" aria-label="Bezárás">&times;</button>
+      <button id="close-lightbox" aria-label="Bezárás" class="absolute -top-2 right-2 text-white text-4xl leading-none">&times;</button>
       <img id="lightbox-image" src="" alt="" class="max-w-full max-h-[75vh] mx-auto rounded-lg shadow-2xl">
       <div id="lightbox-caption" class="text-center text-white mt-4">
         <h4 id="lightbox-title" class="text-xl font-bold"></h4>
-        <p id="lightbox-description" class="text-gray-300"></p>
+        <p id="lightbox-description" class="text-white/80"></p>
       </div>
     </div>
   </div>
@@ -355,7 +319,7 @@
     <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
   </a>
 
-  <!-- UI + Galéria -->
+  <!-- UI + Galéria + Lightbox-logic -->
   <script>
     // Mobil menü
     const mobileMenuButton=document.getElementById('mobile-menu-button');
@@ -363,7 +327,7 @@
     mobileMenuButton?.addEventListener('click',()=>mobileMenu.classList.toggle('hidden'));
     mobileMenu?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>mobileMenu.classList.add('hidden')));
 
-    // Scroll animáció (reveal)
+    // Scroll animáció
     function initializeScrollAnimation(){
       const obs=new IntersectionObserver((entries)=>{
         entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('is-visible'); obs.unobserve(e.target);} });
@@ -381,7 +345,37 @@
       else { toTopButton.classList.add('opacity-0','translate-y-5'); }
     });
 
-    // Galéria betöltése + MOBIL „Több…” gomb (csak ha > 4 kép)
+    // ——— Biztos lightbox implementáció (mint a Klíma Dekoron) ———
+    (function(){
+      const lb = document.getElementById('lightbox');
+      const img = document.getElementById('lightbox-image');
+      const ttl = document.getElementById('lightbox-title');
+      const desc = document.getElementById('lightbox-description');
+      const closeBtn = document.getElementById('close-lightbox');
+
+      function openLightbox(src, title='', description=''){
+        img.src = src || '';
+        ttl.textContent = title || '';
+        desc.textContent = description || '';
+        lb.classList.remove('hidden');
+        lb.classList.add('flex');
+        document.documentElement.style.overflow='hidden';
+      }
+      function closeLightbox(){
+        lb.classList.add('hidden');
+        lb.classList.remove('flex');
+        img.src='';
+        document.documentElement.style.overflow='';
+      }
+      // Ha külső lightbox.js nincs, exportálunk egyet
+      if(!window.openLightbox){ window.openLightbox = openLightbox; }
+
+      closeBtn.addEventListener('click', closeLightbox);
+      lb.addEventListener('click', (e)=>{ if(e.target===lb) closeLightbox(); });
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeLightbox(); });
+    })();
+
+    // Galéria betöltése + mobil „Több…” gomb
     window.addEventListener('DOMContentLoaded', () => {
       fetch('data/gallery.json', {cache: 'no-store'})
         .then(r => r.json())
@@ -422,7 +416,7 @@
               });
             });
 
-            // === Mobilon: csak ha >4 kép, akkor van „Több…” gomb ===
+            // Mobilon „Több/Kevesebb” ha >4 kép
             const isMobile = window.matchMedia('(max-width: 639px)');
             const items = Array.from(document.querySelectorAll('.dekor-card'));
             const moreThanFour = items.length > 4;
@@ -475,10 +469,8 @@
           document.getElementById('gallery-container').innerHTML = '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben.</p>';
         });
     });
-  </script>
 
-  <!-- Visszafelé kompatibilitás: #hash -> perjeles útvonal -->
-  <script>
+    // Hash -> útvonal visszairányítás (változatlan)
     (function() {
       const map = {
         '#szolgaltatasok': '/szolgaltatasok',
@@ -486,19 +478,15 @@
         '#rolunk': '/rolunk',
         '#kapcsolat': '/kapcsolat'
       };
-      if (location.hash && map[location.hash]) {
-        location.replace(map[location.hash]);
-      }
+      if (location.hash && map[location.hash]) { location.replace(map[location.hash]); }
       document.addEventListener('click', (e) => {
-        const a = e.target.closest('a[href^="#"]');
-        if (!a) return;
-        const to = map[a.getAttribute('href')];
-        if (to) { e.preventDefault(); location.href = to; }
+        const a = e.target.closest('a[href^="#"]'); if (!a) return;
+        const to = map[a.getAttribute('href')]; if (to) { e.preventDefault(); location.href = to; }
       });
     })();
   </script>
 
-  <!-- Cookie (Süti) sáv -->
+  <!-- Cookie sáv -->
   <div id="cookie-consent" class="fixed left-0 right-0 bottom-0 z-[200]">
     <div class="mx-auto max-w-3xl mb-4 px-4">
       <div class="bg-white/95 backdrop-blur-md border border-cyan-700/20 rounded-2xl shadow-xl p-4 md:p-5 flex flex-col md:flex-row items-start md:items-center gap-4">
@@ -508,18 +496,12 @@
           </svg>
         </div>
         <p class="text-sm text-gray-700 leading-relaxed">
-          Ez a weboldal sütiket használ a működéshez és a látogatottság méréséhez. Az
-          <span class="font-semibold">„Elfogadom”</span> gombbal hozzájárulsz ezek használatához.
+          Ez a weboldal sütiket használ a működéshez és a látogatottság méréséhez.
+          Az <span class="font-semibold">„Elfogadom”</span> gombbal hozzájárulsz ezek használatához.
         </p>
         <div class="flex items-center gap-2 md:ml-auto">
-          <button id="cookie-decline"
-            class="px-3 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm">
-            Csak szükséges
-          </button>
-          <button id="cookie-accept"
-            class="px-3 py-2 rounded-lg bg-cyan-600 text-white hover:bg-cyan-700 text-sm font-semibold">
-            Elfogadom
-          </button>
+          <button id="cookie-decline" class="px-3 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm">Csak szükséges</button>
+          <button id="cookie-accept" class="px-3 py-2 rounded-lg bg-cyan-600 text-white hover:bg-cyan-700 text-sm font-semibold">Elfogadom</button>
         </div>
       </div>
     </div>
@@ -532,7 +514,6 @@
     const bar = document.getElementById('cookie-consent');
     if (!saved) { requestAnimationFrame(() => bar.classList.add('show')); }
     else { try { window.COOKIE_CONSENT = JSON.parse(saved).accepted; } catch{} }
-
     const hide = () => { bar.classList.remove('show'); setTimeout(() => bar.remove(), 600); };
     document.getElementById('cookie-accept')?.addEventListener('click', () => {
       localStorage.setItem(KEY, JSON.stringify({ accepted: true, date: new Date().toISOString() }));
