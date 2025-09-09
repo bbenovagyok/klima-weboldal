@@ -108,11 +108,11 @@
   </header>
 
   <main>
-    <!-- Hero – kicsit kisebb, mint korábban (mobilon is) -->
+    <!-- Hero – pontosan a klíma-dekor méretezéssel -->
     <section class="hero-bg text-white relative overflow-hidden">
-      <div class="hero-content container mx-auto px-6 pt-28 pb-16 md:pt-36 md:pb-20 text-center">
-        <h1 class="text-[2.2rem] leading-tight md:text-6xl font-black mb-3 reveal-on-scroll">Aktuális Munkáink</h1>
-        <p class="text-base md:text-xl max-w-2xl mx-auto text-gray-100 reveal-on-scroll" style="--delay:150ms">
+      <div class="hero-content container mx-auto px-6 pt-28 pb-12 md:pt-32 md:pb-14 text-center">
+        <h1 class="text-3xl md:text-5xl font-black leading-tight mb-3 reveal-on-scroll">Aktuális Munkáink</h1>
+        <p class="text-base md:text-lg max-w-3xl mx-auto text-gray-100 reveal-on-scroll" style="--delay:140ms">
           Valódi helyszínek, valódi eredmények – nézd meg referenciáinkat és a térképet, hol jártunk már.
         </p>
       </div>
@@ -264,7 +264,7 @@
 
               const el = document.createElement('a');
               el.href = '#';
-              // Mobilon laposabb (16/10), desktopon marad 4/3
+              /* mobilon maradhat a laposabb arány, desktopon 4/3 */
               el.className = 'gallery-item relative block aspect-[16/10] md:aspect-[4/3] overflow-hidden rounded-xl ring-1 ring-gray-200 bg-white shadow hover:shadow-lg transition cursor-zoom-in reveal-on-scroll';
               el.style.setProperty('--delay', `${i*70}ms`);
               el.dataset.src  = safe(item.image);
@@ -283,6 +283,7 @@
             const imgEl = document.getElementById('lightbox-image');
             const ttlEl = document.getElementById('lightbox-title');
             const dscEl = document.getElementById('lightbox-description');
+            const contentEl = document.getElementById('lightbox-content');
 
             function openLB(src, title, desc){
               imgEl.src = src; ttlEl.textContent = title || ''; dscEl.textContent = desc || '';
@@ -314,9 +315,12 @@
             });
 
             document.getElementById('close-lightbox')?.addEventListener('click', closeLB);
-            document.getElementById('lightbox')?.addEventListener('click', e=>{
-              if (e.target.id === 'lightbox') closeLB();
+
+            // <<< Itt módosítottuk: a KÉP MELLÉ kattintva is zárjon >>>
+            modal?.addEventListener('click', (e)=>{
+              if (!contentEl.contains(e.target)) closeLB();
             });
+
             document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeLB(); });
 
             // Mobil "Több… / Kevesebb…" ha >4 kép
