@@ -6,6 +6,7 @@ media_folder: "img/uploads"
 public_folder: "/img/uploads"
 
 collections:
+  # --- MUNKÁINK GALÉRIA (meglévő) ---
   - name: "gallery"
     label: "Galéria"
     editor: { preview: false }
@@ -23,6 +24,7 @@ collections:
               - { label: "Cím (nem kötelező)", name: "title", widget: "string", required: false }
               - { label: "Leírás (nem kötelező)", name: "description", widget: "string", required: false }
 
+  # --- MUNKATERÜLETEK (meglévő) ---
   - name: "locations"
     label: "Munkaterületek"
     editor: { preview: false }
@@ -58,3 +60,21 @@ collections:
                     widget: "string"
                     required: true
                     hint: "Pl. Siófok"
+
+  # --- KLÍMA DEKOR GALÉRIA (ÚJ) ---
+  - name: "decor"
+    label: "Klíma dekor galéria"
+    editor: { preview: false }
+    media_folder: "img/dekor"
+    public_folder: "/img/dekor"
+    files:
+      - label: "Dekor képek"
+        name: "dekor"
+        file: "data/dekor.json"
+        fields:
+          - label: "Képek"
+            name: "images"
+            widget: "list"
+            summary: "Kép"
+            fields:
+              - { label: "Kép", name: "image", widget: "image", required: true }
