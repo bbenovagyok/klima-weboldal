@@ -2,7 +2,7 @@ backend:
   name: git-gateway
   branch: main
 
-media_folder: "img/uploads"
+media_folder: "img/uploads"   # alapértelmezett feltöltési hely
 public_folder: "/img/uploads"
 
 collections:
@@ -65,7 +65,8 @@ collections:
   - name: "decor"
     label: "Klíma dekor galéria"
     editor: { preview: false }
-    media_folder: "img/dekor"
+    # FONTOS: abszolút utak -> mindig a repo gyökeréhez képest
+    media_folder: "/img/dekor"
     public_folder: "/img/dekor"
     files:
       - label: "Dekor képek"
@@ -78,3 +79,5 @@ collections:
             summary: "Kép"
             fields:
               - { label: "Kép", name: "image", widget: "image", required: true }
+              - { label: "Cím (nem kötelező)", name: "title", widget: "string", required: false }
+              - { label: "Leírás (nem kötelező)", name: "description", widget: "string", required: false }
