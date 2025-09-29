@@ -279,7 +279,7 @@
         <div class="inline-block bg-white/90 text-cyan-800 rounded-xl p-8 shadow-2xl reveal-on-scroll" style="--delay:300ms">
           <p class="text-lg mb-2">Időpontegyeztetés telefonon:</p>
           <a href="tel:+36709304841" class="text-4xl font-bold hover:text-cyan-600 transition-colors duration-300 flex items-center justify-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.518.759a1 1 0 00-.43 1.659l4.592 4.592a1 1 0 001.659-.43l.759-1.518a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.518.759a1 156 1 156 0 00-.43 1.659l4.592 4.592a1.156 1.156 0 001.659-.43l.759-1.518a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
             +36 70 930 4841
           </a>
           <p class="mt-4 text-sm text-gray-600">Hívható hétköznap 8:00 és 18:00 között.</p>
@@ -525,9 +525,130 @@
     });
   })();
   </script>
+
+  <!-- === PÁLYÁZAT POPUP – MODUL (HOZZÁADVA) === -->
+  <div id="palyazat-popup" class="fixed inset-0 z-[300] hidden items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity duration-300">
+    <div id="palyazat-popup-content" class="bg-yellow-50 rounded-xl shadow-2xl p-8 max-w-lg w-full m-4 relative transform transition-all duration-300 opacity-0 translate-y-5">
+      <button id="palyazat-popup-close" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800" aria-label="Bezárás">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+      <div class="text-center">
+        <h2 class="text-3xl font-bold text-yellow-800">PÁLYÁZATI LEHETŐSÉG!</h2>
+        <p class="text-4xl md:text-5xl font-black text-cyan-800 my-4">100.000 Ft kedvezmény</p>
+        <p class="text-lg text-gray-700">
+          A P-HEM Klíma pályázat keretében most minden magánszemély, aki meglévő fűtési rendszerét klímás fűtéssel egészítené ki, bruttó 100.000 Ft kedvezményre jogosult!
+        </p>
+        <p class="text-gray-600 mt-2">(A pályázatban csak Polar klímák használhatók fel.)</p>
+        <a href="/kapcsolat" id="palyazat-popup-cta" class="mt-6 bg-cyan-600 text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-cyan-700 transition duration-300 shadow-lg inline-block">
+          Segítünk a pályázatban!
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ======= KONFIG =======
+    const PalyazatPopupConfig = {
+      enabled: true,                 // KI/BE kapcsoló
+      trigger: {                     // Mikor jelenjen meg?
+        type: 'delay',               // 'delay' | 'scroll' | 'exitIntent'
+        delayMs: 2000,               // csak 'delay' esetén
+        scrollPercent: 50            // csak 'scroll' esetén
+      },
+      storageMode: 'none',           // 'none' => MINDIG megjelenik (betöltés/refresh)
+                                     // 'session' => laponként egyszer
+                                     // 'local' => csak egyszer amíg ki nem ürítik
+      storageKey: 'palyazatPopupShown',
+      animMs: 300
+    };
+
+    // ======= KÓD =======
+    (function () {
+      const cfg = PalyazatPopupConfig;
+      if (!cfg.enabled) return;
+
+      const $overlay = document.getElementById('palyazat-popup');
+      const $content = document.getElementById('palyazat-popup-content');
+      const $close = document.getElementById('palyazat-popup-close');
+      const $cta = document.getElementById('palyazat-popup-cta');
+
+      const storage = {
+        get() {
+          if (cfg.storageMode === 'session') return sessionStorage.getItem(cfg.storageKey);
+          if (cfg.storageMode === 'local') return localStorage.getItem(cfg.storageKey);
+          return null; // 'none'
+        },
+        set() {
+          if (cfg.storageMode === 'session') sessionStorage.setItem(cfg.storageKey, '1');
+          if (cfg.storageMode === 'local') localStorage.setItem(cfg.storageKey, '1');
+        }
+      };
+
+      function shouldShow() {
+        if (cfg.storageMode === 'none') return true;
+        return !storage.get();
+      }
+
+      function openPopup() {
+        if (!shouldShow()) return;
+        $overlay.classList.remove('hidden');
+        // tailwind animáció beindítása
+        requestAnimationFrame(() => {
+          $overlay.classList.add('flex');
+          $overlay.classList.remove('opacity-0');
+          $content.classList.remove('opacity-0','translate-y-5');
+        });
+        storage.set();
+      }
+
+      function closePopup() {
+        $overlay.classList.add('opacity-0');
+        $content.classList.add('opacity-0','translate-y-5');
+        setTimeout(() => {
+          $overlay.classList.add('hidden');
+          $overlay.classList.remove('flex');
+        }, cfg.animMs);
+      }
+
+      function setupExitIntent() {
+        function onMouseOut(e) {
+          if (e.clientY <= 0) {
+            document.removeEventListener('mouseout', onMouseOut);
+            openPopup();
+          }
+        }
+        document.addEventListener('mouseout', onMouseOut);
+      }
+
+      function setupScrollTrigger() {
+        function onScroll() {
+          const scrollTop = window.scrollY || document.documentElement.scrollTop;
+          const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+          const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 100;
+          if (pct >= (cfg.trigger.scrollPercent || 50)) {
+            window.removeEventListener('scroll', onScroll);
+            openPopup();
+          }
+        }
+        window.addEventListener('scroll', onScroll);
+      }
+
+      // Események
+      $close.addEventListener('click', closePopup);
+      $cta.addEventListener('click', closePopup);
+      $overlay.addEventListener('click', (e) => { if (e.target === $overlay) closePopup(); });
+
+      // Indítás
+      if (cfg.trigger.type === 'delay') {
+        setTimeout(openPopup, cfg.trigger.delayMs || 0);
+      } else if (cfg.trigger.type === 'exitIntent') {
+        setupExitIntent();
+      } else if (cfg.trigger.type === 'scroll') {
+        setupScrollTrigger();
+      }
+    })();
+  </script>
+  <!-- === /PÁLYÁZAT POPUP – MODUL === -->
+
 </body>
 </html>
-
-
-
-
