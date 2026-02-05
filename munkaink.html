@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="hu" class="scroll-smooth">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Munkáink | Eszes Tiszta Klíma Kft.</title>
-  <meta name="description" content="Eszes Tiszta Klíma Kft. referenciák: klíma tisztítás, karbantartás és telepítés Siófokon és környékén. Valódi helyszínek, elégedett ügyfelek, gyors kiszállás.">
+  <meta name="description"
+    content="Eszes Tiszta Klíma Kft. referenciák: klíma tisztítás, karbantartás és telepítés Siófokon és környékén. Valódi helyszínek, elégedett ügyfelek, gyors kiszállás.">
   <link rel="icon" href="https://i.postimg.cc/xTYhg4gG/image.png" type="image/png">
   <link rel="canonical" href="https://eszestisztaklima.hu/munkaink">
 
@@ -15,11 +17,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
   <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
   <!-- Saját komponens-stílusok (lightbox + térkép) -->
   <link rel="stylesheet" href="/css/components.css" />
@@ -29,55 +33,164 @@
   <script src="/js/work-map.js" defer></script>
 
   <style>
-    body{font-family:'Inter',sans-serif}
+    body {
+      font-family: 'Inter', sans-serif
+    }
 
     /* ---- hero + header animáció + reveal ---- */
-    .hero-bg{position:relative;background-image:url('https://i.postimg.cc/3J1W66pj/fdsffsf.jpg');background-size:cover;background-position:center}
-    .hero-bg::before{content:'';position:absolute;inset:0;background-color:rgba(0,74,111,.7);z-index:1}
-    .hero-content{position:relative;z-index:2}
-    .text-shadow{ text-shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06)}
-    .text-shadow-md{ text-shadow:0 2px 4px rgba(0,0,0,.2)}
+    .hero-bg {
+      position: relative;
+      background-image: url('https://i.postimg.cc/3J1W66pj/fdsffsf.jpg');
+      background-size: cover;
+      background-position: center
+    }
 
-    .reveal-on-scroll{opacity:0;transform:translateY(30px);transition:opacity .8s ease-out,transform .8s ease-out;transition-delay:var(--delay,0ms)}
-    .reveal-on-scroll.is-visible{opacity:1;transform:translateY(0)}
+    .hero-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-color: rgba(0, 74, 111, .7);
+      z-index: 1
+    }
 
-    #header-container,#header-logo,#header-company-name,#main-nav,#mobile-menu-button{transition:all .5s cubic-bezier(.65,0,.35,1)}
-    #header-container{justify-content:space-between}
-    #main-header .max-w-6xl{text-align:center}
-    .header-scrolled #main-nav,.header-scrolled #mobile-menu-button{opacity:0;max-width:0;padding:0;margin:0;flex-basis:0;overflow:hidden}
-    .header-scrolled #header-container{display:inline-flex;justify-content:center;padding-inline:1rem}
-    .header-scrolled #header-logo{height:1.75rem}
-    .header-scrolled #header-company-name{font-size:1.125rem}
+    .hero-content {
+      position: relative;
+      z-index: 2
+    }
+
+    .text-shadow {
+      text-shadow: 0 1px 3px rgba(0, 0, 0, .1), 0 1px 2px rgba(0, 0, 0, .06)
+    }
+
+    .text-shadow-md {
+      text-shadow: 0 2px 4px rgba(0, 0, 0, .2)
+    }
+
+    .reveal-on-scroll {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity .8s ease-out, transform .8s ease-out;
+      transition-delay: var(--delay, 0ms)
+    }
+
+    .reveal-on-scroll.is-visible {
+      opacity: 1;
+      transform: translateY(0)
+    }
+
+    #header-container,
+    #header-logo,
+    #header-company-name,
+    #main-nav,
+    #mobile-menu-button {
+      transition: all .5s cubic-bezier(.65, 0, .35, 1)
+    }
+
+    #header-container {
+      justify-content: space-between
+    }
+
+    #main-header .max-w-6xl {
+      text-align: center
+    }
+
+    .header-scrolled #main-nav,
+    .header-scrolled #mobile-menu-button {
+      opacity: 0;
+      max-width: 0;
+      padding: 0;
+      margin: 0;
+      flex-basis: 0;
+      overflow: hidden
+    }
+
+    .header-scrolled #header-container {
+      display: inline-flex;
+      justify-content: center;
+      padding-inline: 1rem
+    }
+
+    .header-scrolled #header-logo {
+      height: 1.75rem
+    }
+
+    .header-scrolled #header-company-name {
+      font-size: 1.125rem
+    }
 
     /* Galéria kártya */
-    .dekor-card{ position:relative; overflow:hidden; border-radius:14px; }
-    .dekor-card img{ width:100%; height:100%; object-fit:cover; display:block; transition: transform .5s ease; }
-    .dekor-card:hover img{ transform: scale(1.05); }
-    .dekor-card .overlay{ position:absolute; inset:0; background:rgba(0,0,0,0); transition: background .35s ease; }
-    .dekor-card:hover .overlay{ background:rgba(0,0,0,.22); }
-    .aspect-4-3{ aspect-ratio: 4/3; }
+    .dekor-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 14px;
+    }
+
+    .dekor-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform .5s ease;
+    }
+
+    .dekor-card:hover img {
+      transform: scale(1.05);
+    }
+
+    .dekor-card .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0);
+      transition: background .35s ease;
+    }
+
+    .dekor-card:hover .overlay {
+      background: rgba(0, 0, 0, .22);
+    }
+
+    .aspect-4-3 {
+      aspect-ratio: 4/3;
+    }
 
     /* Mobil „Több…” logika */
-    @media (max-width: 639px){ .mobile-hidden{ display: none !important; } }
+    @media (max-width: 639px) {
+      .mobile-hidden {
+        display: none !important;
+      }
+    }
 
     /* Scroll-lock helper a lightboxhoz */
-    .lock-scroll { overflow: hidden !important; }
+    .lock-scroll {
+      overflow: hidden !important;
+    }
 
     /* --- Z-index fixek a térkép ellen --- */
-    .leaflet-container,.leaflet-pane,.leaflet-top,.leaflet-bottom { z-index: 0 !important; }
+    .leaflet-container,
+    .leaflet-pane,
+    .leaflet-top,
+    .leaflet-bottom {
+      z-index: 0 !important;
+    }
 
     /* ************ KRITIKUS: kényszerített 2 oszlop mobilon ************ */
     /* Felülírja a components.css bármely #gallery-container beállítását */
-    #gallery-container{
-      display:grid !important;
-      grid-template-columns: repeat(2, minmax(0,1fr)) !important; /* 2 oszlop TELÓN */
+    #gallery-container {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      /* 2 oszlop TELÓN */
       gap: .75rem !important;
     }
-    @media (min-width:640px){
-      #gallery-container{ grid-template-columns: repeat(3, minmax(0,1fr)) !important; }
+
+    @media (min-width:640px) {
+      #gallery-container {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      }
     }
-    @media (min-width:1024px){
-      #gallery-container{ grid-template-columns: repeat(4, minmax(0,1fr)) !important; }
+
+    @media (min-width:1024px) {
+      #gallery-container {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+      }
     }
   </style>
 </head>
@@ -87,31 +200,46 @@
   <!-- Header -->
   <header id="main-header" class="fixed top-0 left-0 right-0 z-[1500] p-4">
     <div class="max-w-6xl mx-auto">
-      <div id="header-container" class="bg-white/80 backdrop-blur-xl shadow-lg rounded-full px-4 sm:px-6 py-2 flex items-center">
+      <div id="header-container"
+        class="bg-white/80 backdrop-blur-xl shadow-lg rounded-full px-4 sm:px-6 py-2 flex items-center">
         <a href="/" class="flex items-center">
           <img id="header-logo" src="https://i.postimg.cc/xTYhg4gG/image.png" alt="Cég logó" class="h-8 mr-2 sm:mr-3">
-          <span id="header-company-name" class="text-base sm:text-xl font-bold text-yellow-600 text-shadow-md">Eszes Tiszta Klíma Kft.</span>
+          <span id="header-company-name" class="text-base sm:text-xl font-bold text-yellow-600 text-shadow-md">Eszes
+            Tiszta Klíma Kft.</span>
         </a>
 
         <nav id="main-nav" class="hidden md:flex items-center space-x-2">
-          <a href="/klima-dekor" class="text-gray-700 hover:text-cyan-700 px-5 py-2 rounded-full font-semibold">Klíma Dekor</a>
-          <a href="/szolgaltatasok" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Szolgáltatások</a>
-          <a href="/munkaink" class="bg-cyan-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-cyan-700 transition duration-300 shadow-md text-shadow-md">Munkáink</a>
-          <a href="/rolunk" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Rólunk</a>
-          <a href="/kapcsolat" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Kapcsolat</a>
+          <a href="/klima-dekor.html"
+            class="text-gray-700 hover:text-cyan-700 px-5 py-2 rounded-full font-semibold">Klíma Dekor</a>
+          <a href="/szolgaltatasok.html"
+            class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Szolgáltatások</a>
+          <a href="/munkaink.html"
+            class="bg-cyan-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-cyan-700 transition duration-300 shadow-md text-shadow-md">Munkáink</a>
+          <a href="/rolunk.html"
+            class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Rólunk</a>
+          <a href="/kapcsolat.html"
+            class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full transition duration-300 font-semibold text-shadow">Kapcsolat</a>
         </nav>
 
         <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+          </svg>
         </button>
       </div>
 
-      <div id="mobile-menu" class="hidden md:hidden bg-white/90 backdrop-blur-lg mt-2 rounded-2xl shadow-lg overflow-hidden">
-        <a href="/klima-dekor" class="block text-center py-3 px-4 text-sm text-gray-700 font-semibold hover:text-cyan-700">Klíma Dekor</a>
-        <a href="/szolgaltatasok" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Szolgáltatások</a>
-        <a href="/munkaink" class="block text-center py-3 px-4 text-sm bg-cyan-600 text-white font-semibold hover:bg-cyan-700">Munkáink</a>
-        <a href="/rolunk" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Rólunk</a>
-        <a href="/kapcsolat" class="block text-center py-4 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Kapcsolat</a>
+      <div id="mobile-menu"
+        class="hidden md:hidden bg-white/90 backdrop-blur-lg mt-2 rounded-2xl shadow-lg overflow-hidden">
+        <a href="/klima-dekor.html"
+          class="block text-center py-3 px-4 text-sm text-gray-700 font-semibold hover:text-cyan-700">Klíma Dekor</a>
+        <a href="/szolgaltatasok.html"
+          class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Szolgáltatások</a>
+        <a href="/munkaink.html"
+          class="block text-center py-3 px-4 text-sm bg-cyan-600 text-white font-semibold hover:bg-cyan-700">Munkáink</a>
+        <a href="/rolunk.html"
+          class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Rólunk</a>
+        <a href="/kapcsolat.html"
+          class="block text-center py-4 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Kapcsolat</a>
       </div>
     </div>
   </header>
@@ -120,9 +248,15 @@
     <!-- Hero -->
     <section class="hero-bg text-white relative overflow-hidden">
       <div class="hero-content container mx-auto px-6 pt-28 pb-12 md:pt-32 md:pb-14 text-center">
-        <h1 class="text-3xl md:text-5xl font-black leading-tight mb-3 reveal-on-scroll">Aktuális Munkáink</h1>
-        <p class="text-base md:text-lg max-w-3xl mx-auto text-gray-100 reveal-on-scroll" style="--delay:140ms">
-          Valódi helyszínek, valódi eredmények – nézd meg referenciáinkat és a térképet, hol jártunk már.
+        <h1 class="text-3xl md:text-5xl font-black leading-tight mb-3 reveal-on-scroll">
+          <span class="bg-clip-text text-transparent bg-gradient-to-r from-cyan-200 to-blue-400">Aktuális</span>
+          <span
+            class="bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 to-yellow-500 drop-shadow-[0_0_10px_rgba(234,179,8,0.3)]">Munkáink</span>
+        </h1>
+        <p class="text-base md:text-lg max-w-3xl mx-auto text-cyan-50 reveal-on-scroll" style="--delay:140ms">
+          <span class="text-cyan-200 font-bold">Valódi helyszínek</span>, <span
+            class="text-yellow-400 font-extrabold drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]">valódi eredmények</span> –
+          nézd meg referenciáinkat és a térképet, hol jártunk már.
         </p>
       </div>
     </section>
@@ -130,7 +264,8 @@
     <!-- Galéria – TELÓ: 2 oszlop, ≥4 képnél „Több…” -->
     <section class="py-16 bg-gradient-to-b from-cyan-50 to-white">
       <div class="container mx-auto px-6">
-        <div class="max-w-6xl mx-auto bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-cyan-900/5 p-6 md:p-8">
+        <div
+          class="max-w-6xl mx-auto bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-cyan-900/5 p-6 md:p-8">
           <h2 class="text-2xl md:text-3xl font-black text-cyan-800 mb-6 text-center reveal-on-scroll">Galéria</h2>
 
           <!-- Rács (2 oszlop mobilon – CSS kényszeríti) -->
@@ -144,6 +279,14 @@
               class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 text-cyan-800 font-semibold shadow-md active:scale-[0.98]">
               <span class="i">▼</span> <span class="t">Több…</span>
             </button>
+          </div>
+
+          <!-- Extra CTA Button -->
+          <div class="text-center mt-8 reveal-on-scroll">
+            <a href="tel:+36709304841"
+              class="inline-flex items-center gap-2 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-6 py-3 rounded-full shadow transition-transform transform hover:scale-105">
+              <i class="fa-solid fa-phone"></i> Hívjon most: +36 70 930 4841
+            </a>
           </div>
         </div>
       </div>
@@ -182,7 +325,8 @@
           </div>
         </div>
         <div class="text-center mt-8">
-          <a href="tel:+36709304841" class="inline-flex items-center gap-2 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-6 py-3 rounded-full shadow">
+          <a href="tel:+36709304841"
+            class="inline-flex items-center gap-2 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-6 py-3 rounded-full shadow">
             <i class="fa-solid fa-phone"></i> Hívjon most: +36 70 930 4841
           </a>
         </div>
@@ -195,8 +339,10 @@
     <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
     <div class="relative w-full h-full flex items-center justify-center p-4">
       <div id="lightbox-content" class="relative max-w-4xl max-h-[90vh] w-full">
-        <button id="close-lightbox" aria-label="Bezárás" class="absolute -top-2 -right-2 md:-top-4 md:-right-4 text-white text-3xl leading-none bg-black/50 rounded-full w-10 h-10 flex items-center justify-center">&times;</button>
-        <img id="lightbox-image" src="" alt="" class="max-w-full max-h-[75vh] mx-auto rounded-lg shadow-2xl select-none">
+        <button id="close-lightbox" aria-label="Bezárás"
+          class="absolute -top-2 -right-2 md:-top-4 md:-right-4 text-white text-3xl leading-none bg-black/50 rounded-full w-10 h-10 flex items-center justify-center">&times;</button>
+        <img id="lightbox-image" src="" alt=""
+          class="max-w-full max-h-[75vh] mx-auto rounded-lg shadow-2xl select-none">
         <div id="lightbox-caption" class="text-center text-white mt-4">
           <h4 id="lightbox-title" class="text-xl font-bold"></h4>
           <p id="lightbox-description" class="text-white/80"></p>
@@ -209,14 +355,17 @@
   <footer class="bg-gray-800 text-white py-10">
     <div class="container mx-auto px-6 text-center">
       <p class="text-xl font-bold text-white mb-2">Eszes Tiszta Klíma Kft.</p>
-      <p class="text-gray-400">&copy; 2025 Minden jog fenntartva.</p>
+      <p class="text-gray-400">&copy; 2026 Minden jog fenntartva.</p>
       <p class="text-sm text-gray-500 mt-4">Powered by: Berceli Bence</p>
     </div>
   </footer>
 
   <!-- „Fel” gomb -->
-  <a href="#" id="to-top-button" class="fixed bottom-5 right-5 z-[1600] w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg hover:bg-yellow-500 transition-all duration-300 opacity-0 translate-y-5">
-    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+  <a href="#" id="to-top-button"
+    class="fixed bottom-5 right-5 z-[1600] w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg hover:bg-yellow-500 transition-all duration-300 opacity-0 translate-y-5">
+    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+    </svg>
   </a>
 
   <!-- FAQ strukturált adat -->
@@ -242,37 +391,37 @@
 
   <script>
     // Mobil menü
-    const mobileMenuButton=document.getElementById('mobile-menu-button');
-    const mobileMenu=document.getElementById('mobile-menu');
-    mobileMenuButton?.addEventListener('click',()=>mobileMenu.classList.toggle('hidden'));
-    mobileMenu?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>mobileMenu.classList.add('hidden')));
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuButton?.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    mobileMenu?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileMenu.classList.add('hidden')));
 
     // Scroll animáció
-    function initializeScrollAnimation(){
-      const obs=new IntersectionObserver((entries)=>{
-        entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('is-visible'); obs.unobserve(e.target);} });
-      },{threshold:.1});
-      document.querySelectorAll('.reveal-on-scroll').forEach(el=>obs.observe(el));
+    function initializeScrollAnimation() {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); obs.unobserve(e.target); } });
+      }, { threshold: .1 });
+      document.querySelectorAll('.reveal-on-scroll').forEach(el => obs.observe(el));
     }
     initializeScrollAnimation();
 
     // Header zsugor + „fel” gomb
-    const toTopButton=document.getElementById('to-top-button');
-    const header=document.getElementById('main-header');
-    window.addEventListener('scroll',()=>{
-      header.classList.toggle('header-scrolled',window.scrollY>50);
-      if(window.scrollY>window.innerHeight/2){ toTopButton.classList.remove('opacity-0','translate-y-5'); }
-      else { toTopButton.classList.add('opacity-0','translate-y-5'); }
+    const toTopButton = document.getElementById('to-top-button');
+    const header = document.getElementById('main-header');
+    window.addEventListener('scroll', () => {
+      header.classList.toggle('header-scrolled', window.scrollY > 50);
+      if (window.scrollY > window.innerHeight / 2) { toTopButton.classList.remove('opacity-0', 'translate-y-5'); }
+      else { toTopButton.classList.add('opacity-0', 'translate-y-5'); }
     });
 
     // ===== Galéria betöltés – TELÓ: 2 oszlop, >=4 -> Több… =====
     window.addEventListener('DOMContentLoaded', () => {
-      fetch('/data/gallery.json', {cache: 'no-store'})
+      fetch('/data/gallery.json', { cache: 'no-store' })
         .then(r => r.json())
         .then(data => {
-          const grid=document.getElementById('gallery-container');
-          const wrap=document.getElementById('gallery-toggle-wrap');
-          const btn=document.getElementById('gallery-toggle-btn');
+          const grid = document.getElementById('gallery-container');
+          const wrap = document.getElementById('gallery-toggle-wrap');
+          const btn = document.getElementById('gallery-toggle-btn');
           grid.innerHTML = '';
 
           if (data.images?.length) {
@@ -280,11 +429,11 @@
 
             data.images.forEach((item, i) => {
               const title = item.title || item.cim || '';
-              const desc  = item.description || item.leiras || '';
+              const desc = item.description || item.leiras || '';
 
               const card = document.createElement('div');
               card.className = 'dekor-card cursor-pointer reveal-on-scroll';
-              card.style.setProperty('--delay', `${i*80}ms`);
+              card.style.setProperty('--delay', `${i * 80}ms`);
               card.setAttribute('data-src', safe(item.image));
               card.setAttribute('data-title', safe(title));
               card.setAttribute('data-description', safe(desc));
@@ -303,42 +452,42 @@
             const ttlEl = document.getElementById('lightbox-title');
             const dscEl = document.getElementById('lightbox-description');
             const contentEl = document.getElementById('lightbox-content');
-            function openLB(src, title, desc){
+            function openLB(src, title, desc) {
               imgEl.src = src || '';
               ttlEl.textContent = title || '';
               dscEl.textContent = desc || '';
               modal.classList.remove('hidden');
               document.body.classList.add('lock-scroll');
             }
-            function closeLB(){
+            function closeLB() {
               modal.classList.add('hidden');
               imgEl.src = '';
               document.body.classList.remove('lock-scroll');
             }
-            document.querySelectorAll('.dekor-card').forEach(card=>{
-              card.addEventListener('click',()=>{
+            document.querySelectorAll('.dekor-card').forEach(card => {
+              card.addEventListener('click', () => {
                 const src = card.getAttribute('data-src');
                 const title = card.getAttribute('data-title') || '';
-                const desc  = card.getAttribute('data-description') || '';
-                if (typeof window.openLightbox === 'function'){
+                const desc = card.getAttribute('data-description') || '';
+                if (typeof window.openLightbox === 'function') {
                   window.openLightbox(src, title, desc);
                   document.body.classList.add('lock-scroll');
                 } else {
-                  openLB(src,title,desc);
+                  openLB(src, title, desc);
                 }
               });
             });
             document.getElementById('close-lightbox')?.addEventListener('click', closeLB);
-            document.getElementById('lightbox')?.addEventListener('click', e=>{
+            document.getElementById('lightbox')?.addEventListener('click', e => {
               if (!contentEl.contains(e.target)) closeLB();
             });
-            document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeLB(); });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLB(); });
 
             // Mobil „Több…/Kevesebb…”
             const isMobile = window.matchMedia('(max-width: 639px)');
             const items = Array.from(document.querySelectorAll('.dekor-card'));
 
-            function applyMobileClamp(expanded){
+            function applyMobileClamp(expanded) {
               if (isMobile.matches && items.length >= 4) {
                 items.slice(4).forEach(el => el.classList.toggle('mobile-hidden', !expanded));
                 wrap.classList.remove('hidden');
@@ -349,7 +498,7 @@
             }
 
             let expanded = false;
-            btn.addEventListener('click',(e)=>{
+            btn.addEventListener('click', (e) => {
               e.preventDefault();
               expanded = !expanded;
               applyMobileClamp(expanded);
@@ -358,7 +507,7 @@
                 : '<span class="i">▼</span> <span class="t">Több…</span>';
             });
 
-            isMobile.addEventListener('change', ()=>applyMobileClamp(expanded));
+            isMobile.addEventListener('change', () => applyMobileClamp(expanded));
             applyMobileClamp(expanded);
 
             initializeScrollAnimation();
@@ -368,10 +517,11 @@
           }
         })
         .catch(() => {
-          const grid=document.getElementById('gallery-container');
+          const grid = document.getElementById('gallery-container');
           grid.innerHTML = '<p class="text-center col-span-full text-red-500">Hiba történt a galéria betöltése közben.</p>';
         });
     });
   </script>
 </body>
+
 </html>

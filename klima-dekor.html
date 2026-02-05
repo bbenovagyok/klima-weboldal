@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="hu" class="scroll-smooth">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Klíma Dekor | Eszes Tiszta Klíma Kft.</title>
 
   <!-- Primary SEO -->
-  <meta name="description" content="Klíma dekor megoldások Siófokon és ~150 km-es körzetben: dekorcső, kábelcsatorna, burkolat és takarás kültéri-beltéri klímákhoz. Inspirációk galériában." />
+  <meta name="description"
+    content="Klíma dekor megoldások Siófokon és ~150 km-es körzetben: dekorcső, kábelcsatorna, burkolat és takarás kültéri-beltéri klímákhoz. Inspirációk galériában." />
   <link rel="canonical" href="https://eszestisztaklima.hu/klima-dekor" />
 
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Klíma Dekor | Eszes Tiszta Klíma Kft." />
-  <meta property="og:description" content="Esztétikus klíma dekor Siófokon és környékén: dekorcső, burkolatok, kábelcsatorna. Nézd meg a galériát!" />
+  <meta property="og:description"
+    content="Esztétikus klíma dekor Siófokon és környékén: dekorcső, burkolatok, kábelcsatorna. Nézd meg a galériát!" />
   <meta property="og:url" content="https://eszestisztaklima.hu/klima-dekor" />
   <meta property="og:image" content="https://i.postimg.cc/xTYhg4gG/image.png" />
 
@@ -29,44 +32,158 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
   <!-- Saját komponens-stílusok (árnyékok, kerekítések egységesítése) -->
   <link rel="stylesheet" href="/css/components.css" />
 
   <style>
-    body{font-family:'Inter',sans-serif}
-    /* Hero – kisebb magasság, kifinomult */
-    .hero-bg{position:relative;background-image:url('https://i.postimg.cc/3J1W66pj/fdsffsf.jpg');background-size:cover;background-position:center}
-    .hero-bg::before{content:'';position:absolute;inset:0;background-color:rgba(0,74,111,.70);z-index:1}
-    .hero-content{position:relative;z-index:2}
+    body {
+      font-family: 'Inter', sans-serif
+    }
 
-    .reveal-on-scroll{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;transition-delay:var(--delay,0ms)}
-    .reveal-on-scroll.is-visible{opacity:1;transform:translateY(0)}
+    /* Hero – kisebb magasság, kifinomult */
+    .hero-bg {
+      position: relative;
+      background-image: url('https://i.postimg.cc/3J1W66pj/fdsffsf.jpg');
+      background-size: cover;
+      background-position: center
+    }
+
+    .hero-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-color: rgba(0, 74, 111, .70);
+      z-index: 1
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2
+    }
+
+    .reveal-on-scroll {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity .6s ease, transform .6s ease;
+      transition-delay: var(--delay, 0ms)
+    }
+
+    .reveal-on-scroll.is-visible {
+      opacity: 1;
+      transform: translateY(0)
+    }
 
     /* Galéria kártya – csak kép, hover animáció */
-    .dekor-card{position:relative;border-radius:16px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.12);transition:transform .35s ease, box-shadow .35s ease}
-    .dekor-card img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .35s ease}
-    .dekor-card:hover{transform:translateY(-4px);box-shadow:0 16px 34px rgba(0,0,0,.18)}
-    .dekor-card:hover img{transform:scale(1.03)}
-    .aspect-4-3{aspect-ratio:4/3;background:#f3f4f6}
+    .dekor-card {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
+      transition: transform .35s ease, box-shadow .35s ease
+    }
+
+    .dekor-card img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .35s ease
+    }
+
+    .dekor-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 34px rgba(0, 0, 0, .18)
+    }
+
+    .dekor-card:hover img {
+      transform: scale(1.03)
+    }
+
+    .aspect-4-3 {
+      aspect-ratio: 4/3;
+      background: #f3f4f6
+    }
 
     /* Lightbox */
-    #lightbox{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:saturate(120%) blur(2px);display:none;align-items:center;justify-content:center;z-index:110}
-    #lightbox.show{display:flex}
-    #lightbox-content{max-width:min(1100px,92vw);max-height:min(88vh,92vh);width:100%;padding:12px}
-    #lightbox-image{display:block;max-width:100%;max-height:80vh;margin:0 auto;border-radius:14px;box-shadow:0 18px 48px rgba(0,0,0,.45);opacity:0;transform:scale(.98);transition:opacity .25s ease, transform .25s ease}
-    #lightbox.show #lightbox-image{opacity:1;transform:scale(1)}
-    #close-lightbox{position:absolute;top:10px;right:16px;background:transparent;border:none;font-size:40px;line-height:1;color:#fff;cursor:pointer;opacity:.9}
-    #close-lightbox:hover{opacity:1}
-    .no-scroll{overflow:hidden;height:100vh}
+    #lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .82);
+      backdrop-filter: saturate(120%) blur(2px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 110
+    }
+
+    #lightbox.show {
+      display: flex
+    }
+
+    #lightbox-content {
+      max-width: min(1100px, 92vw);
+      max-height: min(88vh, 92vh);
+      width: 100%;
+      padding: 12px
+    }
+
+    #lightbox-image {
+      display: block;
+      max-width: 100%;
+      max-height: 80vh;
+      margin: 0 auto;
+      border-radius: 14px;
+      box-shadow: 0 18px 48px rgba(0, 0, 0, .45);
+      opacity: 0;
+      transform: scale(.98);
+      transition: opacity .25s ease, transform .25s ease
+    }
+
+    #lightbox.show #lightbox-image {
+      opacity: 1;
+      transform: scale(1)
+    }
+
+    #close-lightbox {
+      position: absolute;
+      top: 10px;
+      right: 16px;
+      background: transparent;
+      border: none;
+      font-size: 40px;
+      line-height: 1;
+      color: #fff;
+      cursor: pointer;
+      opacity: .9
+    }
+
+    #close-lightbox:hover {
+      opacity: 1
+    }
+
+    .no-scroll {
+      overflow: hidden;
+      height: 100vh
+    }
 
     /* Mobil clamp helper */
-    @media (max-width:639px){ .mobile-hidden{display:none!important} }
+    @media (max-width:639px) {
+      .mobile-hidden {
+        display: none !important
+      }
+    }
 
     /* CTA gomb (sárga) */
-    .cta-yellow{ background:#FACC15; color:#111827; }
-    .cta-yellow:hover{ filter:brightness(0.98); }
+    .cta-yellow {
+      background: #FACC15;
+      color: #111827;
+    }
+
+    .cta-yellow:hover {
+      filter: brightness(0.98);
+    }
   </style>
 
   <!-- JSON-LD -->
@@ -83,36 +200,53 @@
   }
   </script>
 </head>
+
 <body class="bg-gray-100 text-gray-800">
 
   <!-- Header -->
   <header id="main-header" class="fixed top-0 left-0 right-0 z-50 p-4">
     <div class="max-w-6xl mx-auto">
-      <div id="header-container" class="bg-white/80 backdrop-blur-xl shadow-lg rounded-full px-4 sm:px-6 py-2 flex items-center justify-between">
+      <div id="header-container"
+        class="bg-white/80 backdrop-blur-xl shadow-lg rounded-full px-4 sm:px-6 py-2 flex items-center justify-between">
         <a href="/" class="flex items-center">
           <img id="header-logo" src="https://i.postimg.cc/xTYhg4gG/image.png" alt="Cég logó" class="h-8 mr-2 sm:mr-3">
-          <span id="header-company-name" class="text-base sm:text-xl font-bold text-yellow-600">Eszes Tiszta Klíma Kft.</span>
+          <span id="header-company-name" class="text-base sm:text-xl font-bold text-yellow-600">Eszes Tiszta Klíma
+            Kft.</span>
         </a>
 
         <nav id="main-nav" class="hidden md:flex items-center space-x-2">
-          <a href="/klima-dekor" class="bg-cyan-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-cyan-700">Klíma Dekor</a>
-          <a href="/szolgaltatasok" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full font-semibold">Szolgáltatások</a>
-          <a href="/munkaink" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full font-semibold">Munkáink</a>
-          <a href="/rolunk" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full font-semibold">Rólunk</a>
-          <a href="/kapcsolat" class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full font-semibold">Kapcsolat</a>
+          <a href="/klima-dekor.html"
+            class="bg-cyan-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-cyan-700">Klíma Dekor</a>
+          <a href="/szolgaltatasok.html"
+            class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full font-semibold">Szolgáltatások</a>
+          <a href="/munkaink.html"
+            class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full font-semibold">Munkáink</a>
+          <a href="/rolunk.html"
+            class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full font-semibold">Rólunk</a>
+          <a href="/kapcsolat.html"
+            class="text-gray-700 hover:text-cyan-700 px-4 py-2 rounded-full font-semibold">Kapcsolat</a>
         </nav>
 
         <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+          </svg>
         </button>
       </div>
 
-      <div id="mobile-menu" class="hidden md:hidden bg-white/90 backdrop-blur-lg mt-2 rounded-2xl shadow-lg overflow-hidden">
-        <a href="/klima-dekor" class="block text-center py-3 px-4 text-sm bg-cyan-600 text-white font-semibold hover:bg-cyan-700">Klíma Dekor</a>
-        <a href="/szolgaltatasok" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Szolgáltatások</a>
-        <a href="/munkaink" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Munkáink</a>
-        <a href="/rolunk" class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Rólunk</a>
-        <a href="/kapcsolat" class="block text-center py-4 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Kapcsolat</a>
+      <div id="mobile-menu"
+        class="hidden md:hidden bg-white/90 backdrop-blur-lg mt-2 rounded-2xl shadow-lg overflow-hidden">
+        <a href="/klima-dekor.html"
+          class="block text-center py-3 px-4 text-sm bg-cyan-600 text-white font-semibold hover:bg-cyan-700">Klíma
+          Dekor</a>
+        <a href="/szolgaltatasok.html"
+          class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Szolgáltatások</a>
+        <a href="/munkaink.html"
+          class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Munkáink</a>
+        <a href="/rolunk.html"
+          class="block text-center py-3 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Rólunk</a>
+        <a href="/kapcsolat.html"
+          class="block text-center py-4 px-4 text-sm text-gray-600 hover:bg-cyan-50 font-semibold">Kapcsolat</a>
       </div>
     </div>
   </header>
@@ -121,10 +255,20 @@
     <!-- Hero (kisebb) -->
     <section class="hero-bg text-white relative overflow-hidden">
       <div class="hero-content container mx-auto px-6 pt-28 pb-12 md:pt-32 md:pb-14 text-center">
-        <h1 class="text-3xl md:text-5xl font-black leading-tight mb-3 reveal-on-scroll">Klíma Dekor – esztétikus megoldások</h1>
+        <h1 class="text-3xl md:text-5xl font-black leading-tight mb-3 reveal-on-scroll">
+          <span class="bg-clip-text text-transparent bg-gradient-to-r from-cyan-200 to-blue-400">Egyedi klíma</span>
+          <span class="text-white">–</span>
+          <span
+            class="bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 to-yellow-500 drop-shadow-[0_0_10px_rgba(234,179,8,0.3)]">az
+            otthonod dísze</span>
+        </h1>
         <p class="text-base md:text-lg max-w-3xl mx-auto text-cyan-50 reveal-on-scroll" style="--delay:140ms">
-          Szép kivitelezés, rendezett burkolatok és dekorcsövek –
-          <strong>Siófokon és ~150&nbsp;km-es körzetében</strong>.
+          Nem találod az igazit? Álmodd meg <span
+            class="text-yellow-400 font-extrabold drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]">egyedi megjelenésű
+            klímádat</span>, mi megvalósítjuk!
+          <br class="hidden md:block">
+          Kérj ajánlatot <span class="text-white font-bold border-b-2 border-cyan-400 pb-0.5">Siófokon és
+            ~150&nbsp;km-es körzetében</span>.
         </p>
       </div>
     </section>
@@ -144,7 +288,7 @@
     <section class="pb-16">
       <div class="container mx-auto px-6 text-center">
         <a href="tel:+36709304841"
-           class="inline-flex items-center gap-3 px-6 py-3 rounded-full font-bold shadow-xl cta-yellow">
+          class="inline-flex items-center gap-3 px-6 py-3 rounded-full font-bold shadow-xl cta-yellow">
           <i class="fa-solid fa-phone"></i>
           +36 70 930 4841
         </a>
@@ -164,37 +308,38 @@
   <footer class="bg-gray-900 text-white py-10">
     <div class="container mx-auto px-6 text-center">
       <p class="text-xl font-bold">Eszes Tiszta Klíma Kft.</p>
-      <p class="text-gray-400">&copy; 2025 Minden jog fenntartva.</p>
-      <p class="text-gray-400 mt-3">Bázis: <strong>Siófok</strong> – kiszállás a Balaton térségében és ~150 km-es körzetben.</p>
+      <p class="text-gray-400">&copy; 2026 Minden jog fenntartva.</p>
+      <p class="text-gray-400 mt-3">Bázis: <strong>Siófok</strong> – kiszállás a Balaton térségében és ~150 km-es
+        körzetben.</p>
       <p class="text-gray-500 mt-2 text-sm">Powered by: Berceli Bence</p>
     </div>
   </footer>
 
   <script>
     // Mobil menü
-    const mobileMenuButton=document.getElementById('mobile-menu-button');
-    const mobileMenu=document.getElementById('mobile-menu');
-    mobileMenuButton?.addEventListener('click',()=>mobileMenu.classList.toggle('hidden'));
-    mobileMenu?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>mobileMenu.classList.add('hidden')));
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuButton?.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    mobileMenu?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileMenu.classList.add('hidden')));
 
     // Scroll animáció
-    function initializeScrollAnimation(){
-      const obs=new IntersectionObserver((entries)=>{
-        entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('is-visible'); obs.unobserve(e.target);} });
-      },{threshold:.1});
-      document.querySelectorAll('.reveal-on-scroll').forEach(el=>obs.observe(el));
+    function initializeScrollAnimation() {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); obs.unobserve(e.target); } });
+      }, { threshold: .1 });
+      document.querySelectorAll('.reveal-on-scroll').forEach(el => obs.observe(el));
     }
     initializeScrollAnimation();
 
     // Lightbox implementáció – görgetés tiltása megnyitáskor
-    (function(){
+    (function () {
       const overlay = document.getElementById('lightbox');
       const img = document.getElementById('lightbox-image');
       const btnClose = document.getElementById('close-lightbox');
       let unlockScroll;
 
-      function openLightbox(src){
-        if(!src) return;
+      function openLightbox(src) {
+        if (!src) return;
         img.src = src;
         overlay.classList.add('show');
         // scroll lock
@@ -209,7 +354,7 @@
         };
         overlay.setAttribute('aria-hidden', 'false');
       }
-      function closeLightbox(){
+      function closeLightbox() {
         overlay.classList.remove('show');
         overlay.setAttribute('aria-hidden', 'true');
         img.removeAttribute('src');
@@ -219,11 +364,11 @@
       // export a globális függvény (ha más oldalak is hívnák)
       window.openLightbox = openLightbox;
 
-      overlay.addEventListener('click', (e)=>{
+      overlay.addEventListener('click', (e) => {
         if (e.target === overlay) closeLightbox(); // háttérre kattintás
       });
       btnClose.addEventListener('click', closeLightbox);
-      document.addEventListener('keydown', (e)=>{
+      document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeLightbox();
       });
     })();
@@ -236,24 +381,24 @@
           const wrap = document.getElementById('gallery-container');
           wrap.innerHTML = '';
 
-          if (!data?.images?.length){
+          if (!data?.images?.length) {
             wrap.innerHTML = '<p class="col-span-full text-center text-gray-600">Jelenleg nincsenek dekor képek feltöltve.</p>';
             return;
           }
 
           const safe = s => String(s ?? '').replace(/"/g, '&quot;');
-          data.images.forEach((item,i)=>{
+          data.images.forEach((item, i) => {
             const card = document.createElement('button');
             card.type = 'button';
             card.className = 'dekor-card reveal-on-scroll';
-            card.style.setProperty('--delay', `${i*70}ms`);
-            card.setAttribute('aria-label','Kép megnyitása');
+            card.style.setProperty('--delay', `${i * 70}ms`);
+            card.setAttribute('aria-label', 'Kép megnyitása');
             card.innerHTML = `
               <div class="aspect-4-3">
                 <img src="${safe(item.image)}" alt="${safe(item.title || 'Klíma dekor kép')}" loading="lazy" referrerpolicy="no-referrer">
               </div>
             `;
-            card.addEventListener('click', ()=> {
+            card.addEventListener('click', () => {
               window.openLightbox(safe(item.image));
             });
             wrap.appendChild(card);
@@ -264,7 +409,7 @@
           const items = Array.from(document.querySelectorAll('.dekor-card'));
           const moreThanFour = items.length > 4;
 
-          if (moreThanFour){
+          if (moreThanFour) {
             let expanded = false;
             const toggleWrap = document.createElement('div');
             toggleWrap.className = 'mt-4 text-center sm:hidden';
@@ -274,17 +419,17 @@
             toggleWrap.appendChild(btn);
             wrap.after(toggleWrap);
 
-            function applyMobileClamp(){
-              if (isMobile.matches){
-                items.slice(4).forEach(el=>el.classList.toggle('mobile-hidden', !expanded));
+            function applyMobileClamp() {
+              if (isMobile.matches) {
+                items.slice(4).forEach(el => el.classList.toggle('mobile-hidden', !expanded));
                 toggleWrap.classList.remove('hidden');
               } else {
-                items.forEach(el=>el.classList.remove('mobile-hidden'));
+                items.forEach(el => el.classList.remove('mobile-hidden'));
                 expanded = true;
                 toggleWrap.classList.add('hidden');
               }
             }
-            btn.addEventListener('click', (e)=>{
+            btn.addEventListener('click', (e) => {
               e.preventDefault(); e.stopPropagation();
               expanded = !expanded;
               applyMobileClamp();
@@ -296,11 +441,12 @@
 
           initializeScrollAnimation();
         })
-        .catch(()=>{
+        .catch(() => {
           document.getElementById('gallery-container').innerHTML =
             '<p class="col-span-full text-center text-red-500">Hiba történt a dekor galéria betöltésekor.</p>';
         });
     });
   </script>
 </body>
+
 </html>
