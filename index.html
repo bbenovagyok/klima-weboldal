@@ -680,10 +680,6 @@
       <button id="close-lightbox" aria-label="Bezárás"
         class="absolute -top-2 right-2 text-white text-4xl leading-none">&times;</button>
       <img id="lightbox-image" src="" alt="" class="max-w-full max-h-[75vh] mx-auto rounded-lg shadow-2xl">
-      <div id="lightbox-caption" class="text-center text-white mt-4">
-        <h4 id="lightbox-title" class="text-xl font-bold"></h4>
-        <p id="lightbox-description" class="text-white/80"></p>
-      </div>
     </div>
   </div>
 
@@ -917,7 +913,7 @@
   <div id="palyazat-popup"
     class="fixed inset-0 z-[300] hidden items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity duration-300">
     <div id="palyazat-popup-content"
-      class="bg-yellow-50 rounded-xl shadow-2xl p-8 max-w-lg w-full m-4 relative transform transition-all duration-300 opacity-0 translate-y-5">
+      class="bg-yellow-50 rounded-xl shadow-2xl p-4 md:p-6 max-w-lg w-full m-4 relative transform transition-all duration-300 opacity-0 translate-y-5">
       <button id="palyazat-popup-close" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
         aria-label="Bezárás">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -925,15 +921,28 @@
         </svg>
       </button>
       <div class="text-center">
-        <h2 class="text-3xl font-bold text-yellow-800">PÁLYÁZATI LEHETŐSÉG!</h2>
-        <p class="text-4xl md:text-5xl font-black text-cyan-800 my-4">150.000 Ft kedvezmény</p>
-        <p class="text-lg text-gray-700">
+        <h2 class="text-lg md:text-2xl font-bold text-yellow-800 leading-tight">PÁLYÁZATI LEHETŐSÉG!</h2>
+        <p class="text-2xl md:text-4xl font-black text-cyan-800 my-1 md:my-2 leading-tight">150.000 Ft kedvezmény</p>
+        <p class="text-base text-gray-700 leading-snug">
           A P-HEM Klíma pályázat keretében most minden magánszemély, aki meglévő fűtési rendszerét klímás fűtéssel
           egészítené ki, bruttó 150.000 Ft kedvezményre jogosult!
         </p>
-        <p class="text-gray-600 mt-2">(A pályázatban csak Polar klímák használhatók fel.)</p>
+        <p class="text-sm text-gray-600 mt-1 mb-2">(A pályázatban csak Polar klímák használhatók fel.)</p>
+
+        <!-- Képek -->
+        <div class="grid grid-cols-3 gap-1 md:gap-3 mb-4 px-1 md:px-2">
+          <img src="img/popup/Polar_SDO25_futesprogram_landing_01.png"
+            class="w-full rounded-lg shadow-sm cursor-pointer hover:scale-105 transition-transform duration-200 border border-gray-100"
+            onclick="window.Lightbox.open(this.src)" alt="Polar SD025">
+          <img src="img/popup/Polar_SDO35_futesprogram_landing_01.png"
+            class="w-full rounded-lg shadow-sm cursor-pointer hover:scale-105 transition-transform duration-200 border border-gray-100"
+            onclick="window.Lightbox.open(this.src)" alt="Polar SD035">
+          <img src="img/popup/Polar_SDO50_futesprogram_landing_01.png"
+            class="w-full rounded-lg shadow-sm cursor-pointer hover:scale-105 transition-transform duration-200 border border-gray-100"
+            onclick="window.Lightbox.open(this.src)" alt="Polar SD050">
+        </div>
         <a href="/kapcsolat.html" id="palyazat-popup-cta"
-          class="mt-6 bg-cyan-600 text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-cyan-700 transition duration-300 shadow-lg inline-block">
+          class="mt-2 bg-cyan-600 text-white px-6 py-2 rounded-full font-bold text-base hover:bg-cyan-700 transition duration-300 shadow-lg inline-block">
           Segítünk a pályázatban!
         </a>
       </div>

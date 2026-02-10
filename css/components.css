@@ -1,5 +1,5 @@
 /* ===== Lightbox – mobil fixek ===== */
-#lightbox{ height:100vh; height:100dvh; overscroll-behavior:contain; }
+#lightbox{ height:100vh; height:100dvh; overscroll-behavior:contain; z-index: 9999; }
 html.no-scroll, body.no-scroll{ height:100%; overflow:hidden; touch-action:none; }
 #close-lightbox{
   position:fixed; top:calc(env(safe-area-inset-top,0px) + 12px); right:calc(env(safe-area-inset-right,0px) + 12px);
